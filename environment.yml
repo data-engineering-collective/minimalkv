@@ -1,0 +1,15 @@
+name: minimalkv
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python
+  - dulwich
+  - mock
+  - pytest
+  - pytest-mock
+  - pytest-xdist
+  - redis-py
+  - psycopg2
+  - six
+  - sqlalchemy

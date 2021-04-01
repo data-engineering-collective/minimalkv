@@ -2,6 +2,7 @@
 # coding=utf8
 
 import pytest
+import os
 
 sqlalchemy = pytest.importorskip('sqlalchemy')
 from sqlalchemy import create_engine, MetaData
@@ -14,9 +15,16 @@ from basic_store import BasicStore
 from conftest import ExtendedKeyspaceTests
 from simplekv.contrib import ExtendedKeyspaceMixin
 
-
-# FIXME: for local testing, this needs configurable dsns
-class TestSQLAlchemyStore(BasicStore):
+if os.environ.get("SIMPLEKV_CI", "0") == "1":
+    DSNS = [
+        ('pymysql',
+         'mysql+pymysql://travis:@localhost/simplekv_test'),
+        ('psycopg2',
+         'postgresql+psycopg2://simplekv_test:simplekv_test@127.0.0.1/simplekv_test'),
+        ('sqlite3',
+         'sqlite:///:memory:')
+    ]
+else:
     DSNS = [
         ('pymysql',
          'mysql+pymysql://travis:@localhost/simplekv_test'),
@@ -25,6 +33,10 @@ class TestSQLAlchemyStore(BasicStore):
         ('sqlite3',
          'sqlite:///:memory:')
     ]
+
+
+# FIXME: for local testing, this needs configurable dsns
+class TestSQLAlchemyStore(BasicStore):
 
     @pytest.fixture(params=DSNS, ids=[v[0] for v in DSNS])
     def engine(self, request):
