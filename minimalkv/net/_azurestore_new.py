@@ -28,7 +28,7 @@ else:
 
 @contextmanager
 def map_azure_exceptions(key=None, error_codes_pass=()):
-    """Map Azure-specific exceptions to the simplekv-API."""
+    """Map Azure-specific exceptions to the minimalkv-API."""
     from azure.core.exceptions import AzureError
 
     try:

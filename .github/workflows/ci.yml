@@ -13,9 +13,9 @@ jobs:
       postgres:
         image: postgres:11
         env:
-          POSTGRES_DB: simplekv_test
-          POSTGRES_PASSWORD: simplekv_test
-          POSTGRES_USER: simplekv_test
+          POSTGRES_DB: minimalkv_test
+          POSTGRES_PASSWORD: minimalkv_test
+          POSTGRES_USER: minimalkv_test
     env:
       SIMPLEKV_CI: 1
     steps:

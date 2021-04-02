@@ -17,7 +17,7 @@ from .. import KeyValueStore
 
 @contextmanager
 def map_azure_exceptions(key=None, exc_pass=()):
-    """Map Azure-specific exceptions to the simplekv-API."""
+    """Map Azure-specific exceptions to the minimalkv-API."""
     from azure.common import AzureMissingResourceHttpError, AzureHttpError,\
         AzureException
     try:

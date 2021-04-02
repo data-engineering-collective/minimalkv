@@ -9,27 +9,27 @@ from sqlalchemy import create_engine, MetaData
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.pool import StaticPool
 
-from simplekv.db.sql import SQLAlchemyStore
+from minimalkv.db.sql import SQLAlchemyStore
 
 from basic_store import BasicStore
 from conftest import ExtendedKeyspaceTests
-from simplekv.contrib import ExtendedKeyspaceMixin
+from minimalkv.contrib import ExtendedKeyspaceMixin
 
 if os.environ.get("SIMPLEKV_CI", "0") == "1":
     DSNS = [
         ('pymysql',
-         'mysql+pymysql://travis:@localhost/simplekv_test'),
+         'mysql+pymysql://travis:@localhost/minimalkv_test'),
         ('psycopg2',
-         'postgresql+psycopg2://simplekv_test:simplekv_test@127.0.0.1/simplekv_test'),
+         'postgresql+psycopg2://minimalkv_test:minimalkv_test@127.0.0.1/minimalkv_test'),
         ('sqlite3',
          'sqlite:///:memory:')
     ]
 else:
     DSNS = [
         ('pymysql',
-         'mysql+pymysql://travis:@localhost/simplekv_test'),
+         'mysql+pymysql://travis:@localhost/minimalkv_test'),
         ('psycopg2',
-         'postgresql+psycopg2://postgres:@127.0.0.1/simplekv_test'),
+         'postgresql+psycopg2://postgres:@127.0.0.1/minimalkv_test'),
         ('sqlite3',
          'sqlite:///:memory:')
     ]
@@ -53,7 +53,7 @@ class TestSQLAlchemyStore(BasicStore):
     @pytest.yield_fixture
     def store(self, engine):
         metadata = MetaData(bind=engine)
-        store = SQLAlchemyStore(engine, metadata, 'simplekv_test')
+        store = SQLAlchemyStore(engine, metadata, 'minimalkv_test')
         # create table
         store.table.create()
         yield store
@@ -67,7 +67,7 @@ class TestExtendedKeyspaceSQLAlchemyStore(TestSQLAlchemyStore,
         class ExtendedKeyspaceStore(ExtendedKeyspaceMixin, SQLAlchemyStore):
             pass
         metadata = MetaData(bind=engine)
-        store = ExtendedKeyspaceStore(engine, metadata, 'simplekv_test')
+        store = ExtendedKeyspaceStore(engine, metadata, 'minimalkv_test')
         # create table
         store.table.create()
         yield store

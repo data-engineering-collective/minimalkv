@@ -1,6 +1,6 @@
-from simplekv._compat import BytesIO
-from simplekv.memory import DictStore
-from simplekv.decorator import PrefixDecorator
+from minimalkv._compat import BytesIO
+from minimalkv.memory import DictStore
+from minimalkv.decorator import PrefixDecorator
 import pytest
 
 from basic_store import BasicStore

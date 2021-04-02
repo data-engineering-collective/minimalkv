@@ -2,18 +2,18 @@
 
 import os
 import stat
-from simplekv._compat import BytesIO, url_quote, url_unquote, PY2
+from minimalkv._compat import BytesIO, url_quote, url_unquote, PY2
 import tempfile
-from simplekv._compat import urlparse
+from minimalkv._compat import urlparse
 
-from simplekv.fs import FilesystemStore, WebFilesystemStore
+from minimalkv.fs import FilesystemStore, WebFilesystemStore
 
 from basic_store import BasicStore
 from url_store import UrlStore
 from idgens import UUIDGen, HashGen
 
 from conftest import ExtendedKeyspaceTests
-from simplekv.contrib import ExtendedKeyspaceMixin
+from minimalkv.contrib import ExtendedKeyspaceMixin
 
 from mock import Mock
 import pytest

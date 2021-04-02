@@ -5,11 +5,11 @@ import time
 import tempfile
 
 import pytest
-from simplekv._compat import BytesIO, xrange, text_type
-from simplekv.decorator import PrefixDecorator
-from simplekv.crypt import HMACDecorator
-from simplekv.idgen import UUIDDecorator, HashDecorator
-from simplekv import CopyMixin
+from minimalkv._compat import BytesIO, xrange, text_type
+from minimalkv.decorator import PrefixDecorator
+from minimalkv.crypt import HMACDecorator
+from minimalkv.idgen import UUIDDecorator, HashDecorator
+from minimalkv import CopyMixin
 
 
 class BasicStore(object):

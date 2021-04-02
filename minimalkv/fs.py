@@ -193,7 +193,7 @@ class WebFilesystemStore(FilesystemStore):
     applications. Most common use is to make the *root* directory of the
     filesystem store available through a webserver. Example:
 
-    >>> from simplekv.fs import WebFilesystemStore
+    >>> from minimalkv.fs import WebFilesystemStore
     >>> webserver_url_prefix = 'https://some.domain.invalid/files/'
     >>> webserver_root = '/var/www/some.domain.invalid/www-data/files/'
     >>> store = WebFilesystemStore(webserver_root, webserver_url_prefix)
@@ -206,7 +206,7 @@ class WebFilesystemStore(FilesystemStore):
     *url_prefix* may also be a callable, in which case it gets called with the
     filestore and key as an argument and should return an url_prefix.
 
-    >>> from simplekv.fs import WebFilesystemStore
+    >>> from minimalkv.fs import WebFilesystemStore
     >>> webserver_url_prefix = 'https://some.domain.invalid/files/'
     >>> webserver_root = '/var/www/some.domain.invalid/www-data/files/'
     >>> prefix_func = lambda store, key: webserver_url_prefix
@@ -217,7 +217,7 @@ class WebFilesystemStore(FilesystemStore):
     def __init__(self, root, url_prefix, **kwargs):
         """Initialize new WebFilesystemStore.
 
-        :param root: see :func:`simplekv.FilesystemStore.__init__`
+        :param root: see :func:`minimalkv.FilesystemStore.__init__`
         :param url_prefix: will get prepended to every url generated with
                            url_for.
         """

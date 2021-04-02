@@ -9,7 +9,7 @@ from contextlib import contextmanager
 
 @contextmanager
 def map_boto_exceptions(key=None, exc_pass=()):
-    """Map boto-specific exceptions to the simplekv-API."""
+    """Map boto-specific exceptions to the minimalkv-API."""
     from boto.exception import BotoClientError, BotoServerError, \
         StorageResponseError
     try:

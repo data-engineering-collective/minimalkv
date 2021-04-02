@@ -5,14 +5,14 @@ import os
 import pytest
 
 boto3 = pytest.importorskip('boto3')
-from simplekv.net.boto3store import Boto3Store
-from simplekv._compat import BytesIO
+from minimalkv.net.boto3store import Boto3Store
+from minimalkv._compat import BytesIO
 
 from basic_store import BasicStore
 from url_store import UrlStore
 from bucket_manager import boto_credentials, boto3_bucket
 from conftest import ExtendedKeyspaceTests
-from simplekv.contrib import ExtendedKeyspaceMixin
+from minimalkv.contrib import ExtendedKeyspaceMixin
 
 
 @pytest.fixture(params=boto_credentials,

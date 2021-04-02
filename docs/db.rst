@@ -12,7 +12,7 @@ based store is available:
 
 ::
 
-  from simplekv.db.sql import SQLAlchemyStore
+  from minimalkv.db.sql import SQLAlchemyStore
   from sqlalchemy import create_engine, MetaData
 
   # use echo=True to see queries
@@ -32,7 +32,7 @@ based store is available:
 
   print(store.get(u'my_key'))
 
-.. class:: simplekv.db.sql.SQLAlchemyStore
+.. class:: minimalkv.db.sql.SQLAlchemyStore
 
    Stores data in a table in a database through `SQLAlchemy
    <http://sqlalchemy.org>`_.
@@ -44,7 +44,7 @@ based store is available:
    .. method:: __init__(bind, metadata, tablename)
 
       Generates a new :class:`~sqlalchemy.schema.Table` for use as a
-      backend (see :attr:`~simplekv.db.sql.SQLAlchemyStore.table`) on the
+      backend (see :attr:`~minimalkv.db.sql.SQLAlchemyStore.table`) on the
       supplied metadata.
 
       :param bind: Any queries made by the store run
@@ -63,10 +63,10 @@ based store is available:
 MongoDB
 -------
 
-The :class:`~simplekv.db.mongo.MongoStore` class requires the ``pymongo``
+The :class:`~minimalkv.db.mongo.MongoStore` class requires the ``pymongo``
 package to be installed.
 
-.. class:: simplekv.db.mongo.MongoStore
+.. class:: minimalkv.db.mongo.MongoStore
 
    .. method:: __init__(db, collection)
 

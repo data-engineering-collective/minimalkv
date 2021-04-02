@@ -2,7 +2,7 @@
 
 from basic_store import BasicStore, TTLStore
 from conftest import ExtendedKeyspaceTests
-from simplekv.contrib import ExtendedKeyspaceMixin
+from minimalkv.contrib import ExtendedKeyspaceMixin
 
 import pytest
 redis = pytest.importorskip('redis')
@@ -14,7 +14,7 @@ from redis.exceptions import ConnectionError
 class TestRedisStore(TTLStore, BasicStore):
     @pytest.yield_fixture()
     def store(self):
-        from simplekv.memory.redisstore import RedisStore
+        from minimalkv.memory.redisstore import RedisStore
         r = StrictRedis()
 
         try:
@@ -30,7 +30,7 @@ class TestRedisStore(TTLStore, BasicStore):
 class TestExtendedKeyspaceDictStore(TestRedisStore, ExtendedKeyspaceTests):
     @pytest.fixture
     def store(self):
-        from simplekv.memory.redisstore import RedisStore
+        from minimalkv.memory.redisstore import RedisStore
 
         class ExtendedKeyspaceStore(ExtendedKeyspaceMixin, RedisStore):
             pass

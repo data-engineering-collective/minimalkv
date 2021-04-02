@@ -3,31 +3,31 @@
 
 Network and cloud-based storage
 *******************************
-A core feature of simplekv is the ability to transparently store data using
+A core feature of minimalkv is the ability to transparently store data using
 cloud storage services like `Amazon S3 <http://aws.amazon.com/s3/>`_ and `Google
 Storage <http://code.google.com/apis/storage/>`_. This is achieved by providing
 a backend that utilizes `boto <http://boto.cloudhackers.com/>`_ (preferably >=
 2.25).
 
 ``boto`` doesn't support using Google Storage with Python3. For this
-reason simplekv has a separate Google Storage implementation for Python3 at
-:class:`~simplekv.net.gcstore.GoogleCloudStore` which uses Google's
+reason minimalkv has a separate Google Storage implementation for Python3 at
+:class:`~minimalkv.net.gcstore.GoogleCloudStore` which uses Google's
 ``google-cloud-storage`` library.
 
-Note that boto is not a dependency for simplekv. You need to install it
+Note that boto is not a dependency for minimalkv. You need to install it
 manually, otherwise you will see an :exc:`~exceptions.ImportError`.
 
 Here is a short example:
 
 ::
 
-   from simplekv.net.botostore import BotoStore
+   from minimalkv.net.botostore import BotoStore
    import boto
 
    con = boto.connect_s3('your_access_key', 'your_secret_key')
 
    # use get_bucket instead, if you already have one!
-   bucket = con.create_bucket('simplekv-testbucket')
+   bucket = con.create_bucket('minimalkv-testbucket')
 
    store = BotoStore(bucket)
 
@@ -44,7 +44,7 @@ Unit testing
 
 The unit-tests for the boto storage can only run if you have access to a Google
 Storage and/or Amazon S3 account. The tests will look in a file
-``boto_credentials.ini`` in the simplekv source root folder for account
+``boto_credentials.ini`` in the minimalkv source root folder for account
 credentials, here is an example file:
 
 ::
@@ -64,7 +64,7 @@ If a section is not present, the tests for that backend will be skipped.
 The unit tests for S3 will be run by travis against a local minio instance, emulating S3.
 
 
-.. class:: simplekv.net.boto.BotoStore
+.. class:: minimalkv.net.boto.BotoStore
 
    Backend using the storage api of boto.
 

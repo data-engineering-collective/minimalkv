@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf8
 
-from simplekv._compat import ConfigParser
+from minimalkv._compat import ConfigParser
 from contextlib import contextmanager
 from uuid import uuid4 as uuid
 

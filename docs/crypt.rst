@@ -1,5 +1,5 @@
 Hash and encryption decorators
 ******************************
 
-.. automodule:: simplekv.crypt
+.. automodule:: minimalkv.crypt
    :members:

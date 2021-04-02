@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # coding=utf8
 
-from simplekv.decorator import ReadOnlyDecorator
-from simplekv.memory import DictStore
+from minimalkv.decorator import ReadOnlyDecorator
+from minimalkv.memory import DictStore
 import pytest
 
 

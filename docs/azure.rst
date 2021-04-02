@@ -6,14 +6,14 @@ Simplekv supports storing data in `Microsoft Azure Block Blob Storage <https://a
 The backend uses the `azure-storage-blob <https://github.com/Azure/azure-storage-python/tree/master/azure-storage-blob>`_
 python distribution to access the azure blob storage and currently supports versions 2.x and 12.x.
 
-Note that ``azure-storage-blob`` is not a dependency for simplekv. You need to install it
+Note that ``azure-storage-blob`` is not a dependency for minimalkv. You need to install it
 manually, otherwise you will see an :exc:`~exceptions.ImportError`.
 
 Here is a short example:
 
 ::
 
-   from simplekv.net.azurestore import AzureBlockBlobStore
+   from minimalkv.net.azurestore import AzureBlockBlobStore
 
    conn_string = 'DefaultEndpointsProtocol=https;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;'
 
@@ -49,4 +49,4 @@ before running the tests.
 
 To skip the tests of the azure backend, comment out the ``account_name`` in the ``azure_credentials.ini`` file.
 
-.. autoclass:: simplekv.net.azurestore.AzureBlockBlobStore
+.. autoclass:: minimalkv.net.azurestore.AzureBlockBlobStore

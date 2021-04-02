@@ -1,5 +1,5 @@
-from simplekv.memory import DictStore
-from simplekv.cache import CacheDecorator
+from minimalkv.memory import DictStore
+from minimalkv.cache import CacheDecorator
 
 from basic_store import BasicStore
 
