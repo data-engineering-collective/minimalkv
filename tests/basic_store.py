@@ -117,7 +117,13 @@ class BasicStore(object):
         with pytest.raises(ValueError):
             store.delete(invalid_key)
 
-    def test_put_file(self, store, key, value):
+    def test_put_file(self, store, key, value, request):
+        if is_emulated_gcstore_test(store):
+            mark = pytest.mark.xfail(
+                reason="Triggers resumable upload, which isn't currently supported by the GC Emulator"
+            )
+            request.node.add_marker(mark)
+
         tmp = tempfile.NamedTemporaryFile(delete=False)
         try:
             tmp.write(value)
