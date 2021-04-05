@@ -10,6 +10,13 @@ from minimalkv.decorator import PrefixDecorator
 from minimalkv.crypt import HMACDecorator
 from minimalkv.idgen import UUIDDecorator, HashDecorator
 from minimalkv import CopyMixin
+from minimalkv.net.gcstore import GoogleCloudStore
+
+
+def is_emulated_gcstore_test(store):
+    return isinstance(store, GoogleCloudStore) and "localhost" in os.environ.get(
+        "STORAGE_EMULATOR_HOST"
+    )
 
 
 class BasicStore(object):
@@ -123,7 +130,13 @@ class BasicStore(object):
             if os.path.exists(tmp.name):
                 os.unlink(tmp.name)
 
-    def test_put_opened_file(self, store, key, value):
+    def test_put_opened_file(self, store, key, value, request):
+        if is_emulated_gcstore_test(store):
+            mark = pytest.mark.xfail(
+                reason="Triggers resumable upload, which isn't currently supported by the GC Emulator"
+            )
+            request.node.add_marker(mark)
+
         with tempfile.NamedTemporaryFile() as tmp:
             tmp.write(value)
             tmp.flush()
@@ -154,7 +167,13 @@ class BasicStore(object):
     def test_put_file_return_value(self, store, key, value):
         assert key == store.put_file(key, BytesIO(value))
 
-    def test_put_filename_return_value(self, store, key, value):
+    def test_put_filename_return_value(self, store, key, value, request):
+        if is_emulated_gcstore_test(store):
+            mark = pytest.mark.xfail(
+                reason="Triggers resumable upload, which isn't currently supported by the GC Emulator"
+            )
+            request.node.add_marker(mark)
+
         tmp = tempfile.NamedTemporaryFile(delete=False)
         try:
             tmp.write(value)

@@ -121,7 +121,13 @@ class GoogleCloudStore(KeyValueStore):
     def _put_file(self, key, file):
         blob = self._bucket.blob(key)
         with map_gcloud_exceptions(key):
-            blob.upload_from_file(file_obj=file)
+            if isinstance(file, io.BytesIO):
+                # not passing a size triggers a resumable upload to avoid trying to upload
+                # large files in a single request
+                # For BytesIO, getting the size is cheap, therefore we pass it
+                blob.upload_from_file(file_obj=file, size=file.getbuffer().nbytes)
+            else:
+                blob.upload_from_file(file_obj=file)
         return key
 
     # skips two items: bucket & client.
