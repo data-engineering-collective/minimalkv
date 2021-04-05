@@ -1,5 +1,5 @@
 ID-generating decorators
 ************************
 
-.. automodule:: simplekv.idgen
+.. automodule:: minimalkv.idgen
    :members:

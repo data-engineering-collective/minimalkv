@@ -1,7 +1,7 @@
 from uuid import uuid4 as uuid
-from simplekv._compat import ConfigParser, pickle
-from simplekv.net.azurestore import AzureBlockBlobStore
-from simplekv.contrib import ExtendedKeyspaceMixin
+from minimalkv._compat import ConfigParser, pickle
+from minimalkv.net.azurestore import AzureBlockBlobStore
+from minimalkv.contrib import ExtendedKeyspaceMixin
 from basic_store import BasicStore, OpenSeekTellStore
 from conftest import ExtendedKeyspaceTests
 import pytest

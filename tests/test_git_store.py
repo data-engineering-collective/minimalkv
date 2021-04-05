@@ -3,10 +3,10 @@ from dulwich.repo import Repo
 from idgens import UUIDGen, HashGen
 import pytest
 
-from simplekv.git import GitCommitStore
+from minimalkv.git import GitCommitStore
 
 from conftest import ExtendedKeyspaceTests
-from simplekv.contrib import ExtendedKeyspaceMixin
+from minimalkv.contrib import ExtendedKeyspaceMixin
 
 
 class TestGitCommitStore(BasicStore, UUIDGen, HashGen):

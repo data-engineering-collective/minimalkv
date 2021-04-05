@@ -147,7 +147,7 @@ class URLEncodeKeysDecorator(KeyTransformingDecorator):
 
 class ReadOnlyDecorator(StoreDecorator):
     """
-    A read-only view of an underlying simplekv store
+    A read-only view of an underlying minimalkv store
 
     Provides only access to the following methods/attributes of the
     underlying store: get, iter_keys, keys, open, get_file.

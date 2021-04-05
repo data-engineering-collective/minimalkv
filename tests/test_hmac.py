@@ -1,9 +1,9 @@
 import hmac
 import os
-from simplekv._compat import BytesIO, xrange
+from minimalkv._compat import BytesIO, xrange
 import tempfile
 
-from simplekv.crypt import _HMACFileReader, VerificationException,\
+from minimalkv.crypt import _HMACFileReader, VerificationException,\
     HMACDecorator
 
 from six import b, indexbytes, int2byte

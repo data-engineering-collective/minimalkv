@@ -11,7 +11,7 @@ copies are not touched.
 
 .. _dulwich: http://dulwich.io
 
-.. class:: simplekv.git.GitCommitStore(repo_path, branch=b'master',\
+.. class:: minimalkv.git.GitCommitStore(repo_path, branch=b'master',\
            subdir=b'')
 
     A git-commit based store.

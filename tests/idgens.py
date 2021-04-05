@@ -3,8 +3,8 @@ import re
 import tempfile
 import uuid
 
-from simplekv.idgen import UUIDDecorator, HashDecorator
-from simplekv._compat import text_type
+from minimalkv.idgen import UUIDDecorator, HashDecorator
+from minimalkv._compat import text_type
 
 import pytest
 

@@ -25,7 +25,7 @@ def _public_readable(grants):
 
 @contextmanager
 def map_boto3_exceptions(key=None, exc_pass=()):
-    """Map boto3-specific exceptions to the simplekv-API."""
+    """Map boto3-specific exceptions to the minimalkv-API."""
     from botocore.exceptions import ClientError
 
     try:

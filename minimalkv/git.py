@@ -63,7 +63,7 @@ def _on_tree(repo, tree, components, obj):
 
 
 class GitCommitStore(KeyValueStore):
-    AUTHOR = 'GitCommitStore (simplekv {}) <>'.format(__version__)
+    AUTHOR = 'GitCommitStore (minimalkv {}) <>'.format(__version__)
     TIMEZONE = None
 
     def __init__(self, repo_path, branch=b'master', subdir=b''):

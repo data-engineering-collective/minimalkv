@@ -1,6 +1,6 @@
 Other decorators
 ****************
 
-.. autoclass:: simplekv.decorator.PrefixDecorator
-.. autoclass:: simplekv.decorator.URLEncodeKeysDecorator
-.. autoclass:: simplekv.decorator.ReadOnlyDecorator
+.. autoclass:: minimalkv.decorator.PrefixDecorator
+.. autoclass:: minimalkv.decorator.URLEncodeKeysDecorator
+.. autoclass:: minimalkv.decorator.ReadOnlyDecorator

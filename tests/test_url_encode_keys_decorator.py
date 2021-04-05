@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # coding=utf8
 
-from simplekv.decorator import URLEncodeKeysDecorator
-from simplekv.memory import DictStore
+from minimalkv.decorator import URLEncodeKeysDecorator
+from minimalkv.memory import DictStore
 import pytest
 
 from basic_store import BasicStore

@@ -7,7 +7,7 @@ from .. import KeyValueStore
 
 @contextmanager
 def map_gcloud_exceptions(key=None, error_codes_pass=()):
-    """Map Google Cloud specific exceptions to the simplekv-API.
+    """Map Google Cloud specific exceptions to the minimalkv-API.
 
     This function exists so the gcstore module can be imported
     without needing to install google-cloud-storage (as we lazily

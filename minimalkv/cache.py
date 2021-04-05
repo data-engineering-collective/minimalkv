@@ -7,8 +7,8 @@ from .decorator import StoreDecorator
 class CacheDecorator(StoreDecorator):
     """Write-through cache decorator.
 
-    Can combine two :class:`~simplekv.KeyValueStore` instances into a single
-    caching :class:`~simplekv.KeyValueStore`. On a data-read request, the cache
+    Can combine two :class:`~minimalkv.KeyValueStore` instances into a single
+    caching :class:`~minimalkv.KeyValueStore`. On a data-read request, the cache
     will be consulted first, if there is a cache miss or an error, data will be
     read from the backing store. Any retrieved value will be stored in the
     cache before being forward to the client.
@@ -28,7 +28,7 @@ class CacheDecorator(StoreDecorator):
         self.cache = cache
 
     def delete(self, key):
-        """Implementation of :meth:`~simplekv.KeyValueStore.delete`.
+        """Implementation of :meth:`~minimalkv.KeyValueStore.delete`.
 
         If an exception occurs in either the cache or backing store, all are
         passing on.
@@ -37,7 +37,7 @@ class CacheDecorator(StoreDecorator):
         self.cache.delete(key)
 
     def get(self, key):
-        """Implementation of :meth:`~simplekv.KeyValueStore.get`.
+        """Implementation of :meth:`~minimalkv.KeyValueStore.get`.
 
         If a cache miss occurs, the value is retrieved, stored in the cache and
         returned.
@@ -62,7 +62,7 @@ class CacheDecorator(StoreDecorator):
             return self._dstore.get(key)
 
     def get_file(self, key, file):
-        """Implementation of :meth:`~simplekv.KeyValueStore.get_file`.
+        """Implementation of :meth:`~minimalkv.KeyValueStore.get_file`.
 
         If a cache miss occurs, the value is retrieved, stored in the cache and
         returned.
@@ -87,7 +87,7 @@ class CacheDecorator(StoreDecorator):
         # safely
 
     def open(self, key):
-        """Implementation of :meth:`~simplekv.KeyValueStore.open`.
+        """Implementation of :meth:`~minimalkv.KeyValueStore.open`.
 
         If a cache miss occurs, the value is retrieved, stored in the cache,
         then then another open is issued on the cache.
@@ -111,7 +111,7 @@ class CacheDecorator(StoreDecorator):
             return self._dstore.open(key)
 
     def copy(self, source, dest):
-        """Implementation of :meth:`~simplekv.CopyMixin.copy`.
+        """Implementation of :meth:`~minimalkv.CopyMixin.copy`.
 
         Copies the data in the backing store and removes the destination key from the cache,
          in case it was already populated.
@@ -124,7 +124,7 @@ class CacheDecorator(StoreDecorator):
         return k
 
     def put(self, key, data):
-        """Implementation of :meth:`~simplekv.KeyValueStore.put`.
+        """Implementation of :meth:`~minimalkv.KeyValueStore.put`.
 
         Will store the value in the backing store. After a successful or
         unsuccessful store, the cache will be invalidated by deleting the key
@@ -136,7 +136,7 @@ class CacheDecorator(StoreDecorator):
             self.cache.delete(key)
 
     def put_file(self, key, file):
-        """Implementation of :meth:`~simplekv.KeyValueStore.put_file`.
+        """Implementation of :meth:`~minimalkv.KeyValueStore.put_file`.
 
         Will store the value in the backing store. After a successful or
         unsuccessful store, the cache will be invalidated by deleting the key

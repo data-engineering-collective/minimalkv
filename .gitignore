@@ -101,3 +101,6 @@ Pipfile.lock
 
 # PyCharm
 .idea/
+
+# direnv
+.envrc

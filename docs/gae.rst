@@ -6,7 +6,7 @@ Currently, there is support for storing data on `Google app engine
 for storing small bits of data, like sessions or similiar but not large binary
 blobs [1]_.
 
-.. class:: simplekv.gae.NdbStore
+.. class:: minimalkv.gae.NdbStore
 
    A backend that stores data on ndb objects. The objects key will be the key
    in the kvstore, while an attribute ``v`` must be present on the object to
@@ -22,7 +22,7 @@ Here is a minimal example:
 ::
 
     from google.appengine.ext import ndb
-    from simplekv.gae import NdbStore
+    from minimalkv.gae import NdbStore
 
     class MyKvModel(ndb.Model):
         v = ndb.BlobProperty(indexed=False)
@@ -31,4 +31,4 @@ Here is a minimal example:
 
 
 .. [1] You're welcome to implement it and `submit a patch
-   <https://github.com/mbr/simplekv>`_.
+   <https://github.com/data-engineering-collective/minimalkv>`_.

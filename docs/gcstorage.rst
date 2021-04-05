@@ -5,17 +5,17 @@ This backend is for storing data in `Google Cloud Storage <https://cloud.google.
 by using the ``google-cloud-storage`` library.
 
 ``google-cloud-storage`` is only available for Python 3. Simplekv also provides access to
-Google Cloud Storage through :class:`~simplekv.net.boto.BotoStore` using the ``boto`` library which is available for Python 2.
+Google Cloud Storage through :class:`~minimalkv.net.boto.BotoStore` using the ``boto`` library which is available for Python 2.
 
 
-Note that ``google-cloud-storage`` is not a dependency for simplekv. You need to install it
+Note that ``google-cloud-storage`` is not a dependency for minimalkv. You need to install it
 manually, otherwise you will see an :exc:`~exceptions.ImportError`.
 
 Here is a short example:
 
 ::
 
-   from simplekv.net.gcstore import GoogleCloudStore
+   from minimalkv.net.gcstore import GoogleCloudStore
 
    credentials_path = "/path/to/credentials.json"
 
@@ -49,5 +49,5 @@ To test against a locally running Fake GCS Server instance make sure to start th
 
 before running the tests.
 
-.. autoclass:: simplekv.net.gcstore.GoogleCloudStore
+.. autoclass:: minimalkv.net.gcstore.GoogleCloudStore
     :members: __init__

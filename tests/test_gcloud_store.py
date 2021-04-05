@@ -14,8 +14,8 @@ from conftest import ExtendedKeyspaceTests
 from google.auth.credentials import AnonymousCredentials
 from google.cloud.exceptions import MethodNotAllowed
 
-from simplekv.contrib import ExtendedKeyspaceMixin
-from simplekv.net.gcstore import GoogleCloudStore
+from minimalkv.contrib import ExtendedKeyspaceMixin
+from minimalkv.net.gcstore import GoogleCloudStore
 
 
 @pytest.fixture(scope="module")

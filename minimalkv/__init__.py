@@ -13,7 +13,7 @@ VALID_KEY_REGEXP = "^[%s0-9a-zA-Z]+$" % re.escape(VALID_NON_NUM)
 alphanumeric characters, as well as ``!"`#$%&'()+,-.<=>?@[]^_{}~``."""
 
 VALID_KEY_RE = re.compile(VALID_KEY_REGEXP)
-"""A compiled version of :data:`~simplekv.VALID_KEY_REGEXP`."""
+"""A compiled version of :data:`~minimalkv.VALID_KEY_REGEXP`."""
 
 
 class KeyValueStore(object):
@@ -24,7 +24,7 @@ class KeyValueStore(object):
     a key as an argument raises a ValueError if the key is incorrect.
 
     The regular expression for what constitutes a valid key is available as
-    :data:`simplekv.VALID_KEY_REGEXP`.
+    :data:`minimalkv.VALID_KEY_REGEXP`.
 
     Values are raw bytes. If you need to store strings, make sure to encode
     them upon storage and decode them upon retrieval.
@@ -219,16 +219,16 @@ class KeyValueStore(object):
             raise ValueError('%r contains illegal characters' % key)
 
     def _delete(self, key):
-        """Implementation for :meth:`~simplekv.KeyValueStore.delete`. The
+        """Implementation for :meth:`~minimalkv.KeyValueStore.delete`. The
         default implementation will simply raise a
         :py:exc:`~exceptions.NotImplementedError`.
         """
         raise NotImplementedError
 
     def _get(self, key):
-        """Implementation for :meth:`~simplekv.KeyValueStore.get`. The default
+        """Implementation for :meth:`~minimalkv.KeyValueStore.get`. The default
         implementation will create a :class:`io.BytesIO`-buffer and then call
-        :meth:`~simplekv.KeyValueStore._get_file`.
+        :meth:`~minimalkv.KeyValueStore._get_file`.
 
         :param key: Key of value to be retrieved
         """
@@ -240,8 +240,8 @@ class KeyValueStore(object):
 
     def _get_file(self, key, file):
         """Write key to file-like object file. Either this method or
-        :meth:`~simplekv.KeyValueStore._get_filename` will be called by
-        :meth:`~simplekv.KeyValueStore.get_file`. Note that this method does
+        :meth:`~minimalkv.KeyValueStore._get_filename` will be called by
+        :meth:`~minimalkv.KeyValueStore.get_file`. Note that this method does
         not accept strings.
 
         :param key: Key to be retrieved
@@ -266,10 +266,10 @@ class KeyValueStore(object):
 
     def _get_filename(self, key, filename):
         """Write key to file. Either this method or
-        :meth:`~simplekv.KeyValueStore._get_file` will be called by
-        :meth:`~simplekv.KeyValueStore.get_file`. This method only accepts
+        :meth:`~minimalkv.KeyValueStore._get_file` will be called by
+        :meth:`~minimalkv.KeyValueStore.get_file`. This method only accepts
         filenames and will open the file with a mode of ``wb``, then call
-        :meth:`~simplekv.KeyValueStore._get_file`.
+        :meth:`~minimalkv.KeyValueStore._get_file`.
 
         :param key: Key to be retrieved
         :param filename: Filename to write to
@@ -279,10 +279,10 @@ class KeyValueStore(object):
 
     def _has_key(self, key):
         """Default implementation for
-        :meth:`~simplekv.KeyValueStore.__contains__`.
+        :meth:`~minimalkv.KeyValueStore.__contains__`.
 
         Determines whether or not a key exists by calling
-        :meth:`~simplekv.KeyValueStore.keys`.
+        :meth:`~minimalkv.KeyValueStore.keys`.
 
         :param key: Key to check existance of
         """
@@ -297,9 +297,9 @@ class KeyValueStore(object):
         raise NotImplementedError
 
     def _put(self, key, data):
-        """Implementation for :meth:`~simplekv.KeyValueStore.put`. The default
+        """Implementation for :meth:`~minimalkv.KeyValueStore.put`. The default
         implementation will create a :class:`io.BytesIO`-buffer and then call
-        :meth:`~simplekv.KeyValueStore._put_file`.
+        :meth:`~minimalkv.KeyValueStore._put_file`.
 
         :param key: Key under which data should be stored
         :param data: Data to be stored
@@ -308,8 +308,8 @@ class KeyValueStore(object):
 
     def _put_file(self, key, file):
         """Store data from file-like object in key. Either this method or
-        :meth:`~simplekv.KeyValueStore._put_filename` will be called by
-        :meth:`~simplekv.KeyValueStore.put_file`. Note that this method does
+        :meth:`~minimalkv.KeyValueStore._put_filename` will be called by
+        :meth:`~minimalkv.KeyValueStore.put_file`. Note that this method does
         not accept strings.
 
         The default implementation will simply raise a
@@ -322,12 +322,12 @@ class KeyValueStore(object):
 
     def _put_filename(self, key, filename):
         """Store data from file in key. Either this method or
-        :meth:`~simplekv.KeyValueStore._put_file` will be called by
-        :meth:`~simplekv.KeyValueStore.put_file`. Note that this method does
+        :meth:`~minimalkv.KeyValueStore._put_file` will be called by
+        :meth:`~minimalkv.KeyValueStore.put_file`. Note that this method does
         not accept strings.
 
         The default implementation will open the file in ``rb`` mode, then call
-        :meth:`~simplekv.KeyValueStore._put_file`.
+        :meth:`~minimalkv.KeyValueStore._put_file`.
 
         :param key: Key under which data should be stored
         :param file: Filename of file to store
@@ -366,18 +366,18 @@ class TimeToLiveMixin(object):
     """Allows keys to expire after a certain amount of time.
 
     This mixin overrides some of the signatures of the api of
-    :class:`~simplekv.KeyValueStore`, albeit in a backwards compatible way.
+    :class:`~minimalkv.KeyValueStore`, albeit in a backwards compatible way.
 
     Any value given for a time-to-live parameter must be one of the following:
 
     * A positive ``int``, representing seconds,
-    * ``simplekv.FOREVER``, meaning no expiration
-    * ``simplekv.NOT_SET``, meaning that no TTL configuration will be
+    * ``minimalkv.FOREVER``, meaning no expiration
+    * ``minimalkv.NOT_SET``, meaning that no TTL configuration will be
       done at all or
     * ``None`` representing the default (see
       :class:`.TimeToLiveMixin`'s ``default_ttl_secs``).
 
-    .. note:: When deriving from :class:`~simplekv.TimeToLiveMixin`, the same
+    .. note:: When deriving from :class:`~minimalkv.TimeToLiveMixin`, the same
        default implementations for ``_put``, ``_put_file`` and
        ``_put_filename`` are provided, except that they all take an additional
        ``ttl_secs`` argument. For more information on how to implement
@@ -409,7 +409,7 @@ class TimeToLiveMixin(object):
         return ttl_secs
 
     def put(self, key, data, ttl_secs=None):
-        """Like :meth:`~simplekv.KeyValueStore.put`, but with an additional
+        """Like :meth:`~minimalkv.KeyValueStore.put`, but with an additional
            parameter:
 
            :param ttl_secs: Number of seconds until the key expires. See above
@@ -425,7 +425,7 @@ class TimeToLiveMixin(object):
         return self._put(key, data, self._valid_ttl(ttl_secs))
 
     def put_file(self, key, file, ttl_secs=None):
-        """Like :meth:`~simplekv.KeyValueStore.put_file`, but with an
+        """Like :meth:`~minimalkv.KeyValueStore.put_file`, but with an
            additional parameter:
 
            :param ttl_secs: Number of seconds until the key expires. See above

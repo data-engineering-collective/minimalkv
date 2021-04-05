@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# simplekv documentation build configuration file, created by
+# minimalkv documentation build configuration file, created by
 # sphinx-quickstart on Tue May 10 09:07:13 2011.
 #
 # This file is execfile()d with the current directory set to its containing
@@ -51,7 +51,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'simplekv'
+project = u'minimalkv'
 copyright = u'2011, Marc Brinkmann'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -166,7 +166,7 @@ pygments_style = 'sphinx'
 #html_file_suffix = ''
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'simplekvdoc'
+htmlhelp_basename = 'minimalkvdoc'
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -181,7 +181,7 @@ htmlhelp_basename = 'simplekvdoc'
 # (source start file, target name, title, author, documentclass
 # [howto/manual]).
 latex_documents = [
-  ('index', 'simplekv.tex', u'simplekv Documentation',
+  ('index', 'minimalkv.tex', u'minimalkv Documentation',
    u'Marc Brinkmann', 'manual'),
 ]
 
