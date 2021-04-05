@@ -26,7 +26,8 @@ jobs:
           use-mamba: true
           python-version: ${{ matrix.PYTHON_VERSION }}
           environment-file: environment.yml
-      - shell: bash -x -l {0}
+      - name: Run the unittests
+        shell: bash -x -l {0}
         run: |
           mamba install google-cloud-storage
           pip install --no-deps .
