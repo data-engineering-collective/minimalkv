@@ -15,7 +15,7 @@ from minimalkv.net.gcstore import GoogleCloudStore
 
 def is_emulated_gcstore_test(store):
     return isinstance(store, GoogleCloudStore) and "localhost" in os.environ.get(
-        "STORAGE_EMULATOR_HOST"
+        "STORAGE_EMULATOR_HOST", ""
     )
 
 

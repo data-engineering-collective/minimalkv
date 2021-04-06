@@ -13,3 +13,4 @@ dependencies:
   - psycopg2
   - six
   - sqlalchemy
+  - google-cloud-storage
