@@ -26,7 +26,9 @@ jobs:
           use-mamba: true
           python-version: ${{ matrix.PYTHON_VERSION }}
           environment-file: environment.yml
-      - shell: bash -x -l {0}
+      - name: Run the unittests
+        shell: bash -x -l {0}
         run: |
           pip install --no-deps .
+          docker run -d --name fake-gcs-server -p 4443:4443 fsouza/fake-gcs-server:v1.21.2 -scheme http
           pytest -nauto
