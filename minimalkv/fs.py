@@ -5,8 +5,8 @@ import os
 import os.path
 import shutil
 
-from . import KeyValueStore, UrlMixin, CopyMixin
-from ._compat import url_quote, text_type
+from . import CopyMixin, KeyValueStore, UrlMixin
+from ._compat import text_type, url_quote
 
 
 class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
@@ -18,6 +18,7 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
     Any call to :meth:`.url_for` will result in a `file://`-URL pointing
     towards the internal storage to be generated.
     """
+
     def __init__(self, root, perm=None, **kwargs):
         """Initialize new FilesystemStore
 
@@ -75,7 +76,7 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
 
     def _open(self, key):
         try:
-            f = open(self._build_filename(key), 'rb')
+            f = open(self._build_filename(key), "rb")
             return f
         except IOError as e:
             if 2 == e.errno:
@@ -112,7 +113,7 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
         target = self._build_filename(key)
         self._ensure_dir_exists(os.path.dirname(target))
 
-        with open(target, 'wb') as f:
+        with open(target, "wb") as f:
             while True:
                 buf = file.read(bufsize)
                 f.write(buf)
@@ -138,15 +139,15 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
     def _url_for(self, key):
         full = os.path.abspath(self._build_filename(key))
         parts = full.split(os.sep)
-        location = '/'.join(url_quote(p, safe='') for p in parts)
-        return 'file://' + location
+        location = "/".join(url_quote(p, safe="") for p in parts)
+        return "file://" + location
 
     def keys(self, prefix=u""):
         root = os.path.abspath(self.root)
         result = []
         for dp, dn, fn in os.walk(root):
             for f in fn:
-                key = os.path.join(dp, f)[len(root) + 1:]
+                key = os.path.join(dp, f)[len(root) + 1 :]
                 if key.startswith(prefix):
                     result.append(key)
         return result
@@ -214,6 +215,7 @@ class WebFilesystemStore(FilesystemStore):
     >>> print(store.url_for(u'some_key'))
     https://some.domain.invalid/files/some_key
     """
+
     def __init__(self, root, url_prefix, **kwargs):
         """Initialize new WebFilesystemStore.
 
@@ -232,4 +234,4 @@ class WebFilesystemStore(FilesystemStore):
             stem = self.url_prefix(self, key)
         else:
             stem = self.url_prefix
-        return stem + url_quote(rel, safe='')
+        return stem + url_quote(rel, safe="")

@@ -3,10 +3,10 @@
 
 from io import BytesIO
 
-from .._compat import imap, text_type
-from .. import KeyValueStore, CopyMixin
+from sqlalchemy import Column, LargeBinary, String, Table, exists, select
 
-from sqlalchemy import Table, Column, String, LargeBinary, select, exists
+from .. import CopyMixin, KeyValueStore
+from .._compat import imap, text_type
 
 
 class SQLAlchemyStore(KeyValueStore, CopyMixin):
@@ -14,11 +14,12 @@ class SQLAlchemyStore(KeyValueStore, CopyMixin):
         self.bind = bind
 
         self.table = Table(
-            tablename, metadata,
+            tablename,
+            metadata,
             # 250 characters is the maximum key length that we guarantee can be
             # handled by any kind of backend
-            Column('key', String(250), primary_key=True),
-            Column('value', LargeBinary, nullable=False)
+            Column("key", String(250), primary_key=True),
+            Column("value", LargeBinary, nullable=False),
         )
 
     def _has_key(self, key):
@@ -27,9 +28,7 @@ class SQLAlchemyStore(KeyValueStore, CopyMixin):
         ).scalar()
 
     def _delete(self, key):
-        self.bind.execute(
-            self.table.delete(self.table.c.key == key)
-        )
+        self.bind.execute(self.table.delete(self.table.c.key == key))
 
     def _get(self, key):
         rv = self.bind.execute(
@@ -55,10 +54,14 @@ class SQLAlchemyStore(KeyValueStore, CopyMixin):
 
             # delete the potential existing previous key
             con.execute(self.table.delete(self.table.c.key == dest))
-            con.execute(self.table.insert({
-                'key': dest,
-                'value': data,
-            }))
+            con.execute(
+                self.table.insert(
+                    {
+                        "key": dest,
+                        "value": data,
+                    }
+                )
+            )
         con.close()
         return dest
 
@@ -69,10 +72,7 @@ class SQLAlchemyStore(KeyValueStore, CopyMixin):
             con.execute(self.table.delete(self.table.c.key == key))
 
             # insert new
-            con.execute(self.table.insert({
-                'key': key,
-                'value': data
-            }))
+            con.execute(self.table.insert({"key": key, "value": data}))
 
             # commit happens here
 
@@ -85,6 +85,5 @@ class SQLAlchemyStore(KeyValueStore, CopyMixin):
     def iter_keys(self, prefix=u""):
         query = select([self.table.c.key])
         if prefix != "":
-            query = query.where(self.table.c.key.like(prefix + '%'))
-        return imap(lambda v: text_type(v[0]),
-                    self.bind.execute(query))
+            query = query.where(self.table.c.key.like(prefix + "%"))
+        return imap(lambda v: text_type(v[0]), self.bind.execute(query))

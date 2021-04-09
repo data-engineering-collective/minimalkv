@@ -23,6 +23,7 @@ class CacheDecorator(StoreDecorator):
     :param cache: The caching backend.
     :param store: The backing store. This is the "authorative" backend.
     """
+
     def __init__(self, cache, store):
         super(CacheDecorator, self).__init__(store)
         self.cache = cache
@@ -116,7 +117,7 @@ class CacheDecorator(StoreDecorator):
         Copies the data in the backing store and removes the destination key from the cache,
          in case it was already populated.
          Does not work when the backing store does not implement copy.
-         """
+        """
         try:
             k = self._dstore.copy(source, dest)
         finally:

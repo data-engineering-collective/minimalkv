@@ -2,21 +2,18 @@
 
 import os
 import stat
-from minimalkv._compat import BytesIO, url_quote, url_unquote, PY2
 import tempfile
-from minimalkv._compat import urlparse
 
-from minimalkv.fs import FilesystemStore, WebFilesystemStore
-
-from basic_store import BasicStore
-from url_store import UrlStore
-from idgens import UUIDGen, HashGen
-
-from conftest import ExtendedKeyspaceTests
-from minimalkv.contrib import ExtendedKeyspaceMixin
-
-from mock import Mock
 import pytest
+from basic_store import BasicStore
+from conftest import ExtendedKeyspaceTests
+from idgens import HashGen, UUIDGen
+from mock import Mock
+from url_store import UrlStore
+
+from minimalkv._compat import PY2, BytesIO, url_quote, url_unquote, urlparse
+from minimalkv.contrib import ExtendedKeyspaceMixin
+from minimalkv.fs import FilesystemStore, WebFilesystemStore
 
 
 class TestBaseFilesystemStore(BasicStore, UrlStore, UUIDGen, HashGen):
@@ -30,32 +27,30 @@ class TestBaseFilesystemStore(BasicStore, UrlStore, UUIDGen, HashGen):
 
 
 class TestFilesystemStoreMkdir(TestBaseFilesystemStore):
-
     def test_concurrent_mkdir(self, tmpdir, mocker):
         # Concurrent instantiation of the store in two threads could lead to
         # the situation where both threads see that the directory does not
         # exists. For one, the call to mkdir succeeds, for the other it fails.
         # This is ok for us as long as the directory exists afterwards.
-        makedirs = mocker.patch('os.makedirs')
+        makedirs = mocker.patch("os.makedirs")
         makedirs.side_effect = OSError("Failure")
-        mocker.patch('os.path.isdir')
+        mocker.patch("os.path.isdir")
 
-        store = FilesystemStore(os.path.join(tmpdir, 'test'))
+        store = FilesystemStore(os.path.join(tmpdir, "test"))
         # We have mocked os.makedirs, so this won't work. But it should
         # pass beyond the OS error and simply fail on writing the file itself.
         if PY2:
             with pytest.raises(IOError):
-                store.put('test', b'test')
+                store.put("test", b"test")
         else:
             with pytest.raises(FileNotFoundError):
-                store.put('test', b'test')
+                store.put("test", b"test")
 
 
 class TestFilesystemStoreFileURI(TestBaseFilesystemStore):
-    @pytest.mark.skipif(os.name != 'posix',
-                        reason='Not supported outside posix.')
+    @pytest.mark.skipif(os.name != "posix", reason="Not supported outside posix.")
     def test_correct_file_uri(self, store, tmpdir, key):
-        expected = 'file://' + tmpdir + '/' + url_quote(key)
+        expected = "file://" + tmpdir + "/" + url_quote(key)
         assert store.url_for(key) == expected
 
     def test_file_uri(self, store, value):
@@ -64,13 +59,13 @@ class TestFilesystemStoreFileURI(TestBaseFilesystemStore):
             tmpfile.write(value)
             tmpfile.close()
 
-            key = store.put_file(u'testkey', tmpfile.name)
+            key = store.put_file(u"testkey", tmpfile.name)
             url = store.url_for(key)
 
-            assert url.startswith('file://')
+            assert url.startswith("file://")
             parts = urlparse(url)
 
-            ndata = open(parts.path, 'rb').read()
+            ndata = open(parts.path, "rb").read()
             assert value == ndata
         finally:
             if os.path.exists(tmpfile.name):
@@ -79,30 +74,28 @@ class TestFilesystemStoreFileURI(TestBaseFilesystemStore):
 
 # runs each test with a nonstandard umask and checks if it is set correctly
 class TestFilesystemStoreUmask(TestBaseFilesystemStore):
-    @pytest.fixture(scope='class')
+    @pytest.fixture(scope="class")
     def current_umask(self):
         mask = os.umask(0)
         # re-set umask
         os.umask(mask)
         return mask
 
-    @pytest.fixture(scope='class')
+    @pytest.fixture(scope="class")
     def perms(self, current_umask):
         # the permissions we expect on files are inverse to the mask
         return 0o666 & (0o777 ^ current_umask)
 
-    def test_file_permission_on_new_file_have_correct_value(
-        self, store, perms, value
-    ):
+    def test_file_permission_on_new_file_have_correct_value(self, store, perms, value):
         src = BytesIO(value)
 
-        key = store.put_file(u'test123', src)
+        key = store.put_file(u"test123", src)
 
         parts = urlparse(store.url_for(key))
         path = parts.path
 
         mode = os.stat(path).st_mode
-        mask = (stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
+        mask = stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO
 
         assert mode & mask == perms
 
@@ -120,7 +113,7 @@ class TestFilesystemStoreUmask(TestBaseFilesystemStore):
             path = url_unquote(parts.path)
 
             mode = os.stat(path).st_mode
-            mask = (stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
+            mask = stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO
 
             assert mode & mask == perms
         finally:
@@ -142,7 +135,7 @@ class TestFileStoreSetPermissions(TestFilesystemStoreUmask):
 class TestWebFileStore(TestBaseFilesystemStore):
     @pytest.fixture
     def url_prefix(self):
-        return 'http://some/url/root/'
+        return "http://some/url/root/"
 
     @pytest.fixture
     def store(self, tmpdir, url_prefix):
@@ -153,7 +146,7 @@ class TestWebFileStore(TestBaseFilesystemStore):
         assert store.url_for(key) == expected
 
     def test_url_callable(self, tmpdir, key):
-        prefix = 'http://some.prefix.invalid/'
+        prefix = "http://some.prefix.invalid/"
         mock_callable = Mock(return_value=prefix)
 
         store = WebFilesystemStore(tmpdir, mock_callable)
@@ -164,12 +157,14 @@ class TestWebFileStore(TestBaseFilesystemStore):
         mock_callable.assert_called_with(store, key)
 
 
-class TestExtendedKeyspaceFilesystemStore(TestBaseFilesystemStore,
-                                          ExtendedKeyspaceTests):
+class TestExtendedKeyspaceFilesystemStore(
+    TestBaseFilesystemStore, ExtendedKeyspaceTests
+):
     @pytest.fixture
     def store(self, tmpdir):
         class ExtendedKeyspaceStore(ExtendedKeyspaceMixin, FilesystemStore):
             pass
+
         return ExtendedKeyspaceStore(tmpdir)
 
     def test_prefix_iterator_ossep(self, store, value):
@@ -194,18 +189,22 @@ class TestExtendedKeyspaceFilesystemStore(TestBaseFilesystemStore,
             u"a4" + os.sep,
         ]
 
-        l = sorted(store.iter_prefixes(
-            os.sep,
-            prefix=u"a4" + os.sep,
-        ))
+        l = sorted(
+            store.iter_prefixes(
+                os.sep,
+                prefix=u"a4" + os.sep,
+            )
+        )
         assert l == [
             u"a4" + os.sep + "b1" + os.sep,
             u"a4" + os.sep + "b2" + os.sep,
             u"a4" + os.sep + "b3",
         ]
 
-        l = sorted(store.iter_prefixes(
-            os.sep,
-            prefix=u"foo" + os.sep,
-        ))
+        l = sorted(
+            store.iter_prefixes(
+                os.sep,
+                prefix=u"foo" + os.sep,
+            )
+        )
         assert l == []

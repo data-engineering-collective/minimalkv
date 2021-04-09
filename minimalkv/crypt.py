@@ -17,15 +17,16 @@ class _HMACFileReader(object):
         # "preload" buffer
         self.buffer = source.read(self.hm.digest_size)
         if not len(self.buffer) == self.hm.digest_size:
-            raise VerificationException('Source does not contain HMAC hash '
-                                        '(too small)')
+            raise VerificationException(
+                "Source does not contain HMAC hash " "(too small)"
+            )
 
     def read(self, n=None):
-        if b'' == self.buffer or 0 == n:
-            return b''
+        if b"" == self.buffer or 0 == n:
+            return b""
 
         new_read = self.source.read(n) if n is not None else self.source.read()
-        finished = (n is None or len(new_read) != n)
+        finished = n is None or len(new_read) != n
         self.buffer += new_read
 
         if n is not None:
@@ -41,7 +42,7 @@ class _HMACFileReader(object):
         if finished:
             # check hash
             if not self.buffer == self.hm.digest():
-                raise VerificationException('HMAC verification failed.')
+                raise VerificationException("HMAC verification failed.")
 
         return rv
 
@@ -58,6 +59,7 @@ class _HMACFileReader(object):
 class VerificationException(Exception):
     """This exception is thrown whenever there was an error with an
     authenticity check performed by any of the decorators in this module."""
+
     pass
 
 
@@ -96,39 +98,38 @@ class HMACDecorator(StoreDecorator):
 
     def __new_hmac(self, key, msg=None):
         if not msg:
-            msg = b''
+            msg = b""
 
         # item key is used as salt for secret_key
         hm = hmac.HMAC(
-            key=key.encode('ascii') + self.__secret_key,
+            key=key.encode("ascii") + self.__secret_key,
             msg=msg,
-            digestmod=self.__hashfunc)
+            digestmod=self.__hashfunc,
+        )
 
         return hm
 
     def get(self, key):
         buf = self._dstore.get(key)
         hm = self.__new_hmac(key)
-        hash = buf[-hm.digest_size:]
+        hash = buf[-hm.digest_size :]
 
         # shorten buf
-        buf = buf[:-hm.digest_size]
+        buf = buf[: -hm.digest_size]
 
         hm.update(buf)
 
         if not hm.digest() == hash:
-            raise VerificationException('Invalid hash on key %r' % key)
+            raise VerificationException("Invalid hash on key %r" % key)
 
         return buf
 
     def get_file(self, key, file):
         if isinstance(file, str):
             try:
-                f = open(file, 'wb')
+                f = open(file, "wb")
             except (OSError, IOError) as e:
-                raise IOError('Error opening %s for writing: %r' % (
-                    file, e
-                ))
+                raise IOError("Error opening %s for writing: %r" % (file, e))
 
             # file is open, now we call ourself again with a proper file
             try:
@@ -169,7 +170,7 @@ class HMACDecorator(StoreDecorator):
         if isinstance(file, str):
             # we read the file once, then write the hash at the end, before
             # handing it over to the original backend
-            with open(file, 'rb+') as source:
+            with open(file, "rb+") as source:
                 while True:
                     buf = source.read(bufsize)
                     hm.update(buf)
@@ -196,8 +197,6 @@ class HMACDecorator(StoreDecorator):
                 tmpfile.write(hm.digest())
                 tmpfile.close()
 
-                return self._dstore.put_file(
-                    key, tmpfile.name, *args, **kwargs
-                )
+                return self._dstore.put_file(key, tmpfile.name, *args, **kwargs)
             finally:
                 os.unlink(tmpfile.name)

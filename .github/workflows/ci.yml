@@ -32,3 +32,18 @@ jobs:
           pip install --no-deps .
           docker-compose up -d
           pytest -nauto --dist loadfile -rs
+
+  pre-commit-checks:
+    name: "Pre-commit checks - Python 3.8"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v2.1.0
+        with:
+          ref: ${{ github.head_ref }}
+      - name: Install Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Run pre-commit checks
+        uses: pre-commit/action@v2.0.0

@@ -2,8 +2,8 @@
 Internal utilities for aztorestore_old and azurestore_new
 """
 
-import hashlib
 import base64
+import hashlib
 
 
 def _file_md5(file_, b64encode=True):

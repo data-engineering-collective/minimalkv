@@ -1,8 +1,8 @@
 import io
 from contextlib import contextmanager
 
-from ._net_common import lazy_property, LAZY_PROPERTY_ATTR_PREFIX
 from .. import KeyValueStore
+from ._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
 
 
 @contextmanager
@@ -13,8 +13,8 @@ def map_gcloud_exceptions(key=None, error_codes_pass=()):
     without needing to install google-cloud-storage (as we lazily
     import the google library)
     """
-    from google.cloud.exceptions import NotFound, GoogleCloudError
     from google.api_core.exceptions import ClientError
+    from google.cloud.exceptions import GoogleCloudError, NotFound
 
     try:
         yield

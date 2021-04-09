@@ -2,20 +2,21 @@
 # coding=utf8
 
 import os
-from .._compat import imap
-from .. import KeyValueStore, UrlMixin, CopyMixin
 from contextlib import contextmanager
+
+from .. import CopyMixin, KeyValueStore, UrlMixin
+from .._compat import imap
 
 
 @contextmanager
 def map_boto_exceptions(key=None, exc_pass=()):
     """Map boto-specific exceptions to the minimalkv-API."""
-    from boto.exception import BotoClientError, BotoServerError, \
-        StorageResponseError
+    from boto.exception import BotoClientError, BotoServerError, StorageResponseError
+
     try:
         yield
     except StorageResponseError as e:
-        if e.code == 'NoSuchKey':
+        if e.code == "NoSuchKey":
             raise KeyError(key)
         raise IOError(str(e))
     except (BotoClientError, BotoServerError) as e:
@@ -24,9 +25,16 @@ def map_boto_exceptions(key=None, exc_pass=()):
 
 
 class BotoStore(KeyValueStore, UrlMixin, CopyMixin):
-    def __init__(self, bucket, prefix='', url_valid_time=0,
-                 reduced_redundancy=False, public=False, metadata=None):
-        self.prefix = prefix.strip().lstrip('/')
+    def __init__(
+        self,
+        bucket,
+        prefix="",
+        url_valid_time=0,
+        reduced_redundancy=False,
+        public=False,
+        metadata=None,
+    ):
+        self.prefix = prefix.strip().lstrip("/")
         self.bucket = bucket
         self.reduced_redundancy = reduced_redundancy
         self.public = public
@@ -46,19 +54,20 @@ class BotoStore(KeyValueStore, UrlMixin, CopyMixin):
         set_content_from* functions. This allows us to save API calls by
         passing the necessary parameters on with the upload."""
         d = {
-            'reduced_redundancy': self.reduced_redundancy,
+            "reduced_redundancy": self.reduced_redundancy,
         }
 
         if self.public:
-            d['policy'] = 'public-read'
+            d["policy"] = "public-read"
 
         return d
 
     def iter_keys(self, prefix=u""):
         with map_boto_exceptions():
             prefix_len = len(self.prefix)
-            return imap(lambda k: k.name[prefix_len:],
-                        self.bucket.list(self.prefix + prefix))
+            return imap(
+                lambda k: k.name[prefix_len:], self.bucket.list(self.prefix + prefix)
+            )
 
     def _has_key(self, key):
         with map_boto_exceptions(key=key):
@@ -66,10 +75,11 @@ class BotoStore(KeyValueStore, UrlMixin, CopyMixin):
 
     def _delete(self, key):
         from boto.exception import StorageResponseError
+
         try:
             self.bucket.delete_key(self.prefix + key)
         except StorageResponseError as e:
-            if e.code != 'NoSuchKey':
+            if e.code != "NoSuchKey":
                 raise IOError(str(e))
 
     def _get(self, key):
@@ -112,34 +122,29 @@ class BotoStore(KeyValueStore, UrlMixin, CopyMixin):
         if not self._has_key(source):
             raise KeyError(source)
         with map_boto_exceptions(key=source):
-            self.bucket.copy_key(self.prefix + dest, self.bucket.name, self.prefix + source)
+            self.bucket.copy_key(
+                self.prefix + dest, self.bucket.name, self.prefix + source
+            )
 
     def _put(self, key, data):
         k = self.__new_key(key)
         with map_boto_exceptions(key=key):
-            k.set_contents_from_string(
-                data, **self.__upload_args()
-            )
+            k.set_contents_from_string(data, **self.__upload_args())
             return key
 
     def _put_file(self, key, file):
         k = self.__new_key(key)
         with map_boto_exceptions(key=key):
-            k.set_contents_from_file(
-                file, **self.__upload_args()
-            )
+            k.set_contents_from_file(file, **self.__upload_args())
             return key
 
     def _put_filename(self, key, filename):
         k = self.__new_key(key)
         with map_boto_exceptions(key=key):
-            k.set_contents_from_filename(
-                filename, **self.__upload_args()
-            )
+            k.set_contents_from_filename(filename, **self.__upload_args())
             return key
 
     def _url_for(self, key):
         k = self.__new_key(key)
         with map_boto_exceptions(key=key):
-            return k.generate_url(expires_in=self.url_valid_time,
-                                  query_auth=False)
+            return k.generate_url(expires_in=self.url_valid_time, query_auth=False)

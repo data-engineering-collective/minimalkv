@@ -3,9 +3,10 @@
 
 import re
 from io import BytesIO
+
 from ._compat import key_type
 
-__version__ = '0.14.1'
+__version__ = "0.14.1"
 
 VALID_NON_NUM = r"""\`\!"#$%&'()+,-.<=>?@[]^_{}~"""
 VALID_KEY_REGEXP = "^[%s0-9a-zA-Z]+$" % re.escape(VALID_NON_NUM)
@@ -214,9 +215,9 @@ class KeyValueStore(object):
         :param key: The key to be checked
         """
         if not isinstance(key, key_type):
-            raise ValueError('%r is not a valid key type' % key)
+            raise ValueError("%r is not a valid key type" % key)
         if not VALID_KEY_RE.match(key):
-            raise ValueError('%r contains illegal characters' % key)
+            raise ValueError("%r contains illegal characters" % key)
 
     def _delete(self, key):
         """Implementation for :meth:`~minimalkv.KeyValueStore.delete`. The
@@ -274,7 +275,7 @@ class KeyValueStore(object):
         :param key: Key to be retrieved
         :param filename: Filename to write to
         """
-        with open(filename, 'wb') as dest:
+        with open(filename, "wb") as dest:
             return self._get_file(key, dest)
 
     def _has_key(self, key):
@@ -332,7 +333,7 @@ class KeyValueStore(object):
         :param key: Key under which data should be stored
         :param file: Filename of file to store
         """
-        with open(filename, 'rb') as source:
+        with open(filename, "rb") as source:
             return self._put_file(key, source)
 
 
@@ -358,8 +359,8 @@ class UrlMixin(object):
         raise NotImplementedError
 
 
-FOREVER = 'forever'
-NOT_SET = 'not_set'
+FOREVER = "forever"
+NOT_SET = "not_set"
 
 
 class TimeToLiveMixin(object):
@@ -383,6 +384,7 @@ class TimeToLiveMixin(object):
        ``ttl_secs`` argument. For more information on how to implement
        backends, see :ref:`implement`.
     """
+
     ttl_support = True
     """Indicates that a key-value store supports time-to-live features. This
     allows users of stores to test for support using::
@@ -401,22 +403,22 @@ class TimeToLiveMixin(object):
             return ttl_secs
 
         if not isinstance(ttl_secs, (int, float)):
-            raise ValueError('Not a valid ttl_secs value: %r' % ttl_secs)
+            raise ValueError("Not a valid ttl_secs value: %r" % ttl_secs)
 
         if ttl_secs < 0:
-            raise ValueError('ttl_secs must not be negative: %r' % ttl_secs)
+            raise ValueError("ttl_secs must not be negative: %r" % ttl_secs)
 
         return ttl_secs
 
     def put(self, key, data, ttl_secs=None):
         """Like :meth:`~minimalkv.KeyValueStore.put`, but with an additional
-           parameter:
+        parameter:
 
-           :param ttl_secs: Number of seconds until the key expires. See above
-                            for valid values.
-           :raises exceptions.ValueError: If ``ttl_secs`` is invalid.
-           :raises exceptions.IOError: If storing failed or the file could not
-                            be read
+        :param ttl_secs: Number of seconds until the key expires. See above
+                         for valid values.
+        :raises exceptions.ValueError: If ``ttl_secs`` is invalid.
+        :raises exceptions.IOError: If storing failed or the file could not
+                         be read
 
         """
         self._check_valid_key(key)
@@ -426,11 +428,11 @@ class TimeToLiveMixin(object):
 
     def put_file(self, key, file, ttl_secs=None):
         """Like :meth:`~minimalkv.KeyValueStore.put_file`, but with an
-           additional parameter:
+        additional parameter:
 
-           :param ttl_secs: Number of seconds until the key expires. See above
-                            for valid values.
-           :raises exceptions.ValueError: If ``ttl_secs`` is invalid.
+        :param ttl_secs: Number of seconds until the key expires. See above
+                         for valid values.
+        :raises exceptions.ValueError: If ``ttl_secs`` is invalid.
         """
         if ttl_secs is None:
             ttl_secs = self.default_ttl_secs
@@ -450,7 +452,7 @@ class TimeToLiveMixin(object):
         raise NotImplementedError
 
     def _put_filename(self, key, filename, ttl_secs):
-        with open(filename, 'rb') as source:
+        with open(filename, "rb") as source:
             return self._put_file(key, source, ttl_secs)
 
 
@@ -459,6 +461,7 @@ class UrlKeyValueStore(UrlMixin, KeyValueStore):
     .. deprecated:: 0.9
        Use the :class:`.UrlMixin` instead.
     """
+
     pass
 
 

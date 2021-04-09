@@ -1,23 +1,24 @@
 #!/usr/bin/env python
 # coding=utf8
 
-from .._compat import imap
-from .. import KeyValueStore, UrlMixin, CopyMixin
+import io
 from contextlib import contextmanager
 from shutil import copyfileobj
-import io
+
+from .. import CopyMixin, KeyValueStore, UrlMixin
+from .._compat import imap
 
 
 def _public_readable(grants):
     """Take a list of grants from an ACL and check if they allow public read access."""
     for grant in grants:
         # see: https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html
-        if grant['Permission'] not in ('READ', 'FULL_CONTROL'):
+        if grant["Permission"] not in ("READ", "FULL_CONTROL"):
             continue
-        grantee = grant['Grantee']
-        if grantee.get('Type') != 'Group':
+        grantee = grant["Grantee"]
+        if grantee.get("Type") != "Group":
             continue
-        if grantee.get('URI') != 'http://acs.amazonaws.com/groups/global/AllUsers':
+        if grantee.get("URI") != "http://acs.amazonaws.com/groups/global/AllUsers":
             continue
         return True
     return False
@@ -31,8 +32,8 @@ def map_boto3_exceptions(key=None, exc_pass=()):
     try:
         yield
     except ClientError as ex:
-        code = ex.response['Error']['Code']
-        if code == '404' or code == 'NoSuchKey':
+        code = ex.response["Error"]["Code"]
+        if code == "404" or code == "NoSuchKey":
             raise KeyError(key)
         raise IOError(str(ex))
 
@@ -62,9 +63,10 @@ class Boto3SimpleKeyFile(io.RawIOBase):
         elif whence == io.SEEK_END:
             self.position = self.size + offset
         else:
-            raise ValueError("invalid whence (%r, should be %d, %d, %d)" % (
-                whence, io.SEEK_SET, io.SEEK_CUR, io.SEEK_END
-            ))
+            raise ValueError(
+                "invalid whence (%r, should be %d, %d, %d)"
+                % (whence, io.SEEK_SET, io.SEEK_CUR, io.SEEK_END)
+            )
 
         return self.position
 
@@ -94,16 +96,24 @@ class Boto3SimpleKeyFile(io.RawIOBase):
 
 
 class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):
-    def __init__(self, bucket, prefix='', url_valid_time=0,
-                 reduced_redundancy=False, public=False, metadata=None):
+    def __init__(
+        self,
+        bucket,
+        prefix="",
+        url_valid_time=0,
+        reduced_redundancy=False,
+        public=False,
+        metadata=None,
+    ):
         if isinstance(bucket, str):
             import boto3
-            s3_resource = boto3.resource('s3')
+
+            s3_resource = boto3.resource("s3")
             bucket = s3_resource.Bucket(bucket)
             if bucket not in s3_resource.buckets.all():
-                raise ValueError('invalid s3 bucket name')
+                raise ValueError("invalid s3 bucket name")
         self.bucket = bucket
-        self.prefix = prefix.strip().lstrip('/')
+        self.prefix = prefix.strip().lstrip("/")
         self.url_valid_time = url_valid_time
         self.reduced_redundancy = reduced_redundancy
         self.public = public
@@ -115,8 +125,10 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):
     def iter_keys(self, prefix=u""):
         with map_boto3_exceptions():
             prefix_len = len(self.prefix)
-            return imap(lambda k: k.key[prefix_len:],
-                        self.bucket.objects.filter(Prefix=self.prefix + prefix))
+            return imap(
+                lambda k: k.key[prefix_len:],
+                self.bucket.objects.filter(Prefix=self.prefix + prefix),
+            )
 
     def _delete(self, key):
         self.bucket.Object(self.prefix + key).delete()
@@ -125,20 +137,20 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):
         obj = self.__new_object(key)
         with map_boto3_exceptions(key=key):
             obj = obj.get()
-            return obj['Body'].read()
+            return obj["Body"].read()
 
     def _get_file(self, key, file):
         obj = self.__new_object(key)
         with map_boto3_exceptions(key=key):
             obj = obj.get()
-            return copyfileobj(obj['Body'], file)
+            return copyfileobj(obj["Body"], file)
 
     def _get_filename(self, key, filename):
         obj = self.__new_object(key)
         with map_boto3_exceptions(key=key):
             obj = obj.get()
-            with open(filename, 'wb') as file:
-                return copyfileobj(obj['Body'], file)
+            with open(filename, "wb") as file:
+                return copyfileobj(obj["Body"], file)
 
     def _open(self, key):
         obj = self.__new_object(key)
@@ -149,24 +161,24 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):
     def _copy(self, source, dest):
         obj = self.__new_object(dest)
         parameters = {
-            'CopySource': self.bucket.name + '/' + self.prefix + source,
-            'Metadata': self.metadata
+            "CopySource": self.bucket.name + "/" + self.prefix + source,
+            "Metadata": self.metadata,
         }
         if self.public:
-            parameters['ACL'] = 'public-read'
+            parameters["ACL"] = "public-read"
         if self.reduced_redundancy:
-            parameters['StorageClass'] = 'REDUCED_REDUNDANCY'
+            parameters["StorageClass"] = "REDUCED_REDUNDANCY"
         with map_boto3_exceptions(key=source):
             self.__new_object(source).load()
             obj.copy_from(**parameters)
 
     def _put(self, key, data):
         obj = self.__new_object(key)
-        parameters = {'Body': data, 'Metadata': self.metadata}
+        parameters = {"Body": data, "Metadata": self.metadata}
         if self.public:
-            parameters['ACL'] = 'public-read'
+            parameters["ACL"] = "public-read"
         if self.reduced_redundancy:
-            parameters['StorageClass'] = 'REDUCED_REDUNDANCY'
+            parameters["StorageClass"] = "REDUCED_REDUNDANCY"
         with map_boto3_exceptions(key=key):
             obj.put(**parameters)
         return key
@@ -175,13 +187,14 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):
         return self._put(key, file)
 
     def _put_filename(self, key, filename):
-        with open(filename, 'rb') as file:
+        with open(filename, "rb") as file:
             return self._put(key, file)
 
     def _url_for(self, key):
         import boto3
         import botocore.client
         import botocore.exceptions
+
         obj = self.__new_object(key)
         try:
             grants = obj.Acl().grants
@@ -190,11 +203,14 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):
         else:
             is_public = _public_readable(grants)
         if self.url_valid_time and not is_public:
-            s3_client = boto3.client('s3')
+            s3_client = boto3.client("s3")
         else:
-            s3_client = boto3.client('s3', config=botocore.client.Config(signature_version=botocore.UNSIGNED))
+            s3_client = boto3.client(
+                "s3", config=botocore.client.Config(signature_version=botocore.UNSIGNED)
+            )
         with map_boto3_exceptions(key=key):
-            return s3_client.generate_presigned_url('get_object',
-                                                    Params={'Bucket': self.bucket.name,
-                                                            'Key': key},
-                                                    ExpiresIn=self.url_valid_time)
+            return s3_client.generate_presigned_url(
+                "get_object",
+                Params={"Bucket": self.bucket.name, "Key": key},
+                ExpiresIn=self.url_valid_time,
+            )

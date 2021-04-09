@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import re
 from io import BytesIO
 
-from .. import KeyValueStore, TimeToLiveMixin, NOT_SET, FOREVER
-import re
+from .. import FOREVER, NOT_SET, KeyValueStore, TimeToLiveMixin
 
 
 class RedisStore(TimeToLiveMixin, KeyValueStore):
@@ -20,7 +20,9 @@ class RedisStore(TimeToLiveMixin, KeyValueStore):
         return self.redis.delete(key)
 
     def keys(self, prefix=u""):
-        return list(map(lambda b: b.decode(), self.redis.keys(pattern=re.escape(prefix) + '*')))
+        return list(
+            map(lambda b: b.decode(), self.redis.keys(pattern=re.escape(prefix) + "*"))
+        )
 
     def iter_keys(self, prefix=u""):
         return iter(self.keys(prefix))

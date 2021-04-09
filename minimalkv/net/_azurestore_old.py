@@ -4,22 +4,21 @@ This implements the AzureBlockBlobStore for `azure-storage-blob<12`
 import io
 from contextlib import contextmanager
 
-from ._azurestore_common import (
-    _byte_buffer_md5,
-    _file_md5,
-    _filename_md5,
-)
-from ._net_common import lazy_property, LAZY_PROPERTY_ATTR_PREFIX
-
-from .._compat import binary_type
 from .. import KeyValueStore
+from .._compat import binary_type
+from ._azurestore_common import _byte_buffer_md5, _file_md5, _filename_md5
+from ._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
 
 
 @contextmanager
 def map_azure_exceptions(key=None, exc_pass=()):
     """Map Azure-specific exceptions to the minimalkv-API."""
-    from azure.common import AzureMissingResourceHttpError, AzureHttpError,\
-        AzureException
+    from azure.common import (
+        AzureException,
+        AzureHttpError,
+        AzureMissingResourceHttpError,
+    )
+
     try:
         yield
     except AzureMissingResourceHttpError as ex:
@@ -37,11 +36,18 @@ def map_azure_exceptions(key=None, exc_pass=()):
 
 
 class AzureBlockBlobStore(KeyValueStore):
-    def __init__(self, conn_string=None, container=None, public=False,
-                 create_if_missing=True, max_connections=2,
-                 max_block_size=None, max_single_put_size=None,
-                 checksum=False,
-                 socket_timeout=None):
+    def __init__(
+        self,
+        conn_string=None,
+        container=None,
+        public=False,
+        create_if_missing=True,
+        max_connections=2,
+        max_block_size=None,
+        max_single_put_size=None,
+        checksum=False,
+        socket_timeout=None,
+    ):
         self.conn_string = conn_string
         self.container = container
         self.public = public
@@ -59,6 +65,7 @@ class AzureBlockBlobStore(KeyValueStore):
     @lazy_property
     def block_blob_service(self):
         from azure.storage.blob import BlockBlobService, PublicAccess
+
         block_blob_service = BlockBlobService(
             connection_string=self.conn_string,
             socket_timeout=self.socket_timeout,
@@ -71,13 +78,12 @@ class AzureBlockBlobStore(KeyValueStore):
         if self.create_if_missing:
             block_blob_service.create_container(
                 self.container,
-                public_access=PublicAccess.Container if self.public else None
+                public_access=PublicAccess.Container if self.public else None,
             )
         return block_blob_service
 
     def _delete(self, key):
-        with map_azure_exceptions(key=key,
-                                  exc_pass=['AzureMissingResourceHttpError']):
+        with map_azure_exceptions(key=key, exc_pass=["AzureMissingResourceHttpError"]):
             self.block_blob_service.delete_blob(self.container, key)
 
     def _get(self, key):
@@ -96,9 +102,13 @@ class AzureBlockBlobStore(KeyValueStore):
         if prefix == "":
             prefix = None
         with map_azure_exceptions():
-            blobs = self.block_blob_service.list_blob_names(self.container, prefix=prefix)
-            return (blob.decode('utf-8') if isinstance(blob, binary_type)
-                    else blob for blob in blobs)
+            blobs = self.block_blob_service.list_blob_names(
+                self.container, prefix=prefix
+            )
+            return (
+                blob.decode("utf-8") if isinstance(blob, binary_type) else blob
+                for blob in blobs
+            )
 
     def iter_prefixes(self, delimiter, prefix=u""):
         if prefix == "":
@@ -107,12 +117,16 @@ class AzureBlockBlobStore(KeyValueStore):
             blobs = self.block_blob_service.list_blob_names(
                 self.container, prefix=prefix, delimiter=delimiter
             )
-            return (blob.decode('utf-8') if isinstance(blob, binary_type)
-                    else blob for blob in blobs)
+            return (
+                blob.decode("utf-8") if isinstance(blob, binary_type) else blob
+                for blob in blobs
+            )
 
     def _open(self, key):
         with map_azure_exceptions(key=key):
-            return IOInterface(self.block_blob_service, self.container, key, self.max_connections)
+            return IOInterface(
+                self.block_blob_service, self.container, key, self.max_connections
+            )
 
     def _put(self, key, data):
         from azure.storage.blob.models import ContentSettings
@@ -228,7 +242,7 @@ class IOInterface(io.BufferedIOBase):
 
             end = min(self.pos + size - 1, self.size - 1)
             if self.pos > end:
-                return b''
+                return b""
             b = self.block_blob_service.get_blob_to_bytes(
                 container_name=self.container_name,
                 blob_name=self.key,
@@ -254,15 +268,15 @@ class IOInterface(io.BufferedIOBase):
             raise ValueError("I/O operation on closed file")
         if whence == 0:
             if offset < 0:
-                raise IOError('seek would move position outside the file')
+                raise IOError("seek would move position outside the file")
             self.pos = offset
         elif whence == 1:
             if self.pos + offset < 0:
-                raise IOError('seek would move position outside the file')
+                raise IOError("seek would move position outside the file")
             self.pos += offset
         elif whence == 2:
             if self.size + offset < 0:
-                raise IOError('seek would move position outside the file')
+                raise IOError("seek would move position outside the file")
             self.pos = self.size + offset
         return self.pos
 

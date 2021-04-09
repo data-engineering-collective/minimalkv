@@ -4,19 +4,20 @@ import os
 
 import pytest
 
-boto3 = pytest.importorskip('boto3')
-from minimalkv.net.boto3store import Boto3Store
-from minimalkv._compat import BytesIO
-
+boto3 = pytest.importorskip("boto3")
 from basic_store import BasicStore
-from url_store import UrlStore
-from bucket_manager import boto_credentials, boto3_bucket
+from bucket_manager import boto3_bucket, boto_credentials
 from conftest import ExtendedKeyspaceTests
+from url_store import UrlStore
+
+from minimalkv._compat import BytesIO
 from minimalkv.contrib import ExtendedKeyspaceMixin
+from minimalkv.net.boto3store import Boto3Store
 
 
-@pytest.fixture(params=boto_credentials,
-                ids=[c['access_key'] for c in boto_credentials])
+@pytest.fixture(
+    params=boto_credentials, ids=[c["access_key"] for c in boto_credentials]
+)
 def credentials(request):
     return request.param
 
@@ -34,9 +35,9 @@ class TestBoto3Storage(BasicStore, UrlStore):
 
     @pytest.fixture
     def storage_class(self, reduced_redundancy):
-        return 'REDUCED_REDUNDANCY' if reduced_redundancy else None
+        return "REDUCED_REDUNDANCY" if reduced_redundancy else None
 
-    @pytest.fixture(params=['', '/test-prefix'])
+    @pytest.fixture(params=["", "/test-prefix"])
     def prefix(self, request):
         return request.param
 
@@ -49,24 +50,22 @@ class TestBoto3Storage(BasicStore, UrlStore):
 
     def test_get_filename_nonexistant(self, store, key, tmp_path):
         with pytest.raises(KeyError):
-            store.get_file(key, os.path.join(str(tmp_path), 'a'))
+            store.get_file(key, os.path.join(str(tmp_path), "a"))
 
     def test_key_error_on_nonexistant_get_filename(self, store, key, tmp_path):
         with pytest.raises(KeyError):
-            store.get_file(key, os.path.join(str(tmp_path), 'a'))
+            store.get_file(key, os.path.join(str(tmp_path), "a"))
 
-    def test_storage_class_put(
-        self, store, prefix, key, value, storage_class, bucket
-    ):
+    def test_storage_class_put(self, store, prefix, key, value, storage_class, bucket):
         store.put(key, value)
-        obj = bucket.Object(prefix.lstrip('/') + key)
+        obj = bucket.Object(prefix.lstrip("/") + key)
         assert obj.storage_class == storage_class
 
     def test_storage_class_putfile(
         self, store, prefix, key, value, storage_class, bucket
     ):
         store.put_file(key, BytesIO(value))
-        obj = bucket.Object(prefix.lstrip('/') + key)
+        obj = bucket.Object(prefix.lstrip("/") + key)
         assert obj.storage_class == storage_class
 
 
@@ -75,5 +74,7 @@ class TestExtendedKeyspaceBoto3Store(TestBoto3Storage, ExtendedKeyspaceTests):
     def store(self, bucket, prefix, reduced_redundancy):
         class ExtendedKeyspaceStore(ExtendedKeyspaceMixin, Boto3Store):
             pass
-        return ExtendedKeyspaceStore(bucket, prefix,
-                                     reduced_redundancy=reduced_redundancy)
+
+        return ExtendedKeyspaceStore(
+            bucket, prefix, reduced_redundancy=reduced_redundancy
+        )

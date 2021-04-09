@@ -4,19 +4,20 @@ import os
 
 import pytest
 
-boto = pytest.importorskip('boto')
-from minimalkv.net.botostore import BotoStore
-from minimalkv._compat import BytesIO
-
+boto = pytest.importorskip("boto")
 from basic_store import BasicStore
-from url_store import UrlStore
-from bucket_manager import boto_credentials, boto_bucket
+from bucket_manager import boto_bucket, boto_credentials
 from conftest import ExtendedKeyspaceTests
+from url_store import UrlStore
+
+from minimalkv._compat import BytesIO
 from minimalkv.contrib import ExtendedKeyspaceMixin
+from minimalkv.net.botostore import BotoStore
 
 
-@pytest.fixture(params=boto_credentials,
-                ids=[c['access_key'] for c in boto_credentials])
+@pytest.fixture(
+    params=boto_credentials, ids=[c["access_key"] for c in boto_credentials]
+)
 def credentials(request):
     return request.param
 
@@ -34,9 +35,9 @@ class TestBotoStorage(BasicStore, UrlStore):
 
     @pytest.fixture
     def storage_class(self, reduced_redundancy):
-        return 'REDUCED_REDUNDANCY' if reduced_redundancy else 'STANDARD'
+        return "REDUCED_REDUNDANCY" if reduced_redundancy else "STANDARD"
 
-    @pytest.fixture(params=['', '/test-prefix'])
+    @pytest.fixture(params=["", "/test-prefix"])
     def prefix(self, request):
         return request.param
 
@@ -52,21 +53,19 @@ class TestBotoStorage(BasicStore, UrlStore):
         # the parent tests use /dev/null, which you really should not try
         # to os.remove!
         with pytest.raises(KeyError):
-            store.get_file(key, os.path.join(str(tmp_path), 'a'))
+            store.get_file(key, os.path.join(str(tmp_path), "a"))
 
     def test_key_error_on_nonexistant_get_filename(self, store, key, tmp_path):
         with pytest.raises(KeyError):
-            store.get_file(key, os.path.join(str(tmp_path), 'a'))
+            store.get_file(key, os.path.join(str(tmp_path), "a"))
 
-    def test_storage_class_put(
-        self, store, prefix, key, value, storage_class, bucket
-    ):
+    def test_storage_class_put(self, store, prefix, key, value, storage_class, bucket):
         store.put(key, value)
 
         keyname = prefix + key
 
-        if storage_class != 'STANDARD':
-            pytest.xfail('boto does not support checking the storage class?')
+        if storage_class != "STANDARD":
+            pytest.xfail("boto does not support checking the storage class?")
 
         assert bucket.lookup(keyname).storage_class == storage_class
 
@@ -77,8 +76,8 @@ class TestBotoStorage(BasicStore, UrlStore):
 
         keyname = prefix + key
 
-        if storage_class != 'STANDARD':
-            pytest.xfail('boto does not support checking the storage class?')
+        if storage_class != "STANDARD":
+            pytest.xfail("boto does not support checking the storage class?")
         assert bucket.lookup(keyname).storage_class == storage_class
 
 
@@ -87,5 +86,7 @@ class TestExtendedKeyspaceBotoStore(TestBotoStorage, ExtendedKeyspaceTests):
     def store(self, bucket, prefix, reduced_redundancy):
         class ExtendedKeyspaceStore(ExtendedKeyspaceMixin, BotoStore):
             pass
-        return ExtendedKeyspaceStore(bucket, prefix,
-                                     reduced_redundancy=reduced_redundancy)
+
+        return ExtendedKeyspaceStore(
+            bucket, prefix, reduced_redundancy=reduced_redundancy
+        )

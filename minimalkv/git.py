@@ -1,9 +1,9 @@
-from io import BytesIO
 import re
 import time
+from io import BytesIO
 
+from dulwich.objects import Blob, Commit, Tree
 from dulwich.repo import Repo
-from dulwich.objects import Commit, Tree, Blob
 
 from . import KeyValueStore, __version__
 from ._compat import text_type
@@ -30,7 +30,7 @@ def _on_tree(repo, tree, components, obj):
         elif obj is None:
             mode = None
         else:
-            raise TypeError('Can only mount Blobs or Trees')
+            raise TypeError("Can only mount Blobs or Trees")
         name = components[0]
 
         if mode is not None:
@@ -59,38 +59,38 @@ def _on_tree(repo, tree, components, obj):
             del tree[a]
         return [tree]
     else:
-        raise ValueError('Components can\'t be empty.')
+        raise ValueError("Components can't be empty.")
 
 
 class GitCommitStore(KeyValueStore):
-    AUTHOR = 'GitCommitStore (minimalkv {}) <>'.format(__version__)
+    AUTHOR = "GitCommitStore (minimalkv {}) <>".format(__version__)
     TIMEZONE = None
 
-    def __init__(self, repo_path, branch=b'master', subdir=b''):
+    def __init__(self, repo_path, branch=b"master", subdir=b""):
         self.repo = Repo(repo_path)
         self.branch = branch
 
         # cleans up subdir, to a form of 'a/b/c' (no duplicate, leading or
         # trailing slashes)
-        self.subdir = re.sub('#/+#', '/', subdir.decode('ascii').strip('/'))
+        self.subdir = re.sub("#/+#", "/", subdir.decode("ascii").strip("/"))
 
     @property
     def _subdir_components(self):
-        return [c.encode('ascii') for c in self.subdir.split('/')]
+        return [c.encode("ascii") for c in self.subdir.split("/")]
 
     def _key_components(self, key):
-        return [c.encode('ascii') for c in key.split('/')]
+        return [c.encode("ascii") for c in key.split("/")]
 
     @property
     def _refname(self):
-        return b'refs/heads/' + self.branch
+        return b"refs/heads/" + self.branch
 
     def _create_top_commit(self):
         # get the top commit, create empty one if it does not exist
         commit = Commit()
 
         # commit metadata
-        author = self.AUTHOR.encode('utf8')
+        author = self.AUTHOR.encode("utf8")
         commit.author = commit.committer = author
         commit.commit_time = commit.author_time = int(time.time())
 
@@ -99,7 +99,7 @@ class GitCommitStore(KeyValueStore):
         else:
             tz = time.timezone if (time.localtime().tm_isdst) else time.altzone
         commit.commit_timezone = commit.author_timezone = tz
-        commit.encoding = b'UTF-8'
+        commit.encoding = b"UTF-8"
 
         return commit
 
@@ -122,8 +122,9 @@ class GitCommitStore(KeyValueStore):
         tree = res[-1]
 
         commit.tree = tree.id
-        commit.message = (
-            'Deleted key {}'.format(self.subdir + '/' + key)).encode('utf8')
+        commit.message = ("Deleted key {}".format(self.subdir + "/" + key)).encode(
+            "utf8"
+        )
 
         objects_to_add.append(commit)
 
@@ -137,9 +138,8 @@ class GitCommitStore(KeyValueStore):
         try:
             commit = self.repo[self._refname]
             tree = self.repo[commit.tree]
-            fn = self.subdir + '/' + key
-            _, blob_id = tree.lookup_path(self.repo.__getitem__,
-                                          fn.encode('ascii'))
+            fn = self.subdir + "/" + key
+            _, blob_id = tree.lookup_path(self.repo.__getitem__, fn.encode("ascii"))
             blob = self.repo[blob_id]
         except KeyError:
             raise KeyError(key)
@@ -152,15 +152,19 @@ class GitCommitStore(KeyValueStore):
             tree = self.repo[commit.tree]
 
             if self.subdir:
-                tree = self.repo[tree.lookup_path(
-                    self.repo.__getitem__, self.subdir.encode('ascii'))[1]]
+                tree = self.repo[
+                    tree.lookup_path(
+                        self.repo.__getitem__, self.subdir.encode("ascii")
+                    )[1]
+                ]
         except KeyError:
             pass
         else:
-            for o in self.repo.object_store\
-                    .iter_tree_contents(tree.sha().hexdigest().encode('ascii')):
-                if o.path.decode('ascii').startswith(prefix):
-                    yield o.path.decode('ascii')
+            for o in self.repo.object_store.iter_tree_contents(
+                tree.sha().hexdigest().encode("ascii")
+            ):
+                if o.path.decode("ascii").startswith(prefix):
+                    yield o.path.decode("ascii")
 
     def _open(self, key):
         return BytesIO(self._get(key))
@@ -172,8 +176,9 @@ class GitCommitStore(KeyValueStore):
 
     def _put(self, key, data):
         commit = self._create_top_commit()
-        commit.message = (
-            'Updated key {}'.format(self.subdir + '/' + key)).encode('utf8')
+        commit.message = ("Updated key {}".format(self.subdir + "/" + key)).encode(
+            "utf8"
+        )
 
         blob = Blob.from_string(data)
 
