@@ -31,4 +31,5 @@ jobs:
         run: |
           pip install --no-deps .
           docker run -d --name fake-gcs-server -p 4443:4443 fsouza/fake-gcs-server:v1.21.2 -scheme http
+          docker run -d --name azurite -p 10000:10000 mcr.microsoft.com/azure-storage/azurite azurite-blob --blobHost 0.0.0.0 --loose
           pytest -nauto
