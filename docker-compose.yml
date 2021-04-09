@@ -20,3 +20,8 @@ services:
       MINIO_ACCESS_KEY: minio
       MINIO_SECRET_KEY: miniostorage
     command: server /data
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    ports:
+    - 27017:27017
