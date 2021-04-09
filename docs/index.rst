@@ -77,7 +77,6 @@ Table of contents
    boto
    azure
    gcstorage
-   gae
    memory
    db
    git
