@@ -31,7 +31,8 @@ jobs:
         run: |
           pip install --no-deps .
           docker-compose up -d
-          pytest -nauto --dist loadfile -rs
+          sleep 10s
+          pytest -n auto --dist loadfile -rs
 
   pre-commit-checks:
     name: "Pre-commit checks - Python 3.8"
