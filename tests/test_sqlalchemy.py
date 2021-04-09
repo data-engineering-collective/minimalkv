@@ -16,12 +16,15 @@ from minimalkv.contrib import ExtendedKeyspaceMixin
 from minimalkv.db.sql import SQLAlchemyStore
 
 DSNS = [
-    ('pymysql',
-     'mysql+pymysql://minimalkv_test:minimalkv_test@127.0.0.1/minimalkv_test'),
-    ('psycopg2',
-     'postgresql+psycopg2://minimalkv_test:minimalkv_test@127.0.0.1/minimalkv_test'),
-    ('sqlite3',
-     'sqlite:///:memory:')
+    (
+        "pymysql",
+        "mysql+pymysql://minimalkv_test:minimalkv_test@127.0.0.1/minimalkv_test",
+    ),
+    (
+        "psycopg2",
+        "postgresql+psycopg2://minimalkv_test:minimalkv_test@127.0.0.1/minimalkv_test",
+    ),
+    ("sqlite3", "sqlite:///:memory:"),
 ]
 
 
