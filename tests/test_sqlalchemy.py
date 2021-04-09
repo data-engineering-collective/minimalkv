@@ -17,7 +17,7 @@ from minimalkv.contrib import ExtendedKeyspaceMixin
 
 DSNS = [
     ('pymysql',
-     'mysql+pymysql://travis:@localhost/minimalkv_test'),
+     'mysql+pymysql://minimalkv_test:minimalkv_test@localhost/minimalkv_test'),
     ('psycopg2',
      'postgresql+psycopg2://minimalkv_test:minimalkv_test@127.0.0.1/minimalkv_test'),
     ('sqlite3',
