@@ -30,7 +30,5 @@ jobs:
         shell: bash -x -l {0}
         run: |
           pip install --no-deps .
-          docker run -d --name fake-gcs-server -p 4443:4443 fsouza/fake-gcs-server:v1.21.2 -scheme http
-          docker run -d --name azurite -p 10000:10000 mcr.microsoft.com/azure-storage/azurite azurite-blob --blobHost 0.0.0.0 --loose
-          docker run -d --name minio -p 9000:9000 -e "MINIO_ACCESS_KEY=minio" -e "MINIO_SECRET_KEY=miniostorage" minio/minio server /data
+          docker-compose up -d
           pytest -nauto
