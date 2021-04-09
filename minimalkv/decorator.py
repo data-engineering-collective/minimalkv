@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # coding=utf8
-from ._compat import quote_plus, unquote_plus, text_type, binary_type
+from ._compat import binary_type, quote_plus, text_type, unquote_plus
 
 
 class StoreDecorator(object):
@@ -56,8 +56,11 @@ class KeyTransformingDecorator(StoreDecorator):
         return self._dstore.get_file(self._map_key(key), *args, **kwargs)
 
     def iter_keys(self, prefix=u""):
-        return (self._unmap_key(k) for k in self._dstore.iter_keys(self._map_key_prefix(prefix))
-                if self._filter(k))
+        return (
+            self._unmap_key(k)
+            for k in self._dstore.iter_keys(self._map_key_prefix(prefix))
+            if self._filter(k)
+        )
 
     def iter_prefixes(self, delimiter, prefix=u""):
         dlen = len(delimiter)
@@ -84,12 +87,12 @@ class KeyTransformingDecorator(StoreDecorator):
         return self._dstore.open(self._map_key(key))
 
     def put(self, key, *args, **kwargs):
-        return self._unmap_key(
-            self._dstore.put(self._map_key(key), *args, **kwargs))
+        return self._unmap_key(self._dstore.put(self._map_key(key), *args, **kwargs))
 
     def put_file(self, key, *args, **kwargs):
         return self._unmap_key(
-            self._dstore.put_file(self._map_key(key), *args, **kwargs))
+            self._dstore.put_file(self._map_key(key), *args, **kwargs)
+        )
 
     # support for UrlMixin
     def url_for(self, key, *args, **kwargs):
@@ -125,17 +128,18 @@ class PrefixDecorator(KeyTransformingDecorator):
     def _unmap_key(self, key):
         assert key.startswith(self.prefix)
 
-        return key[len(self.prefix):]
+        return key[len(self.prefix) :]
 
 
 class URLEncodeKeysDecorator(KeyTransformingDecorator):
     """URL-encodes keys before passing them on to the underlying store."""
+
     def _map_key(self, key):
         if not isinstance(key, text_type):
-            raise ValueError('%r is not a unicode string' % key)
-        quoted = quote_plus(key.encode('utf-8'))
+            raise ValueError("%r is not a unicode string" % key)
+        quoted = quote_plus(key.encode("utf-8"))
         if isinstance(quoted, binary_type):
-            quoted = quoted.decode('utf-8')
+            quoted = quoted.decode("utf-8")
         return quoted
 
     def _map_key_prefix(self, key_prefix):
@@ -161,7 +165,7 @@ class ReadOnlyDecorator(StoreDecorator):
     """
 
     def __getattr__(self, attr):
-        if attr in ('get', 'iter_keys', 'keys', 'open', 'get_file'):
+        if attr in ("get", "iter_keys", "keys", "open", "get_file"):
             return super(ReadOnlyDecorator, self).__getattr__(attr)
         else:
             raise AttributeError

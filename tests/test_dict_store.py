@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # coding=utf8
-from minimalkv.memory import DictStore
+import pytest
 from basic_store import BasicStore
-from idgens import UUIDGen, HashGen
+from conftest import ExtendedKeyspaceTests
+from idgens import HashGen, UUIDGen
 from test_hmac import HMACDec
 
-import pytest
-from conftest import ExtendedKeyspaceTests
 from minimalkv.contrib import ExtendedKeyspaceMixin
+from minimalkv.memory import DictStore
 
 
 class TestDictStore(BasicStore, UUIDGen, HashGen, HMACDec):
@@ -21,4 +21,5 @@ class TestExtendedKeyspaceDictStore(TestDictStore, ExtendedKeyspaceTests):
     def store(self):
         class ExtendedKeyspaceStore(ExtendedKeyspaceMixin, DictStore):
             pass
+
         return ExtendedKeyspaceStore()

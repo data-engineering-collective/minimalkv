@@ -1,22 +1,29 @@
-from minimalkv._compat import BytesIO
-from minimalkv.memory import DictStore
-from minimalkv.decorator import PrefixDecorator
 import pytest
-
 from basic_store import BasicStore
+
+from minimalkv._compat import BytesIO
+from minimalkv.decorator import PrefixDecorator
+from minimalkv.memory import DictStore
 
 
 class TestPrefixDecorator(BasicStore):
-    @pytest.fixture(params=[
-        'short_',
-        'loooooooooooooooooooooooooooooooooooooooooooooooooooooooooong_',
-        'nounderscore',
-        '_129073ashd812g',
-    ])
+    @pytest.fixture(
+        params=[
+            "short_",
+            "loooooooooooooooooooooooooooooooooooooooooooooooooooooooooong_",
+            "nounderscore",
+            "_129073ashd812g",
+        ]
+    )
     def prefix(self, request):
         return request.param
 
-    @pytest.fixture(params=['prefix2_', 'zz', ])
+    @pytest.fixture(
+        params=[
+            "prefix2_",
+            "zz",
+        ]
+    )
     def prefix2(self, request):
         # these are used when multiple prefixes in a single store
         # are requested
@@ -28,10 +35,10 @@ class TestPrefixDecorator(BasicStore):
 
         # do we add extra keys to the underlying store?
         if request.param:
-            base_store.put(u'some_other_value', b'data1')
-            base_store.put(u'ends_with_short_', b'data2')
-            base_store.put(u'xx', b'data3')
-            base_store.put(u'test', b'data4')
+            base_store.put(u"some_other_value", b"data1")
+            base_store.put(u"ends_with_short_", b"data2")
+            base_store.put(u"xx", b"data3")
+            base_store.put(u"test", b"data4")
 
         return PrefixDecorator(prefix, base_store)
 
@@ -53,13 +60,12 @@ class TestPrefixDecorator(BasicStore):
 
         assert store._dstore.get(full_key) == value
 
-    def test_multiple_prefixes_one_store(self, store, prefix, prefix2, key,
-                                         value):
+    def test_multiple_prefixes_one_store(self, store, prefix, prefix2, key, value):
         base_store = store._dstore
         store2 = PrefixDecorator(prefix2, base_store)
 
-        pv = value + prefix.encode('ascii')
-        pv2 = value + prefix2.encode('ascii')
+        pv = value + prefix.encode("ascii")
+        pv2 = value + prefix2.encode("ascii")
 
         # put in with each prefix
         store.put(key, pv)
@@ -79,5 +85,6 @@ class TestPrefixDecorator(BasicStore):
 
     def test_pickle(self, store):
         import pickle
+
         rountrip = pickle.loads(pickle.dumps(store))
         assert isinstance(rountrip, PrefixDecorator)

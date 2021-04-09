@@ -1,15 +1,16 @@
 # coding: utf8
 
 import os
-import time
 import tempfile
+import time
 
 import pytest
-from minimalkv._compat import BytesIO, xrange, text_type
-from minimalkv.decorator import PrefixDecorator
-from minimalkv.crypt import HMACDecorator
-from minimalkv.idgen import UUIDDecorator, HashDecorator
+
 from minimalkv import CopyMixin
+from minimalkv._compat import BytesIO, text_type, xrange
+from minimalkv.crypt import HMACDecorator
+from minimalkv.decorator import PrefixDecorator
+from minimalkv.idgen import HashDecorator, UUIDDecorator
 from minimalkv.net.gcstore import GoogleCloudStore
 
 
@@ -56,8 +57,7 @@ class BasicStore(object):
         assert store.get(key) == value
         assert store.get(key2) == value
 
-    def test_store_and_copy_overwrite(self, store, key, key2,
-                                      value, value2):
+    def test_store_and_copy_overwrite(self, store, key, key2, value, value2):
         if not isinstance(store, CopyMixin):
             pytest.skip()
         store.put(key, value)
@@ -95,7 +95,7 @@ class BasicStore(object):
 
     def test_key_error_on_nonexistant_get_filename(self, store, key):
         with pytest.raises(KeyError):
-            store.get_file(key, '/dev/null')
+            store.get_file(key, "/dev/null")
 
     def test_exception_on_invalid_key_get(self, store, invalid_key):
         with pytest.raises(ValueError):
@@ -111,7 +111,7 @@ class BasicStore(object):
 
     def test_exception_on_invalid_key_get_file(self, store, invalid_key):
         with pytest.raises(ValueError):
-            store.get_file(invalid_key, '/dev/null')
+            store.get_file(invalid_key, "/dev/null")
 
     def test_exception_on_invalid_key_delete(self, store, invalid_key):
         with pytest.raises(ValueError):
@@ -147,17 +147,17 @@ class BasicStore(object):
             tmp.write(value)
             tmp.flush()
 
-            store.put_file(key, open(tmp.name, 'rb'))
+            store.put_file(key, open(tmp.name, "rb"))
 
             assert store.get(key) == value
 
     def test_get_into_file(self, store, key, value, tmp_path):
         store.put(key, value)
-        out_filename = os.path.join(str(tmp_path), 'output')
+        out_filename = os.path.join(str(tmp_path), "output")
 
         store.get_file(key, out_filename)
 
-        assert open(out_filename, 'rb').read() == value
+        assert open(out_filename, "rb").read() == value
 
     def test_get_into_stream(self, store, key, value):
         store.put(key, value)
@@ -225,8 +225,8 @@ class BasicStore(object):
 
     def test_key_iterator_with_prefix(self, store, key, key2, value):
         prefix = key
-        key_prefix_1 = prefix + '_key1'
-        key_prefix_2 = prefix + '_key2'
+        key_prefix_1 = prefix + "_key1"
+        key_prefix_2 = prefix + "_key2"
         store.put(key_prefix_1, value)
         store.put(key_prefix_2, value)
         store.put(key2, value)
@@ -282,8 +282,8 @@ class BasicStore(object):
 
     def test_keys_with_prefix(self, store, key, key2, value):
         prefix = key
-        key_prefix_1 = prefix + '_key1'
-        key_prefix_2 = prefix + '_key2'
+        key_prefix_1 = prefix + "_key1"
+        key_prefix_2 = prefix + "_key2"
         store.put(key_prefix_1, value)
         store.put(key_prefix_2, value)
         store.put(key2, value)
@@ -339,7 +339,7 @@ class BasicStore(object):
         a_lot = 20
 
         for i in xrange(a_lot):
-            key = key + '_{}'.format(i)
+            key = key + "_{}".format(i)
             store.put(key, value)
 
 
@@ -352,16 +352,16 @@ class TTLStore(object):
     def ustore(self, store):
         return UUIDDecorator(store)
 
-    @pytest.fixture(params=['hash', 'uuid', 'hmac', 'prefix'])
+    @pytest.fixture(params=["hash", "uuid", "hmac", "prefix"])
     def dstore(self, request, store, secret_key, ustore):
-        if request.param == 'hash':
+        if request.param == "hash":
             return HashDecorator(store)
-        elif request.param == 'uuid':
+        elif request.param == "uuid":
             return ustore
-        elif request.param == 'hmac':
+        elif request.param == "hmac":
             return HMACDecorator(secret_key, store)
-        elif request.param == 'prefix':
-            return PrefixDecorator('SaMpLe_PrEfIX', store)
+        elif request.param == "prefix":
+            return PrefixDecorator("SaMpLe_PrEfIX", store)
 
     @pytest.fixture(params=[0.4, 1])
     def small_ttl(self, request):
@@ -373,7 +373,7 @@ class TTLStore(object):
 
     def test_put_with_non_numeric_ttl_throws_error(self, store, key, value):
         with pytest.raises(ValueError):
-            store.put(key, value, ttl_secs='badttl')
+            store.put(key, value, ttl_secs="badttl")
 
     def test_put_with_ttl_argument(self, store, key, value, small_ttl):
         store.put(key, value, small_ttl)
@@ -414,22 +414,21 @@ class TTLStore(object):
 
     def test_advertises_ttl_features(self, store):
         assert store.ttl_support is True
-        assert hasattr(store, 'ttl_support')
-        assert getattr(store, 'ttl_support') is True
+        assert hasattr(store, "ttl_support")
+        assert getattr(store, "ttl_support") is True
 
     def test_advertises_ttl_features_through_decorator(self, dstore):
         assert dstore.ttl_support is True
-        assert hasattr(dstore, 'ttl_support')
-        assert getattr(dstore, 'ttl_support') is True
+        assert hasattr(dstore, "ttl_support")
+        assert getattr(dstore, "ttl_support") is True
 
     def test_can_pass_ttl_through_decorator(self, dstore, key, value):
         dstore.put(key, value, ttl_secs=10)
 
 
 class OpenSeekTellStore(object):
-
     def test_open_seek_and_tell_empty_value(self, store, key):
-        value = b''
+        value = b""
         store.put(key, value)
         ok = store.open(key)
         assert ok.seekable()
@@ -445,7 +444,7 @@ class OpenSeekTellStore(object):
             ok.seek(-1, 2)
 
         assert ok.tell() == 4
-        assert b'' == ok.read(1)
+        assert b"" == ok.read(1)
 
     def test_open_seek_and_tell(self, store, key, long_value):
         store.put(key, long_value)
@@ -468,11 +467,11 @@ class OpenSeekTellStore(object):
         assert ok.tell() == 5
         ok.seek(-1, 2)
         length_lv = len(long_value)
-        assert long_value[length_lv - 1:length_lv] == ok.read(1)
+        assert long_value[length_lv - 1 : length_lv] == ok.read(1)
         assert ok.tell() == length_lv
         ok.seek(length_lv + 10, 0)
         assert ok.tell() == length_lv + 10
-        assert b'' == ok.read()
+        assert b"" == ok.read()
 
         ok.close()
         with pytest.raises(ValueError):

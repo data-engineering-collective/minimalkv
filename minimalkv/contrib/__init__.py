@@ -21,6 +21,7 @@ class ExtendedKeyspaceMixin(object):
     and then by the desired store.
     Note: This Mixin is unsupported and might not work correctly with all backends.
     """
+
     def _check_valid_key(self, key):
         """Checks if a key is valid and raises a ValueError if its not.
 
@@ -30,6 +31,6 @@ class ExtendedKeyspaceMixin(object):
         :param key: The key to be checked
         """
         if not isinstance(key, key_type) and key is not None:
-            raise ValueError('%r is not a valid key type' % key)
-        if not VALID_KEY_RE_EXTENDED.match(key) or key == u'/':
-            raise ValueError('%r contains illegal characters' % key)
+            raise ValueError("%r is not a valid key type" % key)
+        if not VALID_KEY_RE_EXTENDED.match(key) or key == u"/":
+            raise ValueError("%r contains illegal characters" % key)

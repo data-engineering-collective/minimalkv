@@ -2,9 +2,9 @@
 # coding=utf8
 
 from io import BytesIO
-from .._compat import ifilter
 
-from .. import KeyValueStore, CopyMixin
+from .. import CopyMixin, KeyValueStore
+from .._compat import ifilter
 
 
 class DictStore(KeyValueStore, CopyMixin):
@@ -13,6 +13,7 @@ class DictStore(KeyValueStore, CopyMixin):
     This store uses a dictionary as the backend for storing, its implementation
     is straightforward. The dictionary containing all data is available as `d`.
     """
+
     def __init__(self, d=None):
         self.d = d or {}
 

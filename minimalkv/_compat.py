@@ -11,13 +11,16 @@ else:
     from ConfigParser import ConfigParser
 
 if not PY2:
-    from urllib.parse import quote as url_quote, unquote as url_unquote
-    from urllib.parse import quote_plus, unquote_plus
+    from urllib.parse import quote as url_quote
+    from urllib.parse import quote_plus
+    from urllib.parse import unquote as url_unquote
+    from urllib.parse import unquote_plus
 
 else:
     from urllib import quote as url_quote
+    from urllib import quote_plus
     from urllib import unquote as url_unquote
-    from urllib import quote_plus, unquote_plus
+    from urllib import unquote_plus
 
 if not PY2:
     from urllib.parse import urlparse
@@ -28,8 +31,7 @@ if not PY2:
     imap = map
     ifilter = filter
 else:
-    from itertools import imap
-    from itertools import ifilter
+    from itertools import ifilter, imap
 
 
 if not PY2:

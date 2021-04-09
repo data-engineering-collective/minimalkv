@@ -1,14 +1,14 @@
 import pytest
 
-boto = pytest.importorskip('boto')
+boto = pytest.importorskip("boto")
 from boto.exception import StorageResponseError
 from boto.s3.key import Key
+from bucket_manager import boto_bucket, boto_credentials
 
-from bucket_manager import boto_credentials, boto_bucket
 
-
-@pytest.fixture(params=boto_credentials,
-                ids=[c['access_key'] for c in boto_credentials])
+@pytest.fixture(
+    params=boto_credentials, ids=[c["access_key"] for c in boto_credentials]
+)
 def credentials(request):
     return request.param
 
@@ -24,5 +24,5 @@ def test_simple(bucket):
 
 
 def test_simple_with_contents(bucket):
-    k = bucket.new_key('i_will_prevent_deletion')
-    k.set_contents_from_string('meh')
+    k = bucket.new_key("i_will_prevent_deletion")
+    k.set_contents_from_string("meh")

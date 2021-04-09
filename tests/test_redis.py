@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 
+import pytest
 from basic_store import BasicStore, TTLStore
 from conftest import ExtendedKeyspaceTests
+
 from minimalkv.contrib import ExtendedKeyspaceMixin
 
-import pytest
-redis = pytest.importorskip('redis')
+redis = pytest.importorskip("redis")
 
 from redis import StrictRedis
 from redis.exceptions import ConnectionError
@@ -15,12 +16,13 @@ class TestRedisStore(TTLStore, BasicStore):
     @pytest.yield_fixture()
     def store(self):
         from minimalkv.memory.redisstore import RedisStore
+
         r = StrictRedis()
 
         try:
-            r.get('anything')
+            r.get("anything")
         except ConnectionError:
-            pytest.skip('Could not connect to redis server')
+            pytest.skip("Could not connect to redis server")
 
         r.flushdb()
         yield RedisStore(r)
@@ -34,12 +36,13 @@ class TestExtendedKeyspaceDictStore(TestRedisStore, ExtendedKeyspaceTests):
 
         class ExtendedKeyspaceStore(ExtendedKeyspaceMixin, RedisStore):
             pass
+
         r = StrictRedis()
 
         try:
-            r.get('anything')
+            r.get("anything")
         except ConnectionError:
-            pytest.skip('Could not connect to redis server')
+            pytest.skip("Could not connect to redis server")
 
         r.flushdb()
         yield ExtendedKeyspaceStore(r)

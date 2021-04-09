@@ -3,25 +3,26 @@ import re
 import tempfile
 import uuid
 
-from minimalkv.idgen import UUIDDecorator, HashDecorator
-from minimalkv._compat import text_type
-
 import pytest
 
+from minimalkv._compat import text_type
+from minimalkv.idgen import HashDecorator, UUIDDecorator
 
 UUID_REGEXP = re.compile(
-    r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+    r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
 )
 
 
 class IDGen(object):
-    @pytest.fixture(params=[
-        u'constant',
-        u'foo{}bar',
-        u'{}.jpeg',
-        u'prefix-{}.hello',
-        u'justprefix{}',
-    ])
+    @pytest.fixture(
+        params=[
+            u"constant",
+            u"foo{}bar",
+            u"{}.jpeg",
+            u"prefix-{}.hello",
+            u"justprefix{}",
+        ]
+    )
     def idgen_template(self, request):
         return request.param
 
@@ -40,7 +41,7 @@ class UUIDGen(IDGen):
         assert UUID_REGEXP.match(key)
 
     def test_put_file_generates_uuid_form(self, uuidstore):
-        key = uuidstore.put_file(None, open('/dev/null', 'rb'))
+        key = uuidstore.put_file(None, open("/dev/null", "rb"))
         assert UUID_REGEXP.match(key)
 
         tmpfile = tempfile.NamedTemporaryFile(delete=False)
@@ -57,7 +58,7 @@ class UUIDGen(IDGen):
         uuid.UUID(hex=key)
 
     def test_put_file_generates_valid_uuid(self, uuidstore):
-        key = uuidstore.put_file(None, open('/dev/null', 'rb'))
+        key = uuidstore.put_file(None, open("/dev/null", "rb"))
         uuid.UUID(hex=key)
 
         tmpfile = tempfile.NamedTemporaryFile(delete=False)
@@ -87,9 +88,11 @@ class HashGen(IDGen):
 
     @pytest.fixture
     def validate_hash(self, hashfunc):
-        hash_regexp = re.compile(r'^[0-9a-f]{{{}}}$'.format(
-            hashfunc().digest_size * 2,
-        ))
+        hash_regexp = re.compile(
+            r"^[0-9a-f]{{{}}}$".format(
+                hashfunc().digest_size * 2,
+            )
+        )
 
         return hash_regexp.match
 
@@ -102,7 +105,7 @@ class HashGen(IDGen):
         assert validate_hash(key)
 
     def test_put_file_generates_valid_form(self, hashstore, validate_hash):
-        key = hashstore.put_file(None, open('/dev/null', 'rb'))
+        key = hashstore.put_file(None, open("/dev/null", "rb"))
         assert validate_hash(key)
 
         # this is not correct according to our interface
@@ -116,14 +119,12 @@ class HashGen(IDGen):
         assert value_hash == key
         assert isinstance(key, text_type)
 
-    def test_put_file_generates_correct_hash(
-        self, hashstore, value_hash, value
-    ):
+    def test_put_file_generates_correct_hash(self, hashstore, value_hash, value):
         tmpfile = tempfile.NamedTemporaryFile(delete=False)
         try:
             tmpfile.write(value)
             tmpfile.close()
-            with open(tmpfile.name, 'rb') as f:
+            with open(tmpfile.name, "rb") as f:
                 key = hashstore.put_file(None, f)
             assert key == value_hash
 

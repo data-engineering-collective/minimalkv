@@ -4,14 +4,10 @@ This implements the AzureBlockBlobStore for `azure-storage-blob~=12`
 import io
 from contextlib import contextmanager
 
-from .._compat import PY2
 from .. import KeyValueStore
-
-from ._azurestore_common import (
-    _byte_buffer_md5,
-    _file_md5,
-)
-from ._net_common import lazy_property, LAZY_PROPERTY_ATTR_PREFIX
+from .._compat import PY2
+from ._azurestore_common import _byte_buffer_md5, _file_md5
+from ._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
 
 if PY2:
 
@@ -19,7 +15,9 @@ if PY2:
         """
         Convert the str `name` to unicode
         """
-        return name.decode('utf-8')
+        return name.decode("utf-8")
+
+
 else:
 
     def _blobname_to_texttype(name):
@@ -119,6 +117,7 @@ class AzureBlockBlobStore(KeyValueStore):
             with map_azure_exceptions():
                 for blob in blobs:
                     yield _blobname_to_texttype(blob.name)
+
         return gen_names()
 
     def iter_prefixes(self, delimiter, prefix=u""):
@@ -159,7 +158,9 @@ class AzureBlockBlobStore(KeyValueStore):
         from azure.storage.blob import ContentSettings
 
         if self.checksum:
-            content_settings = ContentSettings(content_md5=_file_md5(file, b64encode=False))
+            content_settings = ContentSettings(
+                content_md5=_file_md5(file, b64encode=False)
+            )
         else:
             content_settings = ContentSettings()
 

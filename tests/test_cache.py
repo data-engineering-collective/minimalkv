@@ -1,9 +1,8 @@
-from minimalkv.memory import DictStore
-from minimalkv.cache import CacheDecorator
-
+import pytest
 from basic_store import BasicStore
 
-import pytest
+from minimalkv.cache import CacheDecorator
+from minimalkv.memory import DictStore
 
 
 class TestCache(BasicStore):

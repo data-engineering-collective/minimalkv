@@ -21,8 +21,8 @@ import os
 import tempfile
 import uuid
 
-from .decorator import StoreDecorator
 from ._compat import text_type
+from .decorator import StoreDecorator
 
 
 class HashDecorator(StoreDecorator):
@@ -30,9 +30,9 @@ class HashDecorator(StoreDecorator):
 
     Overrides :meth:`.KeyValueStore.put` and :meth:`.KeyValueStore.put_file`.
     If a key of *None* is passed, the data/file is hashed using
-    ``hashfunc``, which defaults to *hashlib.sha1*. """
+    ``hashfunc``, which defaults to *hashlib.sha1*."""
 
-    def __init__(self, decorated_store, hashfunc=hashlib.sha1, template=u'{}'):
+    def __init__(self, decorated_store, hashfunc=hashlib.sha1, template=u"{}"):
         self.hashfunc = hashfunc
         self._template = template
         super(HashDecorator, self).__init__(decorated_store)
@@ -49,7 +49,7 @@ class HashDecorator(StoreDecorator):
 
         if not key:
             if isinstance(file, str):
-                with open(file, 'rb') as source:
+                with open(file, "rb") as source:
                     while True:
                         buf = source.read(bufsize)
                         phash.update(buf)
@@ -58,8 +58,8 @@ class HashDecorator(StoreDecorator):
                             break
 
                     return self._dstore.put_file(
-                        self._template.format(phash.hexdigest()),
-                        file, *args, **kwargs)
+                        self._template.format(phash.hexdigest()), file, *args, **kwargs
+                    )
             else:
                 tmpfile = tempfile.NamedTemporaryFile(delete=False)
                 try:
@@ -74,7 +74,9 @@ class HashDecorator(StoreDecorator):
                     tmpfile.close()
                     return self._dstore.put_file(
                         self._template.format(phash.hexdigest()),
-                        tmpfile.name, *args, **kwargs
+                        tmpfile.name,
+                        *args,
+                        **kwargs
                     )
                 finally:
                     try:
@@ -100,10 +102,11 @@ class UUIDDecorator(StoreDecorator):
        `uuidfunc` too early. For that reason, it is a string that will be
        looked up using :func:`getattr` on the :mod:`uuid` module.
     """
-    # for strange reasons, this needs to be looked up as late as possible
-    uuidfunc = 'uuid1'
 
-    def __init__(self, store, template=u'{}'):
+    # for strange reasons, this needs to be looked up as late as possible
+    uuidfunc = "uuid1"
+
+    def __init__(self, store, template=u"{}"):
         super(UUIDDecorator, self).__init__(store)
         self._template = template
 
@@ -111,14 +114,10 @@ class UUIDDecorator(StoreDecorator):
         if not key:
             key = text_type(getattr(uuid, self.uuidfunc)())
 
-        return self._dstore.put(
-            self._template.format(key), data, *args, **kwargs
-        )
+        return self._dstore.put(self._template.format(key), data, *args, **kwargs)
 
     def put_file(self, key, file, *args, **kwargs):
         if not key:
             key = text_type(getattr(uuid, self.uuidfunc)())
 
-        return self._dstore.put_file(
-            self._template.format(key), file, *args, **kwargs
-        )
+        return self._dstore.put_file(self._template.format(key), file, *args, **kwargs)

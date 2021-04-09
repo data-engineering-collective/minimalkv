@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from .. import KeyValueStore
-from .._compat import BytesIO
-
-from .._compat import pickle
-from bson.binary import Binary
 import re
+
+from bson.binary import Binary
+
+from .. import KeyValueStore
+from .._compat import BytesIO, pickle
 
 
 class MongoStore(KeyValueStore):
@@ -38,14 +38,15 @@ class MongoStore(KeyValueStore):
 
     def _put(self, key, value):
         self.db[self.collection].update_one(
-            {"_id": key},
-            {"$set": {"v": Binary(pickle.dumps(value))}},
-            upsert=True)
+            {"_id": key}, {"$set": {"v": Binary(pickle.dumps(value))}}, upsert=True
+        )
         return key
 
     def _put_file(self, key, file):
         return self._put(key, file.read())
 
     def iter_keys(self, prefix=u""):
-        for item in self.db[self.collection].find({"_id": {"$regex": '^' + re.escape(prefix)}}):
+        for item in self.db[self.collection].find(
+            {"_id": {"$regex": "^" + re.escape(prefix)}}
+        ):
             yield item["_id"]

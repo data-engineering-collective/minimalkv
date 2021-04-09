@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # coding=utf8
 
+import pytest
+
 from minimalkv.decorator import ReadOnlyDecorator
 from minimalkv.memory import DictStore
-import pytest
 
 
 class TestReadOnlyDecorator(object):
