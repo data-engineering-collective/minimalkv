@@ -30,3 +30,11 @@ services:
     container_name: redis
     ports:
     - 6379:6379
+  postgres:
+    image: postgres
+    container_name: postgreSQL
+    ports:
+    - 5432:5432
+    environment:
+      POSTGRES_USER: minimalkv_test
+      POSTGRES_PASSWORD: minimalkv_test
