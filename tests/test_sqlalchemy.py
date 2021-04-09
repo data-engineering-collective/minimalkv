@@ -15,24 +15,14 @@ from basic_store import BasicStore
 from conftest import ExtendedKeyspaceTests
 from minimalkv.contrib import ExtendedKeyspaceMixin
 
-if os.environ.get("SIMPLEKV_CI", "0") == "1":
-    DSNS = [
-        ('pymysql',
-         'mysql+pymysql://travis:@localhost/minimalkv_test'),
-        ('psycopg2',
-         'postgresql+psycopg2://minimalkv_test:minimalkv_test@127.0.0.1/minimalkv_test'),
-        ('sqlite3',
-         'sqlite:///:memory:')
-    ]
-else:
-    DSNS = [
-        ('pymysql',
-         'mysql+pymysql://travis:@localhost/minimalkv_test'),
-        ('psycopg2',
-         'postgresql+psycopg2://postgres:@127.0.0.1/minimalkv_test'),
-        ('sqlite3',
-         'sqlite:///:memory:')
-    ]
+DSNS = [
+    ('pymysql',
+     'mysql+pymysql://minimalkv_test:minimalkv_test@127.0.0.1/minimalkv_test'),
+    ('psycopg2',
+     'postgresql+psycopg2://minimalkv_test:minimalkv_test@127.0.0.1/minimalkv_test'),
+    ('sqlite3',
+     'sqlite:///:memory:')
+]
 
 
 # FIXME: for local testing, this needs configurable dsns

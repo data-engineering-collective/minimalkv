@@ -1,0 +1,49 @@
+services:
+  gcs:
+    image: fsouza/fake-gcs-server
+    container_name: fake-gcs-server
+    ports:
+    - 4443:4443
+    command: -scheme http
+  azure:
+    image: mcr.microsoft.com/azure-storage/azurite
+    container_name: azurite
+    ports:
+      - 10000:10000
+    command: azurite-blob --blobHost 0.0.0.0 --loose
+  minio:
+    image: minio/minio
+    container_name: minio
+    ports:
+      - 9000:9000
+    environment:
+      MINIO_ACCESS_KEY: minio
+      MINIO_SECRET_KEY: miniostorage
+    command: server /data
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    ports:
+    - 27017:27017
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+    - 6379:6379
+  postgres:
+    image: postgres
+    container_name: postgreSQL
+    ports:
+    - 5432:5432
+    environment:
+      POSTGRES_USER: minimalkv_test
+      POSTGRES_PASSWORD: minimalkv_test
+
+  mysql:
+    image: mysql
+    container_name: mysql
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_PASSWORD: minimalkv_test
+      MYSQL_USER: minimalkv_test
