@@ -20,3 +20,4 @@ dependencies:
   - docker-compose
   - pymysql
   - pre-commit
+  - setuptools-scm
