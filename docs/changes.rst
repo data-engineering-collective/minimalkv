@@ -1,6 +1,11 @@
 Changelog
 *********
 
+1.0.0
+=====
+
+* Rename to ``minimalkv``.
+
 0.15.0
 ======
 

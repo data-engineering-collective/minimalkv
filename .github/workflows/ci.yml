@@ -1,5 +1,5 @@
 name: CI
-on: [push]
+on: [push, pull_request]
 
 jobs:
   unittest:
@@ -34,6 +34,14 @@ jobs:
           while ! docker exec mysql mysqladmin status -h 127.0.0.1 -u minimalkv_test --password=minimalkv_test; \
             do sleep 3; done
           pytest -n auto --dist loadfile -rs
+          python setup.py sdist
+          python setup.py bdist_wheel
+      - name: Publish package
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags') && matrix.PYTHON_VERSION == '3.7'
+        uses: pypa/gh-action-pypi-publish@v1.3.1
+        with:
+          user: __token__
+          password: ${{ secrets.pypi_password }}
 
   pre-commit-checks:
     name: "Pre-commit checks - Python 3.8"
