@@ -31,7 +31,9 @@ jobs:
         run: |
           pip install --no-deps .
           docker-compose up -d
-          pytest -nauto --dist loadfile -rs
+          while ! docker exec mysql mysqladmin status -h 127.0.0.1 -u minimalkv_test --password=minimalkv_test; \
+            do sleep 3; done
+          pytest -n auto --dist loadfile -rs
 
   pre-commit-checks:
     name: "Pre-commit checks - Python 3.8"
