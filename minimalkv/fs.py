@@ -5,8 +5,8 @@ import os
 import os.path
 import shutil
 
-from . import CopyMixin, KeyValueStore, UrlMixin
-from ._compat import text_type, url_quote
+from minimalkv import CopyMixin, KeyValueStore, UrlMixin
+from minimalkv._compat import text_type, url_quote
 
 
 class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):

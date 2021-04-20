@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-
 import pytest
-import storefact
-import simplekv.decorator
+import minimalkv
+import minimalkv.decorator
 
 good_urls = [
     (u'azure://MYACCOUNT:dead%2Fbeef@1buc-ket1?param1=foo&param2=🍺&eat_more_🍎=1&create_if_missing=true', dict(
@@ -53,19 +51,19 @@ bad_urls = [
 
 def test_raise_on_invalid_store():
     with pytest.raises(ValueError):
-        storefact.url2dict(u'dummy://foo/bar')
+        minimalkv.url2dict(u'dummy://foo/bar')
 
 
 @pytest.mark.parametrize('url, expected', good_urls)
 def test_url2dict(url, expected):
-    assert storefact.url2dict(url) == expected
+    assert minimalkv.url2dict(url) == expected
 
 
 @pytest.mark.parametrize('url, raises', bad_urls)
 def test_bad_url2dict(url, raises):
     with pytest.raises(raises):
-        storefact.url2dict(url)
+        minimalkv.url2dict(url)
 
 
 def test_roundtrip():
-    assert isinstance(storefact.get_store_from_url(u'memory://#wrap:readonly'), simplekv.decorator.ReadOnlyDecorator)
+    assert isinstance(minimalkv.get_store_from_url(u'memory://#wrap:readonly'), minimalkv.decorator.ReadOnlyDecorator)

@@ -1,12 +1,7 @@
-# -*- coding: utf-8 -*-
-""""""
-
-from __future__ import (absolute_import, division, print_function)
-
 import os
 import os.path
 
-from simplekv.fs import FilesystemStore
+from minimalkv.fs import FilesystemStore
 
 
 def create_store(type, params):
@@ -30,7 +25,7 @@ def create_store(type, params):
 
 
 def _create_store_azure(type, params):
-    from simplekv.net.azurestore import AzureBlockBlobStore
+    from minimalkv.net.azurestore import AzureBlockBlobStore
     from ._hstores import HAzureBlockBlobStore
 
     conn_string = params.get('connection_string', _build_azure_url(**params))
@@ -71,7 +66,7 @@ def _create_store_hs3(type, params):
 
 
 def _create_store_s3(type, params):
-    from simplekv.net.botostore import BotoStore
+    from minimalkv.net.botostore import BotoStore
     from ._boto import _get_s3bucket
     return BotoStore(_get_s3bucket(**params))
 
@@ -90,7 +85,7 @@ def _create_store_fs(type, params):
 
 
 def _create_store_mem(type, params):
-    from simplekv.memory import DictStore
+    from minimalkv.memory import DictStore
     return DictStore()
 
 
@@ -100,7 +95,7 @@ def _create_store_hmem(type, params):
 
 
 def _create_store_redis(type, params):
-    from simplekv.memory.redisstore import RedisStore
+    from minimalkv.memory.redisstore import RedisStore
     from redis import StrictRedis
     r = StrictRedis(**params)
     return RedisStore(r)

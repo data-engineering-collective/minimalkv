@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-""""""
-
-from __future__ import (absolute_import, division, print_function)
-
-from simplekv.decorator import (URLEncodeKeysDecorator, ReadOnlyDecorator)
+from minimalkv.decorator import (URLEncodeKeysDecorator, ReadOnlyDecorator)
 
 
 def decorate_store(store, decoratorname):

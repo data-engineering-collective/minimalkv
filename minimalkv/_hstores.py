@@ -1,15 +1,11 @@
-# -*- coding: utf-8 -*-
-""""""
-
-from __future__ import (absolute_import, division, print_function)
 import os
 
-from simplekv.contrib import ExtendedKeyspaceMixin
-from simplekv.fs import FilesystemStore
-from simplekv.memory import DictStore
-from simplekv.memory.redisstore import RedisStore
-from simplekv.net.azurestore import AzureBlockBlobStore
-from simplekv.net.botostore import BotoStore
+from minimalkv.contrib import ExtendedKeyspaceMixin
+from minimalkv.fs import FilesystemStore
+from minimalkv.memory import DictStore
+from minimalkv.memory.redisstore import RedisStore
+from minimalkv.net.azurestore import AzureBlockBlobStore
+from minimalkv.net.botostore import BotoStore
 
 
 class HDictStore(ExtendedKeyspaceMixin, DictStore):

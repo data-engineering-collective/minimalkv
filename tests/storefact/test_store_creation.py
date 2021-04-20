@@ -1,12 +1,12 @@
-from storefact._store_creation import create_store
+from minimalkv._store_creation import create_store
 import pytest
 
 
 def test_create_store_azure(mocker):
     # Mock HAzureBlockBlobStore also here, becase otherwise it will try to inherit from
     # the mock object `mock_azure` created below, which will fail.
-    mock_hazure = mocker.patch("storefact._hstores.HAzureBlockBlobStore")
-    mock_azure = mocker.patch("simplekv.net.azurestore.AzureBlockBlobStore")
+    mock_hazure = mocker.patch("minimalkv._hstores.HAzureBlockBlobStore")
+    mock_azure = mocker.patch("minimalkv.net.azurestore.AzureBlockBlobStore")
     create_store(
         "azure",
         {
@@ -31,7 +31,7 @@ def test_create_store_azure(mocker):
 
 
 def test_create_store_hazure(mocker):
-    mock_hazure = mocker.patch("storefact._hstores.HAzureBlockBlobStore")
+    mock_hazure = mocker.patch("minimalkv._hstores.HAzureBlockBlobStore")
     create_store(
         "hazure",
         {
@@ -71,8 +71,8 @@ def test_create_store_azure_inconsistent_params():
 
 
 def test_create_store_hs3(mocker):
-    mock_hs3 = mocker.patch("storefact._boto._get_s3bucket")
-    mock_hbotostores = mocker.patch("storefact._hstores.HBotoStore")
+    mock_hs3 = mocker.patch("minimalkv._boto._get_s3bucket")
+    mock_hbotostores = mocker.patch("minimalkv._hstores.HBotoStore")
     create_store(
         "hs3",
         {
@@ -91,8 +91,8 @@ def test_create_store_hs3(mocker):
 
 
 def test_create_store_s3(mocker):
-    mock_s3 = mocker.patch("storefact._boto._get_s3bucket")
-    mock_hbotostores = mocker.patch("storefact._hstores.HBotoStore")
+    mock_s3 = mocker.patch("minimalkv._boto._get_s3bucket")
+    mock_hbotostores = mocker.patch("minimalkv._hstores.HBotoStore")
     create_store(
         "s3",
         {
@@ -111,7 +111,7 @@ def test_create_store_s3(mocker):
 
 
 def test_create_store_hfs(mocker):
-    mock_hfs = mocker.patch("storefact._hstores.HFilesystemStore")
+    mock_hfs = mocker.patch("minimalkv._hstores.HFilesystemStore")
     create_store(
         "hfs",
         {
@@ -125,7 +125,7 @@ def test_create_store_hfs(mocker):
 
 @pytest.mark.skip(reason="some issue here")
 def test_create_store_fs(mocker):
-    mock_fs = mocker.patch("simplekv.fs.FilesystemStore")
+    mock_fs = mocker.patch("minimalkv.fs.FilesystemStore")
     create_store(
         "fs",
         {
@@ -138,7 +138,7 @@ def test_create_store_fs(mocker):
 
 
 def test_create_store_mem(mocker):
-    mock_mem = mocker.patch("simplekv.memory.DictStore")
+    mock_mem = mocker.patch("minimalkv.memory.DictStore")
     create_store(
         "memory",
         {'type': u'memory', 'wrap': u'readonly'},
@@ -147,7 +147,7 @@ def test_create_store_mem(mocker):
 
 
 def test_create_store_hmem(mocker):
-    mock_hmem = mocker.patch("storefact._hstores.HDictStore")
+    mock_hmem = mocker.patch("minimalkv._hstores.HDictStore")
     create_store(
         "hmemory",
         {'type': u'memory', 'wrap': u'readonly'},
@@ -157,7 +157,7 @@ def test_create_store_hmem(mocker):
 
 @pytest.mark.skip(reason="some issue here")
 def test_create_store_redis(mocker):
-    mock_redis = mocker.patch("simplekv.memory.redisstore.RedisStore")
+    mock_redis = mocker.patch("minimalkv.memory.redisstore.RedisStore")
     mock_Strictredis = mocker.patch("redis.StrictRedis")
     create_store(
         "redis",

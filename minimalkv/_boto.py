@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-""""""
-
-from __future__ import (absolute_import, division, print_function)
-
-
 def _get_s3bucket(host, bucket, access_key, secret_key, force_bucket_suffix=True, create_if_missing=True):
     from boto.s3.connection import S3Connection, OrdinaryCallingFormat, S3ResponseError
 
