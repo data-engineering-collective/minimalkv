@@ -56,7 +56,7 @@ def test_create_store_hazure(mocker):
 
 def test_create_store_azure_inconsistent_params():
     with pytest.raises(
-            Exception, match="create_if_missing is incompatible with the use of SAS tokens"
+        Exception, match="create_if_missing is incompatible with the use of SAS tokens"
     ):
         create_store(
             "hazure",
@@ -76,17 +76,17 @@ def test_create_store_hs3(mocker):
     create_store(
         "hs3",
         {
-            'host': u'endpoint:1234',
-            'access_key': u'access_key',
-            'secret_key': u'secret_key',
-            'bucket': u'bucketname',
+            "host": u"endpoint:1234",
+            "access_key": u"access_key",
+            "secret_key": u"secret_key",
+            "bucket": u"bucketname",
         },
     )
     mock_hs3.assert_called_once_with(
-        host=u'endpoint:1234',
-        access_key=u'access_key',
-        secret_key=u'secret_key',
-        bucket=u'bucketname',
+        host=u"endpoint:1234",
+        access_key=u"access_key",
+        secret_key=u"secret_key",
+        bucket=u"bucketname",
     )
 
 
@@ -96,17 +96,17 @@ def test_create_store_s3(mocker):
     create_store(
         "s3",
         {
-            'host': u'endpoint:1234',
-            'access_key': u'access_key',
-            'secret_key': u'secret_key',
-            'bucket': u'bucketname',
+            "host": u"endpoint:1234",
+            "access_key": u"access_key",
+            "secret_key": u"secret_key",
+            "bucket": u"bucketname",
         },
     )
     mock_s3.assert_called_once_with(
-        host=u'endpoint:1234',
-        access_key=u'access_key',
-        secret_key=u'secret_key',
-        bucket=u'bucketname',
+        host=u"endpoint:1234",
+        access_key=u"access_key",
+        secret_key=u"secret_key",
+        bucket=u"bucketname",
     )
 
 
@@ -114,13 +114,9 @@ def test_create_store_hfs(mocker):
     mock_hfs = mocker.patch("minimalkv._hstores.HFilesystemStore")
     create_store(
         "hfs",
-        {
-            'type': 'hfs',
-            'path': 'this/is/a/relative/path',
-            'create_if_missing': True
-        },
+        {"type": "hfs", "path": "this/is/a/relative/path", "create_if_missing": True},
     )
-    mock_hfs.assert_called_once_with('this/is/a/relative/path')
+    mock_hfs.assert_called_once_with("this/is/a/relative/path")
 
 
 @pytest.mark.skip(reason="some issue here")
@@ -128,20 +124,16 @@ def test_create_store_fs(mocker):
     mock_fs = mocker.patch("minimalkv.fs.FilesystemStore")
     create_store(
         "fs",
-        {
-            'type': 'fs',
-            'path': 'this/is/a/relative/fspath',
-            'create_if_missing': True
-        }
+        {"type": "fs", "path": "this/is/a/relative/fspath", "create_if_missing": True},
     )
-    mock_fs.assert_called_once_with('this/is/a/relative/fspath')
+    mock_fs.assert_called_once_with("this/is/a/relative/fspath")
 
 
 def test_create_store_mem(mocker):
     mock_mem = mocker.patch("minimalkv.memory.DictStore")
     create_store(
         "memory",
-        {'type': u'memory', 'wrap': u'readonly'},
+        {"type": u"memory", "wrap": u"readonly"},
     )
     mock_mem.assert_called_once_with()
 
@@ -150,7 +142,7 @@ def test_create_store_hmem(mocker):
     mock_hmem = mocker.patch("minimalkv._hstores.HDictStore")
     create_store(
         "hmemory",
-        {'type': u'memory', 'wrap': u'readonly'},
+        {"type": u"memory", "wrap": u"readonly"},
     )
     mock_hmem.assert_called_once_with()
 
@@ -161,15 +153,13 @@ def test_create_store_redis(mocker):
     mock_Strictredis = mocker.patch("redis.StrictRedis")
     create_store(
         "redis",
-        {'type': u'redis', 'host': u'localhost', 'db': 2},
+        {"type": u"redis", "host": u"localhost", "db": 2},
     )
     mock_Strictredis.assert_called_once_with()
 
 
 def test_create_store_valueerror():
-    with pytest.raises(
-            Exception, match="Unknown store type: ABC"
-    ):
+    with pytest.raises(Exception, match="Unknown store type: ABC"):
         create_store(
             "ABC",
             {

@@ -578,23 +578,25 @@ def get_store(type, create_if_missing=True, **params):
     from ._store_decoration import decorate_store
 
     # split off old-style wrappers, if any:
-    parts = type.split('+')
+    parts = type.split("+")
     type = parts.pop(-1)
     decorators = list(reversed(parts))
 
     # find new-style wrappers, if any:
-    wrapspec = params.pop('wrap', '')
-    wrappers = list(wrapspec.split('+')) if wrapspec else []
+    wrapspec = params.pop("wrap", "")
+    wrappers = list(wrapspec.split("+")) if wrapspec else []
 
     # can't have both:
     if wrappers:
         if decorators:
-            raise ValueError('Adding store wrappers via store type as well as via wrap parameter are not allowed. Preferably use wrap.')
+            raise ValueError(
+                "Adding store wrappers via store type as well as via wrap parameter are not allowed. Preferably use wrap."
+            )
         decorators = wrappers
 
     # create_if_missing is a universal parameter, so it's part of the function signature
     # it can be safely ignored by stores where 'creating' makes no sense.
-    params['create_if_missing'] = create_if_missing
+    params["create_if_missing"] = create_if_missing
 
     store = create_store(type, params)
 
