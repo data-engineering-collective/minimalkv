@@ -1,3 +1,0 @@
-simplekv>=0.13.1
-uritools
-toolz
