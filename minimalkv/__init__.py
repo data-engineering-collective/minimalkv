@@ -8,6 +8,11 @@ from functools import reduce
 from ._compat import key_type
 from ._urls import url2dict
 
+try:
+    __version__ = pkg_resources.get_distribution(__name__).version
+except Exception:  # pragma: no cover
+    __version__ = "unknown"
+
 VALID_NON_NUM = r"""\`\!"#$%&'()+,-.<=>?@[]^_{}~"""
 VALID_KEY_REGEXP = "^[%s0-9a-zA-Z]+$" % re.escape(VALID_NON_NUM)
 """This regular expression tests if a key is valid. Allowed are all
