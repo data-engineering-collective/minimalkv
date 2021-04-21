@@ -83,7 +83,7 @@ URL and store types:
 * Filesystem: :code:`fs://` and :code:`hfs://`, e.g., :code:`hfs:///home/user/data`
 * Amazon S3: :code:`s3://access_key:secret_key@endpoint/bucket[?create_if_missing=true]` and :code:`hs3://access_key:secret_key@endpoint/bucket[?create_if_missing=true]`
 * Azure Blob Storage (:code:`azure://` and :code:`hazure://`):
-    * with storage account key: :code:`azure://account_name:account_key@container[?create_if_missing=true][?max_connections=2]`
+    * with storage account key: :code:`azure://account_name:account_key@container[?create_if_missing=true][?max_connections=2]`, e.g., :code:`azure://MYACCOUNT:passw0rd!@bucket_66?create_if_missing=true`
     * with SAS token: :code:`azure://account_name:shared_access_signature@container?use_sas&create_if_missing=false[?max_connections=2&socket_timeout=(20,100)]`
     * with SAS and additional parameters: :code:`azure://account_name:shared_access_signature@container?use_sas&create_if_missing=false[?max_connections=2&socket_timeout=(20,100)][?max_block_size=4*1024*1024&max_single_put_size=64*1024*1024]`
 
