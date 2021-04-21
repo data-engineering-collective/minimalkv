@@ -1,6 +1,11 @@
 Changelog
 *********
 
+1.1.0
+=====
+
+* Merge ``storefact`` into the tree.
+
 1.0.0
 =====
 
