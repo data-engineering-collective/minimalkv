@@ -11,7 +11,7 @@ VALID_KEY_RE_EXTENDED = re.compile(VALID_KEY_REGEXP_EXTENDED)
 """A compiled version of :data:`~minimalkv.VALID_KEY_REGEXP_EXTENDED`."""
 
 
-class ExtendedKeyspaceMixin(object):
+class ExtendedKeyspaceMixin:
     """A mixin to extend the keyspace to allow slashes and spaces in keynames.
 
     Attention: A single / is NOT allowed.
