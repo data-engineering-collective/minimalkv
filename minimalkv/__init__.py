@@ -512,7 +512,7 @@ class CopyMixin(object):
 
 def get_store_from_url(url):
     """
-    Take a URL and return a simplekv store according to the parameters in the URL.
+    Take a URL and return a minimalkv store according to the parameters in the URL.
 
     .. note::
        User credentials like secret keys have to be percent-encoded before they can be
@@ -548,7 +548,7 @@ def get_store(type, create_if_missing=True, **params):
     The *type* must be one of the types below, where each allows
     different parameters:
 
-    * ``"azure"``: Returns a ``simplekv.azure.AzureBlockBlobStorage``. Parameters are
+    * ``"azure"``: Returns a ``minimalkv.azure.AzureBlockBlobStorage``. Parameters are
       ``"account_name"``, ``"account_key"``, ``"container"``, ``"use_sas"`` and ``"create_if_missing"`` (default: ``True``).
       ``"create_if_missing"`` has to be ``False`` if ``"use_sas"`` is set. When ``"use_sas"`` is set,
       ``"account_key"`` is interpreted as Shared Access Signature (SAS) token.FIRE
@@ -556,7 +556,7 @@ def get_store(type, create_if_missing=True, **params):
       ``"socket_timeout"``: maximum timeout value in seconds (socket_timeout: ``200``).
       ``"max_single_put_size"``: max_single_put_size is the largest size upload supported in a single put call.
       ``"max_block_size"``: maximum block size is maximum size of the blocks(maximum size is <= 100MB)
-    * ``"s3"``: Returns a plain ``simplekv.net.botostore.BotoStore``.
+    * ``"s3"``: Returns a plain ``minimalkv.net.botostore.BotoStore``.
       Parameters must include ``"host"``, ``"bucket"``, ``"access_key"``, ``"secret_key"``.
       Optional parameters are
 
@@ -566,10 +566,10 @@ def get_store(type, create_if_missing=True, **params):
          If ``False``, the bucket name is used as-is.
        - ``"create_if_missing"`` (default: ``True`` ). If set, creates the bucket if it does not exist;
          otherwise, try to retrieve the bucket and fail with an ``IOError``.
-    * ``"hs3"`` returns a variant of ``simplekv.net.botostore.BotoStore`` that allows "/" in the key name.
+    * ``"hs3"`` returns a variant of ``minimalkv.net.botostore.BotoStore`` that allows "/" in the key name.
       The parameters are the same as for ``"s3"``
-    * ``"fs"``: Returns a ``simplekv.fs.FilesystemStore``. Specify the base path as "path" parameter.
-    * ``"hfs"`` returns a variant of ``simplekv.fs.FilesystemStore``  that allows "/" in the key name.
+    * ``"fs"``: Returns a ``minimalkv.fs.FilesystemStore``. Specify the base path as "path" parameter.
+    * ``"hfs"`` returns a variant of ``minimalkv.fs.FilesystemStore``  that allows "/" in the key name.
       The parameters are the same as for ``"file"``.
     * ``"memory"``: Returns a DictStore. Doesn't take any parameters
     * ``"redis"``: Returns a RedisStore. Constructs a StrictRedis using params as kwargs.
