@@ -1,11 +1,12 @@
 import re
-from io import BytesIO
 from functools import reduce
+from io import BytesIO
 
-from minimalkv._compat import key_type
 from minimalkv._urls import url2dict
 
 try:
+    import pkg_resources
+
     __version__ = pkg_resources.get_distribution(__name__).version
 except Exception:  # pragma: no cover
     __version__ = "unknown"
@@ -17,6 +18,9 @@ alphanumeric characters, as well as ``!"`#$%&'()+,-.<=>?@[]^_{}~``."""
 
 VALID_KEY_RE = re.compile(VALID_KEY_REGEXP)
 """A compiled version of :data:`~minimalkv.VALID_KEY_REGEXP`."""
+
+# Only here to keep backwards-compatability
+key_type = str
 
 
 class KeyValueStore(object):

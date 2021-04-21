@@ -1,12 +1,9 @@
-#!/usr/bin/env python
-# coding=utf8
-
 import os
 import os.path
 import shutil
+import urllib.parse
 
 from minimalkv import CopyMixin, KeyValueStore, UrlMixin
-from minimalkv._compat import text_type, url_quote
 
 
 class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
@@ -19,7 +16,7 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
     towards the internal storage to be generated.
     """
 
-    def __init__(self, root, perm=None, **kwargs):
+    def __init__(self, root, perm=None):
         """Initialize new FilesystemStore
 
         When files are created, they will receive permissions depending on the
@@ -33,8 +30,8 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
         :param root: the base directory for the store
         :param perm: the permissions for files in the filesystem store
         """
-        super(FilesystemStore, self).__init__(**kwargs)
-        self.root = text_type(root)
+        super(FilesystemStore, self).__init__()
+        self.root = str(root)
         self.perm = perm
         self.bufsize = 1024 * 1024  # 1m
 
@@ -139,7 +136,7 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
     def _url_for(self, key):
         full = os.path.abspath(self._build_filename(key))
         parts = full.split(os.sep)
-        location = "/".join(url_quote(p, safe="") for p in parts)
+        location = "/".join(urllib.parse.quote(p, safe="") for p in parts)
         return "file://" + location
 
     def keys(self, prefix=u""):
@@ -234,4 +231,4 @@ class WebFilesystemStore(FilesystemStore):
             stem = self.url_prefix(self, key)
         else:
             stem = self.url_prefix
-        return stem + url_quote(rel, safe="")
+        return stem + urllib.parse.quote(rel, safe="")

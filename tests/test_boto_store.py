@@ -1,16 +1,15 @@
-#!/usr/bin/env python
-
 import os
 
 import pytest
 
 boto = pytest.importorskip("boto")
+from io import BytesIO
+
 from basic_store import BasicStore
 from bucket_manager import boto_bucket, boto_credentials
 from conftest import ExtendedKeyspaceTests
 from url_store import UrlStore
 
-from minimalkv._compat import BytesIO
 from minimalkv.contrib import ExtendedKeyspaceMixin
 from minimalkv.net.botostore import BotoStore
 

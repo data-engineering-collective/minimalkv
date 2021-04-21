@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# coding=utf8
-
 """
 In cases where you want to generate IDs automatically, decorators are
 available. These should be the outermost decorators, as they change the
@@ -21,8 +18,7 @@ import os
 import tempfile
 import uuid
 
-from ._compat import text_type
-from .decorator import StoreDecorator
+from minimalkv.decorator import StoreDecorator
 
 
 class HashDecorator(StoreDecorator):
@@ -112,12 +108,12 @@ class UUIDDecorator(StoreDecorator):
 
     def put(self, key, data, *args, **kwargs):
         if not key:
-            key = text_type(getattr(uuid, self.uuidfunc)())
+            key = str(getattr(uuid, self.uuidfunc)())
 
         return self._dstore.put(self._template.format(key), data, *args, **kwargs)
 
     def put_file(self, key, file, *args, **kwargs):
         if not key:
-            key = text_type(getattr(uuid, self.uuidfunc)())
+            key = str(getattr(uuid, self.uuidfunc)())
 
         return self._dstore.put_file(self._template.format(key), file, *args, **kwargs)

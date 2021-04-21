@@ -1,11 +1,10 @@
 import hmac
 import os
 import tempfile
+from io import BytesIO
 
 import pytest
-from six import b, indexbytes, int2byte
 
-from minimalkv._compat import BytesIO, xrange
 from minimalkv.crypt import HMACDecorator, VerificationException, _HMACFileReader
 
 
@@ -15,11 +14,11 @@ class TestHMACFileReader(object):
         val = value * 3
 
         def _alter_byte(byte_string, pos):
-            old_val = indexbytes(byte_string, pos)
-            new_byte = int2byte((old_val + 1 % 255))
+            old_val = byte_string[pos]
+            new_byte = bytes((old_val + 1 % 255,))
             return byte_string[:pos] + new_byte + byte_string[pos + 1 :]
 
-        return (_alter_byte(val, i) for i in xrange(len(val)))
+        return (_alter_byte(val, i) for i in range(len(val)))
 
     @pytest.fixture
     def expected_digest(self, secret_key, value, hashfunc):
@@ -37,7 +36,7 @@ class TestHMACFileReader(object):
 
     @pytest.fixture
     def chunk_sizes(self, value):
-        return [10 ** n for n in xrange(2, 8)]
+        return [10 ** n for n in range(2, 8)]
 
     def test_close(self, create_reader):
         reader = create_reader()
@@ -74,7 +73,7 @@ class TestHMACFileReader(object):
                     break
                 chunks.append(r)
 
-            assert b("").join(chunks) == value
+            assert b"".join(chunks) == value
 
     def test_manipulated_input_full_read(self, secret_key, value, bad_datas, hashfunc):
         for bad_data in bad_datas:
@@ -99,7 +98,7 @@ class TestHMACFileReader(object):
 
     def test_input_too_short(self, secret_key, hashfunc):
         with pytest.raises(VerificationException):
-            _HMACFileReader(hmac.HMAC(secret_key, None, hashfunc), BytesIO(b("a")))
+            _HMACFileReader(hmac.HMAC(secret_key, None, hashfunc), BytesIO(b"a"))
 
     def test_unbounded_read(self, value, create_reader):
         assert create_reader().read() == value
@@ -115,7 +114,7 @@ class HMACDec(object):
 
     def test_get_fails_on_manipulation(self, hmacstore, key, value):
         hmacstore.put(key, value)
-        hmacstore.d[key] += b("a")
+        hmacstore.d[key] += b"a"
 
         with pytest.raises(VerificationException):
             hmacstore.get(key)
@@ -148,7 +147,7 @@ class HMACDec(object):
 
     def test_get_file_fails_on_manipulation(self, hmacstore, key, value):
         hmacstore.put(key, value)
-        hmacstore.d[key] += b("a")
+        hmacstore.d[key] += b"a"
 
         with tempfile.TemporaryFile() as tmp:
             with pytest.raises(VerificationException):
@@ -163,7 +162,7 @@ class HMACDec(object):
 
     def test_open_fails_on_manipulation(self, hmacstore, key, value):
         hmacstore.put(key, value)
-        hmacstore.d[key] += b("a")
+        hmacstore.d[key] += b"a"
 
         with pytest.raises(VerificationException):
             hmacstore.open(key).read()

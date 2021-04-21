@@ -145,6 +145,9 @@ class IOInterface(io.BufferedIOBase):
     Class which provides a file-like interface to selectively read from a blob in the bucket.
     """
 
+    size: int
+    pos: int
+
     def __init__(self, blob):
         super(IOInterface, self).__init__()
         self.blob = blob

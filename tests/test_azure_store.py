@@ -1,11 +1,12 @@
+import pickle
 from base64 import b64encode
+from configparser import ConfigParser
 from uuid import uuid4 as uuid
 
 import pytest
 from basic_store import BasicStore, OpenSeekTellStore
 from conftest import ExtendedKeyspaceTests
 
-from minimalkv._compat import ConfigParser, pickle
 from minimalkv.contrib import ExtendedKeyspaceMixin
 from minimalkv.net.azurestore import AzureBlockBlobStore
 

@@ -1,5 +1,6 @@
-from minimalkv._store_creation import create_store
 import pytest
+
+from minimalkv._store_creation import create_store
 
 
 def test_create_store_azure(mocker):

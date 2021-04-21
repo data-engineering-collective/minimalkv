@@ -1,12 +1,8 @@
-#!/usr/bin/env python
-# coding=utf8
-
 import io
 from contextlib import contextmanager
 from shutil import copyfileobj
 
-from .. import CopyMixin, KeyValueStore, UrlMixin
-from .._compat import imap
+from minimalkv import CopyMixin, KeyValueStore, UrlMixin
 
 
 def _public_readable(grants):
@@ -46,7 +42,7 @@ class Boto3SimpleKeyFile(io.RawIOBase):
         self.position = 0
 
     def __repr__(self):
-        return "<%s s3_object=%r >" % (type(self).__name__, self.s3_object)
+        return "<{} s3_object={!r} >".format(type(self).__name__, self.s3_object)
 
     @property
     def size(self):
@@ -125,7 +121,7 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):
     def iter_keys(self, prefix=u""):
         with map_boto3_exceptions():
             prefix_len = len(self.prefix)
-            return imap(
+            return map(
                 lambda k: k.key[prefix_len:],
                 self.bucket.objects.filter(Prefix=self.prefix + prefix),
             )

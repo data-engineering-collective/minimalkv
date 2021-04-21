@@ -1,10 +1,6 @@
-#!/usr/bin/env python
-# coding=utf8
-
 from io import BytesIO
 
-from .. import CopyMixin, KeyValueStore
-from .._compat import ifilter
+from minimalkv import CopyMixin, KeyValueStore
 
 
 class DictStore(KeyValueStore, CopyMixin):
@@ -34,4 +30,4 @@ class DictStore(KeyValueStore, CopyMixin):
         return key
 
     def iter_keys(self, prefix=u""):
-        return ifilter(lambda k: k.startswith(prefix), iter(self.d))
+        return filter(lambda k: k.startswith(prefix), iter(self.d))

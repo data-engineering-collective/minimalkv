@@ -5,7 +5,6 @@ import uuid
 
 import pytest
 
-from minimalkv._compat import text_type
 from minimalkv.idgen import HashDecorator, UUIDDecorator
 
 UUID_REGEXP = re.compile(
@@ -13,7 +12,7 @@ UUID_REGEXP = re.compile(
 )
 
 
-class IDGen(object):
+class IDGen:
     @pytest.fixture(
         params=[
             u"constant",
@@ -70,7 +69,7 @@ class UUIDGen(IDGen):
             if os.path.exists(tmpfile.name):
                 os.unlink(tmpfile.name)
 
-    def test_templates_work(self, templated_uuidstore, value, idgen_template):
+    def test_templates_work_uuid(self, templated_uuidstore, value, idgen_template):
         key = templated_uuidstore.put(None, value)
 
         # should not be a valid UUID
@@ -117,7 +116,7 @@ class HashGen(IDGen):
         key = hashstore.put(None, value)
 
         assert value_hash == key
-        assert isinstance(key, text_type)
+        assert isinstance(key, str)
 
     def test_put_file_generates_correct_hash(self, hashstore, value_hash, value):
         tmpfile = tempfile.NamedTemporaryFile(delete=False)

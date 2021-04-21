@@ -1,6 +1,5 @@
 from uritools import urisplit
 
-
 TRUEVALUES = (u"true",)
 
 

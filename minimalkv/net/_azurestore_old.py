@@ -4,10 +4,9 @@ This implements the AzureBlockBlobStore for `azure-storage-blob<12`
 import io
 from contextlib import contextmanager
 
-from .. import KeyValueStore
-from .._compat import binary_type
-from ._azurestore_common import _byte_buffer_md5, _file_md5, _filename_md5
-from ._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
+from minimalkv import KeyValueStore
+from minimalkv.net._azurestore_common import _byte_buffer_md5, _file_md5, _filename_md5
+from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
 
 
 @contextmanager
@@ -106,7 +105,7 @@ class AzureBlockBlobStore(KeyValueStore):
                 self.container, prefix=prefix
             )
             return (
-                blob.decode("utf-8") if isinstance(blob, binary_type) else blob
+                blob.decode("utf-8") if isinstance(blob, bytes) else blob
                 for blob in blobs
             )
 
@@ -118,7 +117,7 @@ class AzureBlockBlobStore(KeyValueStore):
                 self.container, prefix=prefix, delimiter=delimiter
             )
             return (
-                blob.decode("utf-8") if isinstance(blob, binary_type) else blob
+                blob.decode("utf-8") if isinstance(blob, bytes) else blob
                 for blob in blobs
             )
 

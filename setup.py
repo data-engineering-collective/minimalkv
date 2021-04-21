@@ -4,7 +4,6 @@ from os import path
 
 from setuptools import find_packages, setup
 
-
 here = path.abspath(path.dirname(__file__))
 
 with open("README.rst") as f:

@@ -1,12 +1,8 @@
-#!/usr/bin/env python
-# coding=utf8
-
 from io import BytesIO
 
 from sqlalchemy import Column, LargeBinary, String, Table, exists, select
 
-from .. import CopyMixin, KeyValueStore
-from .._compat import imap, text_type
+from minimalkv import CopyMixin, KeyValueStore
 
 
 class SQLAlchemyStore(KeyValueStore, CopyMixin):
@@ -86,4 +82,4 @@ class SQLAlchemyStore(KeyValueStore, CopyMixin):
         query = select([self.table.c.key])
         if prefix != "":
             query = query.where(self.table.c.key.like(prefix + "%"))
-        return imap(lambda v: text_type(v[0]), self.bind.execute(query))
+        return map(lambda v: str(v[0]), self.bind.execute(query))

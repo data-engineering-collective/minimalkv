@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-# coding=utf8
-from ._compat import binary_type, quote_plus, text_type, unquote_plus
+from urllib.parse import quote_plus, unquote_plus
 
 
 class StoreDecorator(object):
@@ -135,10 +133,10 @@ class URLEncodeKeysDecorator(KeyTransformingDecorator):
     """URL-encodes keys before passing them on to the underlying store."""
 
     def _map_key(self, key):
-        if not isinstance(key, text_type):
+        if not isinstance(key, str):
             raise ValueError("%r is not a unicode string" % key)
         quoted = quote_plus(key.encode("utf-8"))
-        if isinstance(quoted, binary_type):
+        if isinstance(quoted, bytes):
             quoted = quoted.decode("utf-8")
         return quoted
 

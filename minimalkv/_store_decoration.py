@@ -1,4 +1,4 @@
-from minimalkv.decorator import URLEncodeKeysDecorator, ReadOnlyDecorator
+from minimalkv.decorator import ReadOnlyDecorator, URLEncodeKeysDecorator
 
 
 def decorate_store(store, decoratorname):
