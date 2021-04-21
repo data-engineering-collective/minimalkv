@@ -1,8 +1,8 @@
 import pickle
 import re
+from io import BytesIO
 
 from bson.binary import Binary
-from cStringIO import StringIO
 
 from minimalkv import KeyValueStore
 
@@ -32,7 +32,7 @@ class MongoStore(KeyValueStore):
             raise KeyError(key)
 
     def _open(self, key):
-        return StringIO(self._get(key))
+        return BytesIO(self._get(key))
 
     def _put(self, key, value):
         self.db[self.collection].update_one(

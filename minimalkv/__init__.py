@@ -1,6 +1,7 @@
 import re
 from functools import reduce
 from io import BytesIO
+from typing import Iterable, Sequence
 
 from minimalkv._urls import url2dict
 
@@ -23,7 +24,7 @@ VALID_KEY_RE = re.compile(VALID_KEY_REGEXP)
 key_type = str
 
 
-class KeyValueStore(object):
+class KeyValueStore:
     """The smallest API supported by all backends.
 
     Keys are ascii-strings with certain restrictions, guaranteed to be properly
@@ -37,7 +38,7 @@ class KeyValueStore(object):
     them upon storage and decode them upon retrieval.
     """
 
-    def __contains__(self, key):
+    def __contains__(self, key: str) -> bool:
         """Checks if a key is present
 
         :param key: The key whose existence should be verified.
@@ -51,14 +52,14 @@ class KeyValueStore(object):
         self._check_valid_key(key)
         return self._has_key(key)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterable[str]:
         """Iterate over keys
 
         :raises exceptions.IOError: If there was an error accessing the store.
         """
         return self.iter_keys()
 
-    def delete(self, key):
+    def delete(self, key: str):
         """Delete key and data associated with it.
 
         If the key does not exist, no error is reported.
@@ -69,7 +70,7 @@ class KeyValueStore(object):
         self._check_valid_key(key)
         return self._delete(key)
 
-    def get(self, key):
+    def get(self, key: str) -> bytes:
         """Returns the key data as a bytestring.
 
         :param key: Value associated with the key, as a `bytes` object
@@ -81,7 +82,7 @@ class KeyValueStore(object):
         self._check_valid_key(key)
         return self._get(key)
 
-    def get_file(self, key, file):
+    def get_file(self, key: str, file):
         """Write contents of key to file
 
         Like :meth:`.KeyValueStore.put_file`, this method allows backends to
@@ -106,7 +107,7 @@ class KeyValueStore(object):
         else:
             return self._get_file(key, file)
 
-    def iter_keys(self, prefix=u""):
+    def iter_keys(self, prefix: str = "") -> Iterable[str]:
         """Return an Iterator over all keys currently in the store, in any
         order.
         If prefix is not the empty string, iterates only over all keys starting with prefix.
@@ -115,7 +116,7 @@ class KeyValueStore(object):
         """
         raise NotImplementedError
 
-    def iter_prefixes(self, delimiter, prefix=u""):
+    def iter_prefixes(self, delimiter: str, prefix: str = "") -> Iterable[str]:
         """Returns an Iterator over all prefixes currently in the store, in any order. The
         prefixes are listed up to the given delimiter.
 
@@ -142,7 +143,7 @@ class KeyValueStore(object):
                 yield k
                 memory.add(k)
 
-    def keys(self, prefix=u""):
+    def keys(self, prefix: str = "") -> Sequence[str]:
         """Return a list of keys currently in store, in any order
         If prefix is not the empty string, returns only all keys starting with prefix.
 
@@ -150,7 +151,7 @@ class KeyValueStore(object):
         """
         return list(self.iter_keys(prefix))
 
-    def open(self, key):
+    def open(self, key: str):
         """Open key for reading.
 
         Returns a read-only file-like object for reading a key.
@@ -164,7 +165,7 @@ class KeyValueStore(object):
         self._check_valid_key(key)
         return self._open(key)
 
-    def put(self, key, data):
+    def put(self, key: str, data: bytes):
         """Store into key from file
 
         Stores bytestring *data* in *key*.
@@ -183,7 +184,7 @@ class KeyValueStore(object):
             raise IOError("Provided data is not of type bytes")
         return self._put(key, data)
 
-    def put_file(self, key, file):
+    def put_file(self, key: str, file):
         """Store into key from file on disk
 
         Stores data from a source into key. *file* can either be a string,
@@ -212,7 +213,7 @@ class KeyValueStore(object):
         else:
             return self._put_file(key, file)
 
-    def _check_valid_key(self, key):
+    def _check_valid_key(self, key: str) -> None:
         """Checks if a key is valid and raises a ValueError if its not.
 
         When in need of checking a key for validity, always use this
@@ -225,14 +226,14 @@ class KeyValueStore(object):
         if not VALID_KEY_RE.match(key):
             raise ValueError("%r contains illegal characters" % key)
 
-    def _delete(self, key):
+    def _delete(self, key: str):
         """Implementation for :meth:`~minimalkv.KeyValueStore.delete`. The
         default implementation will simply raise a
         :py:exc:`~exceptions.NotImplementedError`.
         """
         raise NotImplementedError
 
-    def _get(self, key):
+    def _get(self, key: str) -> bytes:
         """Implementation for :meth:`~minimalkv.KeyValueStore.get`. The default
         implementation will create a :class:`io.BytesIO`-buffer and then call
         :meth:`~minimalkv.KeyValueStore._get_file`.
@@ -245,7 +246,7 @@ class KeyValueStore(object):
 
         return buf.getvalue()
 
-    def _get_file(self, key, file):
+    def _get_file(self, key: str, file):
         """Write key to file-like object file. Either this method or
         :meth:`~minimalkv.KeyValueStore._get_filename` will be called by
         :meth:`~minimalkv.KeyValueStore.get_file`. Note that this method does
@@ -271,7 +272,7 @@ class KeyValueStore(object):
         finally:
             source.close()
 
-    def _get_filename(self, key, filename):
+    def _get_filename(self, key: str, filename: str):
         """Write key to file. Either this method or
         :meth:`~minimalkv.KeyValueStore._get_file` will be called by
         :meth:`~minimalkv.KeyValueStore.get_file`. This method only accepts
@@ -284,7 +285,7 @@ class KeyValueStore(object):
         with open(filename, "wb") as dest:
             return self._get_file(key, dest)
 
-    def _has_key(self, key):
+    def _has_key(self, key: str) -> bool:
         """Default implementation for
         :meth:`~minimalkv.KeyValueStore.__contains__`.
 
@@ -295,7 +296,7 @@ class KeyValueStore(object):
         """
         return key in self.keys()
 
-    def _open(self, key):
+    def _open(self, key: str):
         """Open key for reading. Default implementation simply raises a
         :py:exc:`~exceptions.NotImplementedError`.
 
@@ -303,7 +304,7 @@ class KeyValueStore(object):
         """
         raise NotImplementedError
 
-    def _put(self, key, data):
+    def _put(self, key: str, data: bytes):
         """Implementation for :meth:`~minimalkv.KeyValueStore.put`. The default
         implementation will create a :class:`io.BytesIO`-buffer and then call
         :meth:`~minimalkv.KeyValueStore._put_file`.
@@ -313,7 +314,7 @@ class KeyValueStore(object):
         """
         return self._put_file(key, BytesIO(data))
 
-    def _put_file(self, key, file):
+    def _put_file(self, key: str, file):
         """Store data from file-like object in key. Either this method or
         :meth:`~minimalkv.KeyValueStore._put_filename` will be called by
         :meth:`~minimalkv.KeyValueStore.put_file`. Note that this method does
@@ -327,7 +328,7 @@ class KeyValueStore(object):
         """
         raise NotImplementedError
 
-    def _put_filename(self, key, filename):
+    def _put_filename(self, key: str, filename: str):
         """Store data from file in key. Either this method or
         :meth:`~minimalkv.KeyValueStore._put_file` will be called by
         :meth:`~minimalkv.KeyValueStore.put_file`. Note that this method does
@@ -343,10 +344,10 @@ class KeyValueStore(object):
             return self._put_file(key, source)
 
 
-class UrlMixin(object):
+class UrlMixin:
     """Supports getting a download URL for keys."""
 
-    def url_for(self, key):
+    def url_for(self, key: str) -> str:
         """Returns a full external URL that can be used to retrieve *key*.
 
         Does not perform any checks (such as if a key exists), other than
@@ -361,7 +362,7 @@ class UrlMixin(object):
         self._check_valid_key(key)
         return self._url_for(key)
 
-    def _url_for(self, key):
+    def _url_for(self, key: str) -> str:
         raise NotImplementedError
 
 
@@ -369,7 +370,7 @@ FOREVER = "forever"
 NOT_SET = "not_set"
 
 
-class TimeToLiveMixin(object):
+class TimeToLiveMixin:
     """Allows keys to expire after a certain amount of time.
 
     This mixin overrides some of the signatures of the api of
@@ -416,7 +417,7 @@ class TimeToLiveMixin(object):
 
         return ttl_secs
 
-    def put(self, key, data, ttl_secs=None):
+    def put(self, key: str, data: bytes, ttl_secs=None):
         """Like :meth:`~minimalkv.KeyValueStore.put`, but with an additional
         parameter:
 
@@ -432,7 +433,7 @@ class TimeToLiveMixin(object):
             raise IOError("Provided data is not of type bytes")
         return self._put(key, data, self._valid_ttl(ttl_secs))
 
-    def put_file(self, key, file, ttl_secs=None):
+    def put_file(self, key: str, file, ttl_secs=None):
         """Like :meth:`~minimalkv.KeyValueStore.put_file`, but with an
         additional parameter:
 
@@ -451,13 +452,13 @@ class TimeToLiveMixin(object):
             return self._put_file(key, file, self._valid_ttl(ttl_secs))
 
     # default implementations similar to KeyValueStore below:
-    def _put(self, key, data, ttl_secs):
+    def _put(self, key: str, data: bytes, ttl_secs):
         return self._put_file(key, BytesIO(data), ttl_secs)
 
-    def _put_file(self, key, file, ttl_secs):
+    def _put_file(self, key: str, file, ttl_secs):
         raise NotImplementedError
 
-    def _put_filename(self, key, filename, ttl_secs):
+    def _put_filename(self, key: str, filename: str, ttl_secs):
         with open(filename, "rb") as source:
             return self._put_file(key, source, ttl_secs)
 
@@ -474,7 +475,7 @@ class UrlKeyValueStore(UrlMixin, KeyValueStore):
 class CopyMixin(object):
     """Exposes a copy operation, if the backend supports it."""
 
-    def copy(self, source, dest):
+    def copy(self, source: str, dest: str):
         """Copies a key. The destination is overwritten if it does exist.
 
         :param source: The source key to copy
@@ -488,10 +489,10 @@ class CopyMixin(object):
         self._check_valid_key(dest)
         return self._copy(source, dest)
 
-    def _copy(self, source, dest):
+    def _copy(self, source: str, dest: str):
         raise NotImplementedError
 
-    def move(self, source, dest):
+    def move(self, source: str, dest: str) -> str:
         """Moves a key. The destination is overwritten if it does exist.
 
         :param source: The source key to move
@@ -505,13 +506,13 @@ class CopyMixin(object):
         self._check_valid_key(dest)
         return self._move(source, dest)
 
-    def _move(self, source, dest):
+    def _move(self, source: str, dest: str) -> str:
         self._copy(source, dest)
         self._delete(source)
         return dest
 
 
-def get_store_from_url(url):
+def get_store_from_url(url: str):
     """
     Take a URL and return a minimalkv store according to the parameters in the URL.
 
@@ -543,7 +544,7 @@ def get_store_from_url(url):
     return get_store(**url2dict(url))
 
 
-def get_store(type, create_if_missing=True, **params):
+def get_store(type: str, create_if_missing: bool = True, **params):
     """Return a storage object according to the `type` and additional parameters.
 
     The *type* must be one of the types below, where each allows

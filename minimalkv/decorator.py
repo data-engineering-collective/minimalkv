@@ -1,7 +1,8 @@
+from typing import Iterable
 from urllib.parse import quote_plus, unquote_plus
 
 
-class StoreDecorator(object):
+class StoreDecorator:
     """Base class for store decorators.
 
     The default implementation will use :func:`getattr` to pass through all
@@ -17,50 +18,50 @@ class StoreDecorator(object):
         store = object.__getattribute__(self, "_dstore")
         return getattr(store, attr)
 
-    def __contains__(self, *args, **kwargs):
-        return self._dstore.__contains__(*args, **kwargs)
+    def __contains__(self, key: str) -> bool:
+        return self._dstore.__contains__(key)
 
-    def __iter__(self, *args, **kwargs):
-        return self._dstore.__iter__(*args, **kwargs)
+    def __iter__(self) -> Iterable[str]:
+        return self._dstore.__iter__()
 
 
 class KeyTransformingDecorator(StoreDecorator):
     # currently undocumented (== not advertised as a feature)
-    def _map_key(self, key):
+    def _map_key(self, key: str) -> str:
         return key
 
-    def _map_key_prefix(self, key_prefix):
+    def _map_key_prefix(self, key_prefix: str) -> str:
         return key_prefix
 
-    def _unmap_key(self, key):
+    def _unmap_key(self, key: str) -> str:
         return key
 
-    def _filter(self, key):
+    def _filter(self, key: str) -> bool:
         return True
 
-    def __contains__(self, key):
+    def __contains__(self, key: str) -> bool:
         return self._map_key(key) in self._dstore
 
-    def __iter__(self):
+    def __iter__(self) -> Iterable[str]:
         return self.iter_keys()
 
-    def delete(self, key):
+    def delete(self, key: str):
         return self._dstore.delete(self._map_key(key))
 
     def get(self, key, *args, **kwargs):
         return self._dstore.get(self._map_key(key), *args, **kwargs)
 
-    def get_file(self, key, *args, **kwargs):
+    def get_file(self, key: str, *args, **kwargs):
         return self._dstore.get_file(self._map_key(key), *args, **kwargs)
 
-    def iter_keys(self, prefix=u""):
+    def iter_keys(self, prefix: str = "") -> Iterable[str]:
         return (
             self._unmap_key(k)
             for k in self._dstore.iter_keys(self._map_key_prefix(prefix))
             if self._filter(k)
         )
 
-    def iter_prefixes(self, delimiter, prefix=u""):
+    def iter_prefixes(self, delimiter: str, prefix: str = "") -> Iterable[str]:
         dlen = len(delimiter)
         plen = len(prefix)
         memory = set()
@@ -74,30 +75,30 @@ class KeyTransformingDecorator(StoreDecorator):
                 yield k
                 memory.add(k)
 
-    def keys(self, prefix=u""):
+    def keys(self, prefix: str = ""):
         """Return a list of keys currently in store, in any order
 
         :raises IOError: If there was an error accessing the store.
         """
         return list(self.iter_keys(prefix))
 
-    def open(self, key):
+    def open(self, key: str):
         return self._dstore.open(self._map_key(key))
 
-    def put(self, key, *args, **kwargs):
+    def put(self, key: str, *args, **kwargs):
         return self._unmap_key(self._dstore.put(self._map_key(key), *args, **kwargs))
 
-    def put_file(self, key, *args, **kwargs):
+    def put_file(self, key: str, *args, **kwargs):
         return self._unmap_key(
             self._dstore.put_file(self._map_key(key), *args, **kwargs)
         )
 
     # support for UrlMixin
-    def url_for(self, key, *args, **kwargs):
+    def url_for(self, key: str, *args, **kwargs) -> str:
         return self._dstore.url_for(self._map_key(key), *args, **kwargs)
 
     # support for CopyMixin
-    def copy(self, source, dest):
+    def copy(self, source: str, dest: str):
         return self._dstore.copy(self._map_key(source), self._map_key(dest))
 
 
@@ -109,21 +110,21 @@ class PrefixDecorator(KeyTransformingDecorator):
     :param prefix: Prefix to add.
     """
 
-    def __init__(self, prefix, store):
+    def __init__(self, prefix: str, store):
         super(PrefixDecorator, self).__init__(store)
         self.prefix = prefix
 
-    def _filter(self, key):
+    def _filter(self, key: str) -> bool:
         return key.startswith(self.prefix)
 
-    def _map_key(self, key):
+    def _map_key(self, key: str) -> str:
         self._check_valid_key(key)
         return self.prefix + key
 
-    def _map_key_prefix(self, key_prefix):
+    def _map_key_prefix(self, key_prefix: str) -> str:
         return self.prefix + key_prefix
 
-    def _unmap_key(self, key):
+    def _unmap_key(self, key: str) -> str:
         assert key.startswith(self.prefix)
 
         return key[len(self.prefix) :]
@@ -132,7 +133,7 @@ class PrefixDecorator(KeyTransformingDecorator):
 class URLEncodeKeysDecorator(KeyTransformingDecorator):
     """URL-encodes keys before passing them on to the underlying store."""
 
-    def _map_key(self, key):
+    def _map_key(self, key: str) -> str:
         if not isinstance(key, str):
             raise ValueError("%r is not a unicode string" % key)
         quoted = quote_plus(key.encode("utf-8"))
@@ -140,10 +141,10 @@ class URLEncodeKeysDecorator(KeyTransformingDecorator):
             quoted = quoted.decode("utf-8")
         return quoted
 
-    def _map_key_prefix(self, key_prefix):
+    def _map_key_prefix(self, key_prefix: str) -> str:
         return self._map_key(key_prefix)
 
-    def _unmap_key(self, key):
+    def _unmap_key(self, key: str) -> str:
         return unquote_plus(key)
 
 
