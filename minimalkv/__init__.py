@@ -1,12 +1,9 @@
-#!/usr/bin/env python
-# coding=utf8
-
 import re
 from io import BytesIO
 from functools import reduce
 
-from ._compat import key_type
-from ._urls import url2dict
+from minimalkv._compat import key_type
+from minimalkv._urls import url2dict
 
 try:
     __version__ = pkg_resources.get_distribution(__name__).version
