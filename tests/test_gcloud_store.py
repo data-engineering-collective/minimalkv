@@ -12,6 +12,7 @@ from uuid import uuid4
 import google
 from basic_store import BasicStore, OpenSeekTellStore
 from conftest import ExtendedKeyspaceTests
+from google.api_core.exceptions import NotFound
 from google.auth.credentials import AnonymousCredentials
 from google.cloud.exceptions import MethodNotAllowed
 
@@ -159,5 +160,5 @@ class TestGCExceptions:
             bucket_name="thisbucketdoesntexist123123",
             create_if_missing=False,
         )
-        with pytest.raises(google.api_core.exceptions.NotFound):
+        with pytest.raises(NotFound):
             store.get("key")
