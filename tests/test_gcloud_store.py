@@ -130,7 +130,7 @@ class TestExtendedKeysGCStore(TestGoogleCloudStore, ExtendedKeyspaceTests):
         uuid = str(uuid4())
         # if we have a credentials.json that specifies the project name, else we pick one
         if type(gc_credentials) == AnonymousCredentials:
-            project_name:Optional[str] = "testing"
+            project_name: Optional[str] = "testing"
         else:
             project_name = None
 

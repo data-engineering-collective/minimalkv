@@ -19,7 +19,7 @@ class TestGitCommitStore(BasicStore, UUIDGen, HashGen):
     def subdir_name(self, request):
         return request.param
 
-    @pytest.yield_fixture
+    @pytest.fixture
     def repo_path(self, tmp_path):
         Repo.init_bare(str(tmp_path))
         yield str(tmp_path)

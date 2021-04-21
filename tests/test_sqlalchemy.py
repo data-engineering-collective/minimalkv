@@ -40,7 +40,7 @@ class TestSQLAlchemyStore(BasicStore):
             pytest.skip("could not connect to database {}".format(dsn))
         return engine
 
-    @pytest.yield_fixture
+    @pytest.fixture
     def store(self, engine):
         metadata = MetaData(bind=engine)
         store = SQLAlchemyStore(engine, metadata, "minimalkv_test")

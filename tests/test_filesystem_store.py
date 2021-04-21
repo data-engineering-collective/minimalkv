@@ -18,7 +18,7 @@ from minimalkv.fs import FilesystemStore, WebFilesystemStore
 
 
 class TestBaseFilesystemStore(BasicStore, UrlStore, UUIDGen, HashGen):
-    @pytest.yield_fixture
+    @pytest.fixture
     def tmpdir(self, tmp_path):
         yield str(tmp_path)
 

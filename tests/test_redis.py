@@ -13,7 +13,7 @@ from redis.exceptions import ConnectionError
 
 
 class TestRedisStore(TTLStore, BasicStore):
-    @pytest.yield_fixture()
+    @pytest.fixture
     def store(self):
         from minimalkv.memory.redisstore import RedisStore
 
