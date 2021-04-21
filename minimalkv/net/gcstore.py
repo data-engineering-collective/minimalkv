@@ -1,6 +1,6 @@
 import io
 from contextlib import contextmanager
-from typing import Iterable, Optional
+from typing import Iterable, Optional, cast
 
 from minimalkv import KeyValueStore
 from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
@@ -155,7 +155,7 @@ class IOInterface(io.BufferedIOBase):
 
         if blob.size is None:
             blob.reload()
-        self.size = blob.size
+        self.size = cast(int, blob.size)
         self.pos = 0
 
     def tell(self):
