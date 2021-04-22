@@ -1,12 +1,12 @@
 import re
 import time
 from io import BytesIO
+from typing import Optional
 
 from dulwich.objects import Blob, Commit, Tree
 from dulwich.repo import Repo
 
-from . import KeyValueStore, __version__
-from ._compat import text_type
+from minimalkv import KeyValueStore, __version__
 
 
 def _on_tree(repo, tree, components, obj):
@@ -24,7 +24,7 @@ def _on_tree(repo, tree, components, obj):
     # pattern-matching:
     if len(components) == 1:
         if isinstance(obj, Blob):
-            mode = 0o100644
+            mode: Optional[int] = 0o100644
         elif isinstance(obj, Tree):
             mode = 0o040000
         elif obj is None:

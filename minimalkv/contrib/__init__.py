@@ -1,9 +1,7 @@
-#!/usr/bin/env python
-# coding=utf8
 import re
+from typing import Optional
 
 from minimalkv import VALID_NON_NUM
-from minimalkv._compat import key_type
 
 VALID_NON_NUM_EXTENDED = VALID_NON_NUM + r"/ "
 VALID_KEY_REGEXP_EXTENDED = "^[%s0-9a-zA-Z]+$" % re.escape(VALID_NON_NUM_EXTENDED)
@@ -13,7 +11,7 @@ VALID_KEY_RE_EXTENDED = re.compile(VALID_KEY_REGEXP_EXTENDED)
 """A compiled version of :data:`~minimalkv.VALID_KEY_REGEXP_EXTENDED`."""
 
 
-class ExtendedKeyspaceMixin(object):
+class ExtendedKeyspaceMixin:
     """A mixin to extend the keyspace to allow slashes and spaces in keynames.
 
     Attention: A single / is NOT allowed.
@@ -22,7 +20,7 @@ class ExtendedKeyspaceMixin(object):
     Note: This Mixin is unsupported and might not work correctly with all backends.
     """
 
-    def _check_valid_key(self, key):
+    def _check_valid_key(self, key: Optional[str]):
         """Checks if a key is valid and raises a ValueError if its not.
 
         When in need of checking a key for validity, always use this
@@ -30,7 +28,8 @@ class ExtendedKeyspaceMixin(object):
 
         :param key: The key to be checked
         """
-        if not isinstance(key, key_type) and key is not None:
-            raise ValueError("%r is not a valid key type" % key)
-        if not VALID_KEY_RE_EXTENDED.match(key) or key == u"/":
-            raise ValueError("%r contains illegal characters" % key)
+        if key is not None:
+            if not isinstance(key, str):
+                raise ValueError("%r is not a valid key type" % key)
+            elif not VALID_KEY_RE_EXTENDED.match(key) or key == "/":
+                raise ValueError("%r contains illegal characters" % key)

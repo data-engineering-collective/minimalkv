@@ -1,11 +1,7 @@
-#!/usr/bin/env python
-# coding=utf8
-
 import os
 from contextlib import contextmanager
 
-from .. import CopyMixin, KeyValueStore, UrlMixin
-from .._compat import imap
+from minimalkv import CopyMixin, KeyValueStore, UrlMixin
 
 
 @contextmanager
@@ -65,7 +61,7 @@ class BotoStore(KeyValueStore, UrlMixin, CopyMixin):
     def iter_keys(self, prefix=u""):
         with map_boto_exceptions():
             prefix_len = len(self.prefix)
-            return imap(
+            return map(
                 lambda k: k.name[prefix_len:], self.bucket.list(self.prefix + prefix)
             )
 

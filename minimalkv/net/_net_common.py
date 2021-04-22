@@ -9,7 +9,7 @@ def lazy_property(fn):
     Any subsequent property access then returns the cached value."""
     attr_name = LAZY_PROPERTY_ATTR_PREFIX + fn.__name__
 
-    @property
+    @property  # type: ignore
     def _lazy_property(self):
         if not hasattr(self, attr_name):
             setattr(self, attr_name, fn(self))

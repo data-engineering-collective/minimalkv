@@ -1,7 +1,4 @@
-#!/usr/bin/env python
-# coding=utf8
-
-from .decorator import StoreDecorator
+from minimalkv.decorator import StoreDecorator
 
 
 class CacheDecorator(StoreDecorator):
@@ -28,7 +25,7 @@ class CacheDecorator(StoreDecorator):
         super(CacheDecorator, self).__init__(store)
         self.cache = cache
 
-    def delete(self, key):
+    def delete(self, key: str):
         """Implementation of :meth:`~minimalkv.KeyValueStore.delete`.
 
         If an exception occurs in either the cache or backing store, all are
@@ -37,7 +34,7 @@ class CacheDecorator(StoreDecorator):
         self._dstore.delete(key)
         self.cache.delete(key)
 
-    def get(self, key):
+    def get(self, key: str):
         """Implementation of :meth:`~minimalkv.KeyValueStore.get`.
 
         If a cache miss occurs, the value is retrieved, stored in the cache and
@@ -62,7 +59,7 @@ class CacheDecorator(StoreDecorator):
             # cache error, ignore completely and return from backend
             return self._dstore.get(key)
 
-    def get_file(self, key, file):
+    def get_file(self, key: str, file):
         """Implementation of :meth:`~minimalkv.KeyValueStore.get_file`.
 
         If a cache miss occurs, the value is retrieved, stored in the cache and
@@ -87,7 +84,7 @@ class CacheDecorator(StoreDecorator):
         # if an IOError occured, file pointer may be dirty - cannot proceed
         # safely
 
-    def open(self, key):
+    def open(self, key: str):
         """Implementation of :meth:`~minimalkv.KeyValueStore.open`.
 
         If a cache miss occurs, the value is retrieved, stored in the cache,
@@ -111,7 +108,7 @@ class CacheDecorator(StoreDecorator):
             # cache error, ignore completely and return from backend
             return self._dstore.open(key)
 
-    def copy(self, source, dest):
+    def copy(self, source: str, dest: str):
         """Implementation of :meth:`~minimalkv.CopyMixin.copy`.
 
         Copies the data in the backing store and removes the destination key from the cache,
@@ -124,7 +121,7 @@ class CacheDecorator(StoreDecorator):
             self.cache.delete(dest)
         return k
 
-    def put(self, key, data):
+    def put(self, key: str, data):
         """Implementation of :meth:`~minimalkv.KeyValueStore.put`.
 
         Will store the value in the backing store. After a successful or
@@ -136,7 +133,7 @@ class CacheDecorator(StoreDecorator):
         finally:
             self.cache.delete(key)
 
-    def put_file(self, key, file):
+    def put_file(self, key: str, file):
         """Implementation of :meth:`~minimalkv.KeyValueStore.put_file`.
 
         Will store the value in the backing store. After a successful or

@@ -1,8 +1,10 @@
-# coding: utf8
-
 import os
 import stat
 import tempfile
+from io import BytesIO
+from urllib.parse import quote as url_quote
+from urllib.parse import unquote as url_unquote
+from urllib.parse import urlparse
 
 import pytest
 from basic_store import BasicStore
@@ -11,13 +13,12 @@ from idgens import HashGen, UUIDGen
 from mock import Mock
 from url_store import UrlStore
 
-from minimalkv._compat import PY2, BytesIO, url_quote, url_unquote, urlparse
 from minimalkv.contrib import ExtendedKeyspaceMixin
 from minimalkv.fs import FilesystemStore, WebFilesystemStore
 
 
 class TestBaseFilesystemStore(BasicStore, UrlStore, UUIDGen, HashGen):
-    @pytest.yield_fixture
+    @pytest.fixture
     def tmpdir(self, tmp_path):
         yield str(tmp_path)
 
@@ -39,12 +40,8 @@ class TestFilesystemStoreMkdir(TestBaseFilesystemStore):
         store = FilesystemStore(os.path.join(tmpdir, "test"))
         # We have mocked os.makedirs, so this won't work. But it should
         # pass beyond the OS error and simply fail on writing the file itself.
-        if PY2:
-            with pytest.raises(IOError):
-                store.put("test", b"test")
-        else:
-            with pytest.raises(FileNotFoundError):
-                store.put("test", b"test")
+        with pytest.raises(FileNotFoundError):
+            store.put("test", b"test")
 
 
 class TestFilesystemStoreFileURI(TestBaseFilesystemStore):
@@ -118,7 +115,7 @@ class TestFilesystemStoreUmask(TestBaseFilesystemStore):
             assert mode & mask == perms
         finally:
             if os.path.exists(tmpfile.name):
-                os.path.unlink(tmpfile.name)
+                os.unlink(tmpfile.name)
 
 
 class TestFileStoreSetPermissions(TestFilesystemStoreUmask):

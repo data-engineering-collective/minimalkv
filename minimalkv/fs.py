@@ -1,12 +1,10 @@
-#!/usr/bin/env python
-# coding=utf8
-
 import os
 import os.path
 import shutil
+import urllib.parse
+from typing import Any, Callable, Iterable, List, Optional, Union, cast
 
 from minimalkv import CopyMixin, KeyValueStore, UrlMixin
-from minimalkv._compat import text_type, url_quote
 
 
 class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
@@ -19,7 +17,11 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
     towards the internal storage to be generated.
     """
 
-    def __init__(self, root, perm=None, **kwargs):
+    root: str
+    perm: Optional[int]
+    bufsize: int
+
+    def __init__(self, root, perm: Optional[int] = None):
         """Initialize new FilesystemStore
 
         When files are created, they will receive permissions depending on the
@@ -33,8 +35,8 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
         :param root: the base directory for the store
         :param perm: the permissions for files in the filesystem store
         """
-        super(FilesystemStore, self).__init__(**kwargs)
-        self.root = text_type(root)
+        super(FilesystemStore, self).__init__()
+        self.root = str(root)
         self.perm = perm
         self.bufsize = 1024 * 1024  # 1m
 
@@ -49,10 +51,10 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
                     break
             parents = os.path.dirname(parents)
 
-    def _build_filename(self, key):
+    def _build_filename(self, key: str) -> str:
         return os.path.abspath(os.path.join(self.root, key))
 
-    def _delete(self, key):
+    def _delete(self, key: str) -> None:
         try:
             targetname = self._build_filename(key)
             os.unlink(targetname)
@@ -61,7 +63,7 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
             if not e.errno == 2:
                 raise
 
-    def _fix_permissions(self, filename):
+    def _fix_permissions(self, filename: str) -> None:
         current_umask = os.umask(0)
         os.umask(current_umask)
 
@@ -69,12 +71,12 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
         if self.perm is None:
             perm = 0o666 & (0o777 ^ current_umask)
 
-        os.chmod(filename, perm)
+        os.chmod(filename, cast(int, perm))
 
-    def _has_key(self, key):
+    def _has_key(self, key: str) -> bool:
         return os.path.exists(self._build_filename(key))
 
-    def _open(self, key):
+    def _open(self, key: str):
         try:
             f = open(self._build_filename(key), "rb")
             return f
@@ -84,7 +86,7 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
             else:
                 raise
 
-    def _copy(self, source, dest):
+    def _copy(self, source: str, dest: str) -> str:
         try:
             source_file_name = self._build_filename(source)
             dest_file_name = self._build_filename(dest)
@@ -99,7 +101,7 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
             else:
                 raise
 
-    def _ensure_dir_exists(self, path):
+    def _ensure_dir_exists(self, path: str) -> None:
         if not os.path.isdir(path):
             try:
                 os.makedirs(path)
@@ -107,7 +109,7 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
                 if not os.path.isdir(path):
                     raise e
 
-    def _put_file(self, key, file):
+    def _put_file(self, key: str, file, *args, **kwargs) -> str:
         bufsize = self.bufsize
 
         target = self._build_filename(key)
@@ -127,7 +129,7 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
 
         return key
 
-    def _put_filename(self, key, filename):
+    def _put_filename(self, key: str, filename, *args, **kwargs) -> str:
         target = self._build_filename(key)
         self._ensure_dir_exists(os.path.dirname(target))
         shutil.move(filename, target)
@@ -136,13 +138,13 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
         self._fix_permissions(target)
         return key
 
-    def _url_for(self, key):
+    def _url_for(self, key: str) -> str:
         full = os.path.abspath(self._build_filename(key))
         parts = full.split(os.sep)
-        location = "/".join(url_quote(p, safe="") for p in parts)
+        location = "/".join(urllib.parse.quote(p, safe="") for p in parts)
         return "file://" + location
 
-    def keys(self, prefix=u""):
+    def keys(self, prefix: str = "") -> List[str]:
         root = os.path.abspath(self.root)
         result = []
         for dp, dn, fn in os.walk(root):
@@ -152,10 +154,10 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
                     result.append(key)
         return result
 
-    def iter_keys(self, prefix=u""):
+    def iter_keys(self, prefix: str = "") -> Iterable[str]:
         return iter(self.keys(prefix))
 
-    def iter_prefixes(self, delimiter, prefix=u""):
+    def iter_prefixes(self, delimiter: str, prefix: str = "") -> Iterable[str]:
         if delimiter != os.sep:
             return super(FilesystemStore, self).iter_prefixes(
                 delimiter,
@@ -163,11 +165,13 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
             )
         return self._iter_prefixes_efficient(delimiter, prefix)
 
-    def _iter_prefixes_efficient(self, delimiter, prefix=u""):
+    def _iter_prefixes_efficient(
+        self, delimiter: str, prefix: str = ""
+    ) -> Iterable[str]:
         if delimiter in prefix:
             pos = prefix.rfind(delimiter)
-            search_prefix = prefix[:pos]
-            path = os.path.join(self.root, search_prefix)
+            search_prefix: Optional[str] = prefix[:pos]
+            path = os.path.join(self.root, cast(str, search_prefix))
         else:
             search_prefix = None
             path = self.root
@@ -216,7 +220,9 @@ class WebFilesystemStore(FilesystemStore):
     https://some.domain.invalid/files/some_key
     """
 
-    def __init__(self, root, url_prefix, **kwargs):
+    def __init__(
+        self, root, url_prefix: Union[Callable[[Any, str], str], str], **kwargs
+    ):
         """Initialize new WebFilesystemStore.
 
         :param root: see :func:`minimalkv.FilesystemStore.__init__`
@@ -227,11 +233,11 @@ class WebFilesystemStore(FilesystemStore):
 
         self.url_prefix = url_prefix
 
-    def _url_for(self, key):
+    def _url_for(self, key: str) -> str:
         rel = key
 
         if callable(self.url_prefix):
-            stem = self.url_prefix(self, key)
+            stem: str = self.url_prefix(self, key)
         else:
             stem = self.url_prefix
-        return stem + url_quote(rel, safe="")
+        return stem + urllib.parse.quote(rel, safe="")

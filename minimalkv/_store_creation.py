@@ -26,6 +26,7 @@ def create_store(type, params):
 
 def _create_store_azure(type, params):
     from minimalkv.net.azurestore import AzureBlockBlobStore
+
     from ._hstores import HAzureBlockBlobStore
 
     conn_string = params.get("connection_string", _build_azure_url(**params))
@@ -68,6 +69,7 @@ def _create_store_hs3(type, params):
 
 def _create_store_s3(type, params):
     from minimalkv.net.botostore import BotoStore
+
     from ._boto import _get_s3bucket
 
     return BotoStore(_get_s3bucket(**params))
@@ -100,8 +102,9 @@ def _create_store_hmem(type, params):
 
 
 def _create_store_redis(type, params):
-    from minimalkv.memory.redisstore import RedisStore
     from redis import StrictRedis
+
+    from minimalkv.memory.redisstore import RedisStore
 
     r = StrictRedis(**params)
     return RedisStore(r)

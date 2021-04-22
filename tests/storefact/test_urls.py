@@ -1,4 +1,5 @@
 import pytest
+
 import minimalkv
 import minimalkv.decorator
 

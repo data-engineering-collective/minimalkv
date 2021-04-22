@@ -1,13 +1,11 @@
-# coding: utf8
-
 import os
 import tempfile
 import time
+from io import BytesIO
 
 import pytest
 
 from minimalkv import CopyMixin
-from minimalkv._compat import BytesIO, text_type, xrange
 from minimalkv.crypt import HMACDecorator
 from minimalkv.decorator import PrefixDecorator
 from minimalkv.idgen import HashDecorator, UUIDDecorator
@@ -23,7 +21,7 @@ def is_emulated_gcstore_test(store):
 class BasicStore(object):
     def test_store(self, store, key, value):
         key = store.put(key, value)
-        assert isinstance(key, text_type)
+        assert isinstance(key, str)
 
     def test_unicode_store(self, store, key, unicode_value):
         with pytest.raises(IOError):
@@ -216,7 +214,7 @@ class BasicStore(object):
 
         l = []
         for k in store.iter_keys():
-            assert isinstance(k, text_type)
+            assert isinstance(k, str)
             l.append(k)
 
         l.sort()
@@ -276,7 +274,7 @@ class BasicStore(object):
         l = store.keys()
         assert isinstance(l, list)
         for k in l:
-            assert isinstance(k, text_type)
+            assert isinstance(k, str)
 
         assert set(l) == {key, key2}
 
@@ -338,7 +336,7 @@ class BasicStore(object):
     def test_a_lot_of_puts(self, store, key, value):
         a_lot = 20
 
-        for i in xrange(a_lot):
+        for i in range(a_lot):
             key = key + "_{}".format(i)
             store.put(key, value)
 

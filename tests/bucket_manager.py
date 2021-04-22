@@ -1,12 +1,8 @@
-#!/usr/bin/env python
-# coding=utf8
-
+from configparser import ConfigParser
 from contextlib import contextmanager
 from uuid import uuid4 as uuid
 
 import pytest
-
-from minimalkv._compat import ConfigParser
 
 boto = pytest.importorskip("boto")
 

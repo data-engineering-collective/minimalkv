@@ -1,10 +1,7 @@
-#!/usr/bin/env python
-# coding=utf8
-
 from io import BytesIO
+from typing import Dict, Iterable, Optional
 
-from .. import CopyMixin, KeyValueStore
-from .._compat import ifilter
+from minimalkv import CopyMixin, KeyValueStore
 
 
 class DictStore(KeyValueStore, CopyMixin):
@@ -14,24 +11,26 @@ class DictStore(KeyValueStore, CopyMixin):
     is straightforward. The dictionary containing all data is available as `d`.
     """
 
-    def __init__(self, d=None):
+    d: Dict[str, bytes]
+
+    def __init__(self, d: Optional[Dict[str, bytes]] = None):
         self.d = d or {}
 
-    def _delete(self, key):
+    def _delete(self, key: str) -> None:
         self.d.pop(key, None)
 
-    def _has_key(self, key):
+    def _has_key(self, key: str) -> bool:
         return key in self.d
 
-    def _open(self, key):
+    def _open(self, key: str):
         return BytesIO(self.d[key])
 
-    def _copy(self, source, dest):
+    def _copy(self, source: str, dest: str) -> None:
         self.d[dest] = self.d[source]
 
-    def _put_file(self, key, file):
+    def _put_file(self, key: str, file, *args, **kwargs) -> str:
         self.d[key] = file.read()
         return key
 
-    def iter_keys(self, prefix=u""):
-        return ifilter(lambda k: k.startswith(prefix), iter(self.d))
+    def iter_keys(self, prefix: str = "") -> Iterable[str]:
+        return filter(lambda k: k.startswith(prefix), iter(self.d))

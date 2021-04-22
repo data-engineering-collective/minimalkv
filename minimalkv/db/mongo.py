@@ -1,12 +1,10 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
+import pickle
 import re
+from io import BytesIO
 
 from bson.binary import Binary
 
-from .. import KeyValueStore
-from .._compat import BytesIO, pickle
+from minimalkv import KeyValueStore
 
 
 class MongoStore(KeyValueStore):

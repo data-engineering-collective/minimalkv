@@ -1,8 +1,9 @@
 import io
 from contextlib import contextmanager
+from typing import Iterable, Optional, cast
 
-from .. import KeyValueStore
-from ._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
+from minimalkv import KeyValueStore
+from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
 
 
 @contextmanager
@@ -88,7 +89,7 @@ class GoogleCloudStore(KeyValueStore):
         with map_gcloud_exceptions(key, error_codes_pass=("NotFound",)):
             self._bucket.delete_blob(key)
 
-    def _get(self, key: str):
+    def _get(self, key: str) -> bytes:
         blob = self._bucket.blob(key)
         with map_gcloud_exceptions(key):
             blob_bytes = blob.download_as_bytes()
@@ -99,10 +100,10 @@ class GoogleCloudStore(KeyValueStore):
         with map_gcloud_exceptions(key):
             blob.download_to_file(file)
 
-    def _has_key(self, key: str):
+    def _has_key(self, key: str) -> bool:
         return self._bucket.blob(key).exists()
 
-    def iter_keys(self, prefix=""):
+    def iter_keys(self, prefix: str = "") -> Iterable[str]:
         return (blob.name for blob in self._bucket.list_blobs(prefix=prefix))
 
     def _open(self, key: str):
@@ -111,14 +112,14 @@ class GoogleCloudStore(KeyValueStore):
             raise KeyError
         return IOInterface(blob)
 
-    def _put(self, key: str, data: bytes):
+    def _put(self, key: str, data: bytes) -> str:
         blob = self._bucket.blob(key)
         if type(data) != bytes:
             raise IOError(f"data has to be of type 'bytes', not {type(data)}")
         blob.upload_from_string(data, content_type="application/octet-stream")
         return key
 
-    def _put_file(self, key, file):
+    def _put_file(self, key: str, file) -> str:
         blob = self._bucket.blob(key)
         with map_gcloud_exceptions(key):
             if isinstance(file, io.BytesIO):
@@ -145,13 +146,16 @@ class IOInterface(io.BufferedIOBase):
     Class which provides a file-like interface to selectively read from a blob in the bucket.
     """
 
+    size: int
+    pos: int
+
     def __init__(self, blob):
         super(IOInterface, self).__init__()
         self.blob = blob
 
         if blob.size is None:
             blob.reload()
-        self.size = blob.size
+        self.size = cast(int, blob.size)
         self.pos = 0
 
     def tell(self):
@@ -160,7 +164,7 @@ class IOInterface(io.BufferedIOBase):
             raise ValueError("I/O operation on closed file")
         return self.pos
 
-    def read(self, size=-1):
+    def read(self, size=-1) -> bytes:
         """Returns 'size' amount of bytes or less if there is no more data.
         If no size is given all data is returned. size can be >= 0."""
         if self.closed:
@@ -176,7 +180,7 @@ class IOInterface(io.BufferedIOBase):
         self.pos += len(blob_bytes)
         return blob_bytes
 
-    def seek(self, offset, whence=0):
+    def seek(self, offset: int, whence: int = 0):
         """Move to a new offset either relative or absolute. whence=0 is
         absolute, whence=1 is relative, whence=2 is relative to the end.
 
@@ -203,8 +207,8 @@ class IOInterface(io.BufferedIOBase):
             self.pos = self.size + offset
         return self.pos
 
-    def seekable(self):
+    def seekable(self) -> bool:
         return True
 
-    def readable(self):
+    def readable(self) -> bool:
         return True

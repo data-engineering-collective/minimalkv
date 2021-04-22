@@ -5,6 +5,6 @@ try:
 
     from ._azurestore_old import AzureBlockBlobStore
 except ImportError:
-    from ._azurestore_new import AzureBlockBlobStore
+    from ._azurestore_new import AzureBlockBlobStore  # type: ignore
 
 __all__ = ["AzureBlockBlobStore"]
