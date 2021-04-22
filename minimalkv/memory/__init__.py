@@ -28,7 +28,7 @@ class DictStore(KeyValueStore, CopyMixin):
     def _copy(self, source: str, dest: str) -> None:
         self.d[dest] = self.d[source]
 
-    def _put_file(self, key: str, file) -> str:
+    def _put_file(self, key: str, file, *args, **kwargs) -> str:
         self.d[key] = file.read()
         return key
 

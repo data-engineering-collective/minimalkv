@@ -109,7 +109,7 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
                 if not os.path.isdir(path):
                     raise e
 
-    def _put_file(self, key: str, file) -> str:
+    def _put_file(self, key: str, file, *args, **kwargs) -> str:
         bufsize = self.bufsize
 
         target = self._build_filename(key)
@@ -129,7 +129,7 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
 
         return key
 
-    def _put_filename(self, key: str, filename) -> str:
+    def _put_filename(self, key: str, filename, *args, **kwargs) -> str:
         target = self._build_filename(key)
         self._ensure_dir_exists(os.path.dirname(target))
         shutil.move(filename, target)

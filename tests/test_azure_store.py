@@ -141,7 +141,7 @@ def test_azure_special_args():
         create_if_missing=False,
     )
     if hasattr(abbs, "blob_container_client"):
-        cfg = abbs.blob_container_client._config
+        cfg = abbs.blob_container_client._config  # type: ignore
         assert cfg.max_single_put_size == MSP
         assert cfg.max_block_size == MBS
 
@@ -173,7 +173,7 @@ class TestAzureExceptionHandling(object):
 
             store.block_blob_service.retry = ExponentialRetry(max_attempts=0).retry
         else:
-            store.blob_container_client._config.retry_policy.total_retries = 0
+            store.blob_container_client._config.retry_policy.total_retries = 0  # type: ignore
 
         with pytest.raises(IOError) as exc:
             store.put(u"key", b"data")
@@ -195,7 +195,7 @@ class TestAzureExceptionHandling(object):
 
             store.block_blob_service.retry = ExponentialRetry(max_attempts=0).retry
         else:
-            store.blob_container_client._config.retry_policy.total_retries = 0
+            store.blob_container_client._config.retry_policy.total_retries = 0  # type: ignore
 
         with pytest.raises(IOError) as exc:
             store.put(u"key", b"data")

@@ -49,7 +49,7 @@ class KeyValueStore:
         :returns: True if the key exists, False otherwise.
         """
 
-        self._check_valid_key(key)
+        self._check_valid_key(key)  # type: ignore
         return self._has_key(key)
 
     def __iter__(self) -> Iterable[str]:
@@ -67,7 +67,7 @@ class KeyValueStore:
         :raises exceptions.ValueError: If the key is not valid.
         :raises exceptions.IOError: If there was an error deleting.
         """
-        self._check_valid_key(key)
+        self._check_valid_key(key)  # type: ignore
         return self._delete(key)
 
     def get(self, key: str) -> bytes:
@@ -359,7 +359,7 @@ class UrlMixin:
 
         :return: A string containing a URL to access key
         """
-        self._check_valid_key(key)
+        self._check_valid_key(key)  # type: ignore
         return self._url_for(key)
 
     def _url_for(self, key: str) -> str:
@@ -428,7 +428,7 @@ class TimeToLiveMixin:
                          be read
 
         """
-        self._check_valid_key(key)
+        self._check_valid_key(key)  # type: ignore
         if not isinstance(data, bytes):
             raise IOError("Provided data is not of type bytes")
         return self._put(key, data, self._valid_ttl(ttl_secs))
@@ -444,7 +444,7 @@ class TimeToLiveMixin:
         if ttl_secs is None:
             ttl_secs = self.default_ttl_secs
 
-        self._check_valid_key(key)
+        self._check_valid_key(key)  # type: ignore
 
         if isinstance(file, str):
             return self._put_filename(key, file, self._valid_ttl(ttl_secs))
@@ -485,8 +485,8 @@ class CopyMixin(object):
 
         :raises: exceptions.ValueError: If the source or target key are not valid
         :raises: exceptions.KeyError: If the source key was not found"""
-        self._check_valid_key(source)
-        self._check_valid_key(dest)
+        self._check_valid_key(source)  # type: ignore
+        self._check_valid_key(dest)  # type: ignore
         return self._copy(source, dest)
 
     def _copy(self, source: str, dest: str):
@@ -502,13 +502,13 @@ class CopyMixin(object):
 
         :raises: exceptions.ValueError: If the source or target key are not valid
         :raises: exceptions.KeyError: If the source key was not found"""
-        self._check_valid_key(source)
-        self._check_valid_key(dest)
+        self._check_valid_key(source)  # type: ignore
+        self._check_valid_key(dest)  # type: ignore
         return self._move(source, dest)
 
     def _move(self, source: str, dest: str) -> str:
         self._copy(source, dest)
-        self._delete(source)
+        self._delete(source)  # type: ignore
         return dest
 
 
