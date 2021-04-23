@@ -9,7 +9,7 @@ Google Cloud Storage through :class:`~minimalkv.net.boto.BotoStore` using the ``
 
 
 Note that ``google-cloud-storage`` is not a dependency for minimalkv. You need to install it
-manually, otherwise you will see an :exc:`~exceptions.ImportError`.
+manually, otherwise you will see an :py:exc:`ImportError`.
 
 Here is a short example:
 

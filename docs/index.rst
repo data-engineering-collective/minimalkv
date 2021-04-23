@@ -13,7 +13,7 @@ automatic ID generation/hashing (in :mod:`minimalkv.idgen`). A number of
 backends are available, ranging from :class:`~.FilesystemStore` to
 support for `Amazon S3 <http://aws.amazon.com/s3/>`_ and `Google
 Storage <http://code.google.com/apis/storage/>`_ through
-:class:`~.BotoStore`.
+:class:`~minimalkv.net.boto.BotoStore`.
 
 A faster in-memory store suitable for session management and caching is
 supported through :class:`~.RedisStore`
@@ -92,7 +92,7 @@ URL options with :code:`[]` are optional and the :code:`[]` need to be removed.
 
 
 Why you should  use minimalkv
-============================
+=============================
 
 no server dependencies
   *minimalkv* does only depend on python and possibly a few libraries easily
