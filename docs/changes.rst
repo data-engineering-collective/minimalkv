@@ -1,6 +1,11 @@
 Changelog
 *********
 
+1.2.1
+=====
+
+* Fixed ``intersphinx`` inventory build on readthedocs to include all classes.
+
 1.2.0
 =====
 
