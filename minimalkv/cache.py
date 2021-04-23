@@ -40,7 +40,7 @@ class CacheDecorator(StoreDecorator):
         If a cache miss occurs, the value is retrieved, stored in the cache and
         returned.
 
-        If the cache raises an :exc:`~exceptions.IOError`, the cache is
+        If the cache raises an :exc:`~IOError`, the cache is
         ignored, and the backing store is consulted directly.
 
         It is possible for a caching error to occur while attempting to store
@@ -65,9 +65,9 @@ class CacheDecorator(StoreDecorator):
         If a cache miss occurs, the value is retrieved, stored in the cache and
         returned.
 
-        If the cache raises an :exc:`~exceptions.IOError`, the retrieval cannot
+        If the cache raises an :exc:`~IOError`, the retrieval cannot
         proceed: If ``file`` was an open file, data maybe been written to it
-        already. The :exc:`~exceptions.IOError` bubbles up.
+        already. The :exc:`~IOError` bubbles up.
 
         It is possible for a caching error to occur while attempting to store
         the value in the cache. It will not be handled as well.
@@ -90,7 +90,7 @@ class CacheDecorator(StoreDecorator):
         If a cache miss occurs, the value is retrieved, stored in the cache,
         then then another open is issued on the cache.
 
-        If the cache raises an :exc:`~exceptions.IOError`, the cache is
+        If the cache raises an :exc:`~IOError`, the cache is
         ignored, and the backing store is consulted directly.
 
         It is possible for a caching error to occur while attempting to store
