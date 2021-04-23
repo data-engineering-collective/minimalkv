@@ -5,6 +5,7 @@ Changelog
 =====
 
 * Add Python to build and support matrix.
+* Allow creating ``GoogleCloudStore`` via URL
 
 1.1.0
 =====
