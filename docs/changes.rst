@@ -5,7 +5,6 @@ Changelog
 =====
 
 * Add Python 3.6 / 3.9 to build and support matrix.
-* Add Python to build and support matrix.
 * Allow creating ``GoogleCloudStore`` via URL
 * Fix sphinx intersphinx generation and cleanup docs configuration.
 
