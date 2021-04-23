@@ -9,7 +9,7 @@ def create_store(type, params):
         return _create_store_azure(type, params)
     if type in ("hs3", "boto"):
         return _create_store_hs3(type, params)
-    if type in ("s3"):
+    if type == "s3":
         return _create_store_s3(type, params)
     if type in ("gcs", "hgcs"):
         return _create_store_gcs(type, params)
@@ -17,11 +17,11 @@ def create_store(type, params):
         return _create_store_hfs(type, params)
     if type in ("fs", "file"):
         return _create_store_fs(type, params)
-    if type in ("memory"):
+    if type == "memory":
         return _create_store_mem(type, params)
-    if type in ("hmemory"):
+    if type == "hmemory":
         return _create_store_hmem(type, params)
-    if type in ("redis"):
+    if type == "redis":
         return _create_store_redis(type, params)
     raise ValueError("Unknown store type: " + str(type))
 

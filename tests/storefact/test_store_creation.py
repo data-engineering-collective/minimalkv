@@ -111,6 +111,21 @@ def test_create_store_s3(mocker):
     )
 
 
+def test_dont_fuzzy_match_stores(mocker):
+    mock_s3 = mocker.patch("minimalkv._boto._get_s3bucket")
+    with pytest.raises(ValueError):
+        create_store(
+            "s",
+            {
+                "host": u"endpoint:1234",
+                "access_key": u"access_key",
+                "secret_key": u"secret_key",
+                "bucket": u"bucketname",
+            },
+        )
+    mock_s3.assert_not_called()
+
+
 def test_create_store_hfs(mocker):
     mock_hfs = mocker.patch("minimalkv._hstores.HFilesystemStore")
     create_store(
