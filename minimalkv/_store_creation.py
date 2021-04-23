@@ -30,7 +30,8 @@ def _create_store_gcs(store_type, params):
     import json
 
     from google.oauth2.service_account import Credentials
-    from simplekv.net.gcstore import GoogleCloudStore
+
+    from minimalkv.net.gcstore import GoogleCloudStore
 
     from ._hstores import HGoogleCloudStore
 

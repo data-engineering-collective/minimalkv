@@ -4,7 +4,7 @@ Google Cloud Storage
 This backend is for storing data in `Google Cloud Storage <https://cloud.google.com/storage>`_
 by using the ``google-cloud-storage`` library.
 
-``google-cloud-storage`` is only available for Python 3. Simplekv also provides access to
+``google-cloud-storage`` is only available for Python 3. Minimalkv also provides access to
 Google Cloud Storage through :class:`~minimalkv.net.boto.BotoStore` using the ``boto`` library which is available for Python 2.
 
 
