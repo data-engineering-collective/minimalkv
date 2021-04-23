@@ -113,21 +113,24 @@ def test_create_store_s3(mocker):
 
 def test_create_store_hfs(mocker):
     mock_hfs = mocker.patch("minimalkv._hstores.HFilesystemStore")
+    mock_makedirs = mocker.patch("os.makedirs")
     create_store(
         "hfs",
         {"type": "hfs", "path": "this/is/a/relative/path", "create_if_missing": True},
     )
     mock_hfs.assert_called_once_with("this/is/a/relative/path")
+    mock_makedirs.assert_called_once_with("this/is/a/relative/path")
 
 
-@pytest.mark.skip(reason="some issue here")
 def test_create_store_fs(mocker):
-    mock_fs = mocker.patch("minimalkv.fs.FilesystemStore")
+    mock_fs = mocker.patch("minimalkv._store_creation.FilesystemStore")
+    mock_makedirs = mocker.patch("os.makedirs")
     create_store(
         "fs",
         {"type": "fs", "path": "this/is/a/relative/fspath", "create_if_missing": True},
     )
     mock_fs.assert_called_once_with("this/is/a/relative/fspath")
+    mock_makedirs.assert_called_once_with("this/is/a/relative/fspath")
 
 
 def test_create_store_mem(mocker):
@@ -148,15 +151,13 @@ def test_create_store_hmem(mocker):
     mock_hmem.assert_called_once_with()
 
 
-@pytest.mark.skip(reason="some issue here")
 def test_create_store_redis(mocker):
-    mock_redis = mocker.patch("minimalkv.memory.redisstore.RedisStore")
     mock_Strictredis = mocker.patch("redis.StrictRedis")
     create_store(
         "redis",
         {"type": u"redis", "host": u"localhost", "db": 2},
     )
-    mock_Strictredis.assert_called_once_with()
+    mock_Strictredis.assert_called_once_with(db=2, host="localhost", type="redis")
 
 
 def test_create_store_valueerror():
