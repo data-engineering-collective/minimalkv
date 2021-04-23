@@ -43,8 +43,8 @@ class KeyValueStore:
 
         :param key: The key whose existence should be verified.
 
-        :raises exceptions.ValueError: If the key is not valid.
-        :raises exceptions.IOError: If there was an error accessing the store.
+        :raises ValueError: If the key is not valid.
+        :raises IOError: If there was an error accessing the store.
 
         :returns: True if the key exists, False otherwise.
         """
@@ -55,7 +55,7 @@ class KeyValueStore:
     def __iter__(self) -> Iterable[str]:
         """Iterate over keys
 
-        :raises exceptions.IOError: If there was an error accessing the store.
+        :raises IOError: If there was an error accessing the store.
         """
         return self.iter_keys()
 
@@ -64,8 +64,8 @@ class KeyValueStore:
 
         If the key does not exist, no error is reported.
 
-        :raises exceptions.ValueError: If the key is not valid.
-        :raises exceptions.IOError: If there was an error deleting.
+        :raises ValueError: If the key is not valid.
+        :raises IOError: If there was an error deleting.
         """
         self._check_valid_key(key)  # type: ignore
         return self._delete(key)
@@ -75,9 +75,9 @@ class KeyValueStore:
 
         :param key: Value associated with the key, as a `bytes` object
 
-        :raises exceptions.ValueError: If the key is not valid.
-        :raises exceptions.IOError: If the file could not be read.
-        :raises exceptions.KeyError: If the key was not found.
+        :raises ValueError: If the key is not valid.
+        :raises IOError: If the file could not be read.
+        :raises KeyError: If the key was not found.
         """
         self._check_valid_key(key)
         return self._get(key)
@@ -96,10 +96,10 @@ class KeyValueStore:
         :param key: The key to be read
         :param file: Output filename or an object with a *write* method.
 
-        :raises exceptions.ValueError: If the key is not valid.
-        :raises exceptions.IOError: If there was a problem reading or writing
+        :raises ValueError: If the key is not valid.
+        :raises IOError: If there was a problem reading or writing
                                     data.
-        :raises exceptions.KeyError: If the key was not found.
+        :raises KeyError: If the key was not found.
         """
         self._check_valid_key(key)
         if isinstance(file, str):
@@ -112,7 +112,7 @@ class KeyValueStore:
         order.
         If prefix is not the empty string, iterates only over all keys starting with prefix.
 
-        :raises exceptions.IOError: If there was an error accessing the store.
+        :raises IOError: If there was an error accessing the store.
         """
         raise NotImplementedError
 
@@ -128,7 +128,7 @@ class KeyValueStore:
         The default uses an naive key iteration. Some backends may implement more efficient
         variants.
 
-        :raises exceptions.IOError: If there was an error accessing the store.
+        :raises IOError: If there was an error accessing the store.
         """
         dlen = len(delimiter)
         plen = len(prefix)
@@ -147,7 +147,7 @@ class KeyValueStore:
         """Return a list of keys currently in store, in any order
         If prefix is not the empty string, returns only all keys starting with prefix.
 
-        :raises exceptions.IOError: If there was an error accessing the store.
+        :raises IOError: If there was an error accessing the store.
         """
         return list(self.iter_keys(prefix))
 
@@ -158,9 +158,9 @@ class KeyValueStore:
 
         :param key: Key to open
 
-        :raises exceptions.ValueError: If the key is not valid.
-        :raises exceptions.IOError: If the file could not be read.
-        :raises exceptions.KeyError: If the key was not found.
+        :raises ValueError: If the key is not valid.
+        :raises IOError: If the file could not be read.
+        :raises KeyError: If the key was not found.
         """
         self._check_valid_key(key)
         return self._open(key)
@@ -175,8 +175,8 @@ class KeyValueStore:
 
         :returns: The key under which data was stored
 
-        :raises exceptions.ValueError: If the key is not valid.
-        :raises exceptions.IOError: If storing failed or the file could not
+        :raises ValueError: If the key is not valid.
+        :raises IOError: If storing failed or the file could not
                                     be read
         """
         self._check_valid_key(key)
@@ -204,8 +204,8 @@ class KeyValueStore:
 
         :returns: The key under which data was stored
 
-        :raises exceptions.ValueError: If the key is not valid.
-        :raises exceptions.IOError: If there was a problem moving the file in.
+        :raises ValueError: If the key is not valid.
+        :raises IOError: If there was a problem moving the file in.
         """
         # FIXME: shouldn't we call self._check_valid_key here?
         if isinstance(file, str):
@@ -229,7 +229,7 @@ class KeyValueStore:
     def _delete(self, key: str):
         """Implementation for :meth:`~minimalkv.KeyValueStore.delete`. The
         default implementation will simply raise a
-        :py:exc:`~exceptions.NotImplementedError`.
+        :py:exc:`~NotImplementedError`.
         """
         raise NotImplementedError
 
@@ -298,7 +298,7 @@ class KeyValueStore:
 
     def _open(self, key: str):
         """Open key for reading. Default implementation simply raises a
-        :py:exc:`~exceptions.NotImplementedError`.
+        :py:exc:`~NotImplementedError`.
 
         :param key: Key to open
         """
@@ -321,7 +321,7 @@ class KeyValueStore:
         not accept strings.
 
         The default implementation will simply raise a
-        :py:exc:`~exceptions.NotImplementedError`.
+        :py:exc:`~NotImplementedError`.
 
         :param key: Key under which data should be stored
         :param file: File-like object to store data from
@@ -355,7 +355,7 @@ class UrlMixin:
 
         :param key: The key for which the url is to be generated
 
-        :raises exceptions.ValueError: If the key is not valid.
+        :raises ValueError: If the key is not valid.
 
         :return: A string containing a URL to access key
         """
@@ -423,8 +423,8 @@ class TimeToLiveMixin:
 
         :param ttl_secs: Number of seconds until the key expires. See above
                          for valid values.
-        :raises exceptions.ValueError: If ``ttl_secs`` is invalid.
-        :raises exceptions.IOError: If storing failed or the file could not
+        :raises ValueError: If ``ttl_secs`` is invalid.
+        :raises IOError: If storing failed or the file could not
                          be read
 
         """
@@ -439,7 +439,7 @@ class TimeToLiveMixin:
 
         :param ttl_secs: Number of seconds until the key expires. See above
                          for valid values.
-        :raises exceptions.ValueError: If ``ttl_secs`` is invalid.
+        :raises ValueError: If ``ttl_secs`` is invalid.
         """
         if ttl_secs is None:
             ttl_secs = self.default_ttl_secs
@@ -483,8 +483,8 @@ class CopyMixin(object):
 
         :returns: The destination key
 
-        :raises: exceptions.ValueError: If the source or target key are not valid
-        :raises: exceptions.KeyError: If the source key was not found"""
+        :raises: ValueError: If the source or target key are not valid
+        :raises: KeyError: If the source key was not found"""
         self._check_valid_key(source)  # type: ignore
         self._check_valid_key(dest)  # type: ignore
         return self._copy(source, dest)
@@ -500,8 +500,8 @@ class CopyMixin(object):
 
         :returns: The destination key
 
-        :raises: exceptions.ValueError: If the source or target key are not valid
-        :raises: exceptions.KeyError: If the source key was not found"""
+        :raises: ValueError: If the source or target key are not valid
+        :raises: KeyError: If the source key was not found"""
         self._check_valid_key(source)  # type: ignore
         self._check_valid_key(dest)  # type: ignore
         return self._move(source, dest)
@@ -598,7 +598,7 @@ def get_store(type: str, create_if_missing: bool = True, **params):
       See StrictRedis documentation for details.
 
     :param str type: Type of storage to open, with optional storage decorators
-    :param boolean create_if_missing: Create the "root" of the storage (Azure container, parent directory, S3 bucket, etc.).
+    :param bool create_if_missing: Create the "root" of the storage (Azure container, parent directory, S3 bucket, etc.).
       Has no effect for stores where this makes no sense, like `redis` or `memory`.
     :param kwargs: Parameters specific to the Store-class"""
     from ._store_creation import create_store
