@@ -2,7 +2,7 @@ import os
 import os.path
 import shutil
 import urllib.parse
-from typing import Any, Callable, Iterable, List, Optional, Union, cast
+from typing import Any, Callable, Iterator, List, Optional, Union, cast
 
 from minimalkv import CopyMixin, KeyValueStore, UrlMixin
 
@@ -154,10 +154,10 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
                     result.append(key)
         return result
 
-    def iter_keys(self, prefix: str = "") -> Iterable[str]:
+    def iter_keys(self, prefix: str = "") -> Iterator[str]:
         return iter(self.keys(prefix))
 
-    def iter_prefixes(self, delimiter: str, prefix: str = "") -> Iterable[str]:
+    def iter_prefixes(self, delimiter: str, prefix: str = "") -> Iterator[str]:
         if delimiter != os.sep:
             return super(FilesystemStore, self).iter_prefixes(
                 delimiter,
@@ -167,7 +167,7 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
 
     def _iter_prefixes_efficient(
         self, delimiter: str, prefix: str = ""
-    ) -> Iterable[str]:
+    ) -> Iterator[str]:
         if delimiter in prefix:
             pos = prefix.rfind(delimiter)
             search_prefix: Optional[str] = prefix[:pos]

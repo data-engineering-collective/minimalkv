@@ -1,8 +1,9 @@
 import re
 from functools import reduce
 from io import BytesIO
-from typing import Iterable, Sequence
+from typing import Callable, Iterable, Iterator, List, Sequence, Union
 
+from minimalkv._typing import File
 from minimalkv._urls import url2dict
 
 try:
@@ -25,55 +26,50 @@ key_type = str
 
 
 class KeyValueStore:
-    """The smallest API supported by all backends.
+    f"""
+    Class to access a key-value store.
 
-    Keys are ascii-strings with certain restrictions, guaranteed to be properly
-    handled up to a length of at least 250 characters. Any function that takes
-    a key as an argument raises a ValueError if the key is incorrect.
-
-    The regular expression for what constitutes a valid key is available as
-    :data:`minimalkv.VALID_KEY_REGEXP`.
-
-    Values are raw bytes. If you need to store strings, make sure to encode
-    them upon storage and decode them upon retrieval.
+    Supported keys are ascii-strings containing alphanumeric characters or symbols out
+    of {VALID_NON_NUM} of length not greater than 250. Values (or records) are stored as
+    raw bytes.
     """
 
     def __contains__(self, key: str) -> bool:
-        """Checks if a key is present
+        """Check if the store has an entry at key.
 
         :param key: The key whose existence should be verified.
 
         :raises exceptions.ValueError: If the key is not valid.
         :raises exceptions.IOError: If there was an error accessing the store.
 
-        :returns: True if the key exists, False otherwise.
+        :returns: True if the key exists and False otherwise.
         """
 
-        self._check_valid_key(key)  # type: ignore
+        self._check_valid_key(key)
         return self._has_key(key)
 
     def __iter__(self) -> Iterable[str]:
-        """Iterate over keys
+        """Iterate over all keys in the store.
 
         :raises exceptions.IOError: If there was an error accessing the store.
         """
         return self.iter_keys()
 
     def delete(self, key: str):
-        """Delete key and data associated with it.
+        """Delete data at key.
 
-        If the key does not exist, no error is reported.
+        Does not raise an error if the key does not exist.
 
         :raises exceptions.ValueError: If the key is not valid.
         :raises exceptions.IOError: If there was an error deleting.
         """
-        self._check_valid_key(key)  # type: ignore
+        self._check_valid_key(key)
         return self._delete(key)
 
     def get(self, key: str) -> bytes:
-        """Returns the key data as a bytestring.
+        """Return data at key as a bytestring.
 
-        :param key: Value associated with the key, as a `bytes` object
+        :param key: Value associated with the key, as a `bytes` object.
 
         :raises exceptions.ValueError: If the key is not valid.
         :raises exceptions.IOError: If the file could not be read.
@@ -82,23 +78,21 @@ class KeyValueStore:
         self._check_valid_key(key)
         return self._get(key)
 
-    def get_file(self, key: str, file):
-        """Write contents of key to file
+    def get_file(self, key: str, file: Union[str, File]) -> None:
+        """Write data at key to file.
 
-        Like :meth:`.KeyValueStore.put_file`, this method allows backends to
-        implement a specialized function if data needs to be written to disk or
-        streamed.
+        Like :meth:`.KeyValueStore.put_file`, this method allows backends to implement a
+        specialized function if data needs to be written to disk or streamed.
 
-        If *file* is a string, contents of *key* are written to a newly
-        created file with the filename *file*. Otherwise, the data will be
-        written using the *write* method of *file*.
+        If *file* is a string, contents of *key* are written to a newly created file
+        with the filename *file*. Otherwise the data will be written using the *write*
+        method of *file*.
 
-        :param key: The key to be read
-        :param file: Output filename or an object with a *write* method.
+        :param key: The key to be read.
+        :param file: Output filename or file-like object with a *write* method.
 
         :raises exceptions.ValueError: If the key is not valid.
-        :raises exceptions.IOError: If there was a problem reading or writing
-                                    data.
+        :raises exceptions.IOError: If there was a problem reading or writing data.
         :raises exceptions.KeyError: If the key was not found.
         """
         self._check_valid_key(key)
@@ -107,26 +101,27 @@ class KeyValueStore:
         else:
             return self._get_file(key, file)
 
-    def iter_keys(self, prefix: str = "") -> Iterable[str]:
-        """Return an Iterator over all keys currently in the store, in any
-        order.
-        If prefix is not the empty string, iterates only over all keys starting with prefix.
+    def iter_keys(self, prefix: str = "") -> Iterator[str]:
+        """Iterate over all keys in the store starting with prefix.
+
+        :param prefix: Only iterate over keys starting with prefix. Iterate over all
+                       keys if empty.
 
         :raises exceptions.IOError: If there was an error accessing the store.
         """
         raise NotImplementedError
 
-    def iter_prefixes(self, delimiter: str, prefix: str = "") -> Iterable[str]:
-        """Returns an Iterator over all prefixes currently in the store, in any order. The
-        prefixes are listed up to the given delimiter.
+    def iter_prefixes(self, delimiter: str, prefix: str = "") -> Iterator[str]:
+        """Iterate over unique prefixes up to delimiter starting with prefix.
 
-        If the prefix contains the delimiter, the first delimiter after the prefix is used
-        as a cut-off point.
+        If *prefix* contains *delimiter*, return the prefix up to the first occurence of
+        delimiter after the prefix.
 
-        The uniqueness of the prefixes is ensured.
+        The default uses an naive key iteration. Some backends may implement more
+        efficient methods.
 
-        The default uses an naive key iteration. Some backends may implement more efficient
-        variants.
+        :param delimiter: Delimiter up to which to iterate over prefixes.
+        :param prefix: Only iterate over prefixes starting with prefix.
 
         :raises exceptions.IOError: If there was an error accessing the store.
         """
@@ -143,20 +138,21 @@ class KeyValueStore:
                 yield k
                 memory.add(k)
 
-    def keys(self, prefix: str = "") -> Sequence[str]:
-        """Return a list of keys currently in store, in any order
-        If prefix is not the empty string, returns only all keys starting with prefix.
+    def keys(self, prefix: str = "") -> List[str]:
+        """List all keys in the store starting with prefix.
+
+        :param prefix: Only list keys starting with prefix. List all keys if empty.
 
         :raises exceptions.IOError: If there was an error accessing the store.
         """
         return list(self.iter_keys(prefix))
 
-    def open(self, key: str):
-        """Open key for reading.
+    def open(self, key: str) -> File:
+        """Open record at key.
 
         Returns a read-only file-like object for reading a key.
 
-        :param key: Key to open
+        :param key: Key to open.
 
         :raises exceptions.ValueError: If the key is not valid.
         :raises exceptions.IOError: If the file could not be read.
@@ -165,15 +161,13 @@ class KeyValueStore:
         self._check_valid_key(key)
         return self._open(key)
 
-    def put(self, key: str, data: bytes):
-        """Store into key from file
+    def put(self, key: str, data: bytes) -> str:
+        """Store bytestring data at key.
 
-        Stores bytestring *data* in *key*.
-
-        :param key: The key under which the data is to be stored
+        :param key: The key under which the data is to be stored.
         :param data: Data to be stored into key, must be `bytes`.
 
-        :returns: The key under which data was stored
+        :returns: The key under which data was stored.
 
         :raises exceptions.ValueError: If the key is not valid.
         :raises exceptions.IOError: If storing failed or the file could not
@@ -184,25 +178,21 @@ class KeyValueStore:
             raise IOError("Provided data is not of type bytes")
         return self._put(key, data)
 
-    def put_file(self, key: str, file):
-        """Store into key from file on disk
+    def put_file(self, key: str, file: Union[str, File]) -> str:
+        """Store contents of file at key.
 
-        Stores data from a source into key. *file* can either be a string,
-        which will be interpretet as a filename, or an object with a *read()*
-        method.
+        Stores data from a source into key. *file* can be a string, which will be
+        interpreted as a filename, or an object with a *read()* method.
 
-        If the passed object has a *fileno()* method, it may be used to speed
-        up the operation.
+        If *file* has a *fileno()* method, it will be used to speed up storage.
 
-        The file specified by *file*, if it is a filename, may be removed in
-        the process, to avoid copying if possible. If you need to make a copy,
-        pass the opened file instead.
+        If *file* is a filename, the file might be removed while storing to avoid
+        unnecessary copies. To prevent this, pass the opened file instead.
 
-        :param key: The key under which the data is to be stored
-        :param file: A filename or an object with a read method. If a filename,
-                     may be removed
+        :param key: Key where to store data in file.
+        :param file: A filename or an object with a read method.
 
-        :returns: The key under which data was stored
+        :returns: The key under which data was stored.
 
         :raises exceptions.ValueError: If the key is not valid.
         :raises exceptions.IOError: If there was a problem moving the file in.
@@ -214,31 +204,25 @@ class KeyValueStore:
             return self._put_file(key, file)
 
     def _check_valid_key(self, key: str) -> None:
-        """Checks if a key is valid and raises a ValueError if its not.
+        """Check if a key is valid and raise a ValueError if it is not.
 
-        When in need of checking a key for validity, always use this
-        method if possible.
+        Always use this method to check whether a key is valid.
 
-        :param key: The key to be checked
+        :param key: The key to be checked.
         """
         if not isinstance(key, key_type):
-            raise ValueError("%r is not a valid key type" % key)
+            raise ValueError(f"The key {key} is not a valid key type.")
         if not VALID_KEY_RE.match(key):
-            raise ValueError("%r contains illegal characters" % key)
+            raise ValueError(f"The key {key} contains illegal characters.")
 
     def _delete(self, key: str):
-        """Implementation for :meth:`~minimalkv.KeyValueStore.delete`. The
-        default implementation will simply raise a
-        :py:exc:`~exceptions.NotImplementedError`.
-        """
+        """Delete the record at key in store."""
         raise NotImplementedError
 
     def _get(self, key: str) -> bytes:
-        """Implementation for :meth:`~minimalkv.KeyValueStore.get`. The default
-        implementation will create a :class:`io.BytesIO`-buffer and then call
-        :meth:`~minimalkv.KeyValueStore._get_file`.
+        """Read record at key.
 
-        :param key: Key of value to be retrieved
+        :param key: Key of value to be retrieved.
         """
         buf = BytesIO()
 
@@ -246,14 +230,12 @@ class KeyValueStore:
 
         return buf.getvalue()
 
-    def _get_file(self, key: str, file):
-        """Write key to file-like object file. Either this method or
-        :meth:`~minimalkv.KeyValueStore._get_filename` will be called by
-        :meth:`~minimalkv.KeyValueStore.get_file`. Note that this method does
-        not accept strings.
+    def _get_file(self, key: str, file: File) -> None:
+        """
+        Write record at key to file-like object file.
 
-        :param key: Key to be retrieved
-        :param file: File-like object to write to
+        :param key: Key of record to be written to file.
+        :param file: File-like object with a *write* method to be written.
         """
         bufsize = 1024 * 1024
 
@@ -273,14 +255,10 @@ class KeyValueStore:
             source.close()
 
     def _get_filename(self, key: str, filename: str):
-        """Write key to file. Either this method or
-        :meth:`~minimalkv.KeyValueStore._get_file` will be called by
-        :meth:`~minimalkv.KeyValueStore.get_file`. This method only accepts
-        filenames and will open the file with a mode of ``wb``, then call
-        :meth:`~minimalkv.KeyValueStore._get_file`.
+        """Write record at key to file at filename.
 
-        :param key: Key to be retrieved
-        :param filename: Filename to write to
+        :param key: Key of record to be written to file.
+        :param file: File-like object to be written.
         """
         with open(filename, "wb") as dest:
             return self._get_file(key, dest)
@@ -292,53 +270,38 @@ class KeyValueStore:
         Determines whether or not a key exists by calling
         :meth:`~minimalkv.KeyValueStore.keys`.
 
-        :param key: Key to check existance of
+        :param key: Key to check existance of.
         """
         return key in self.keys()
 
-    def _open(self, key: str):
-        """Open key for reading. Default implementation simply raises a
-        :py:exc:`~exceptions.NotImplementedError`.
+    def _open(self, key: str) -> File:
+        """Open record at key.
 
-        :param key: Key to open
+        :param key: Key of record to open.
         """
         raise NotImplementedError
 
     def _put(self, key: str, data: bytes):
-        """Implementation for :meth:`~minimalkv.KeyValueStore.put`. The default
-        implementation will create a :class:`io.BytesIO`-buffer and then call
-        :meth:`~minimalkv.KeyValueStore._put_file`.
+        """Store bytestring data at key.
 
-        :param key: Key under which data should be stored
-        :param data: Data to be stored
+        :param key: Key under which data should be stored.
+        :param data: Data to be stored.
         """
         return self._put_file(key, BytesIO(data))
 
-    def _put_file(self, key: str, file):
-        """Store data from file-like object in key. Either this method or
-        :meth:`~minimalkv.KeyValueStore._put_filename` will be called by
-        :meth:`~minimalkv.KeyValueStore.put_file`. Note that this method does
-        not accept strings.
+    def _put_file(self, key: str, file: File):
+        """Store data from file-like object at key.
 
-        The default implementation will simply raise a
-        :py:exc:`~exceptions.NotImplementedError`.
-
-        :param key: Key under which data should be stored
-        :param file: File-like object to store data from
+        :param key: Key at which to store contents of file.
+        :param file: File-like object to store data from.
         """
         raise NotImplementedError
 
     def _put_filename(self, key: str, filename: str):
-        """Store data from file in key. Either this method or
-        :meth:`~minimalkv.KeyValueStore._put_file` will be called by
-        :meth:`~minimalkv.KeyValueStore.put_file`. Note that this method does
-        not accept strings.
+        """Store data from file at filename at key.
 
-        The default implementation will open the file in ``rb`` mode, then call
-        :meth:`~minimalkv.KeyValueStore._put_file`.
-
-        :param key: Key under which data should be stored
-        :param file: Filename of file to store
+        :param key: Key under which data should be stored.
+        :param file: Filename of file to store.
         """
         with open(filename, "rb") as source:
             return self._put_file(key, source)
@@ -346,6 +309,8 @@ class KeyValueStore:
 
 class UrlMixin:
     """Supports getting a download URL for keys."""
+
+    _check_valid_key: Callable
 
     def url_for(self, key: str) -> str:
         """Returns a full external URL that can be used to retrieve *key*.
@@ -359,7 +324,7 @@ class UrlMixin:
 
         :return: A string containing a URL to access key
         """
-        self._check_valid_key(key)  # type: ignore
+        self._check_valid_key(key)
         return self._url_for(key)
 
     def _url_for(self, key: str) -> str:
@@ -401,6 +366,7 @@ class TimeToLiveMixin:
     """
 
     default_ttl_secs = NOT_SET
+    _check_valid_key: Callable
 
     def _valid_ttl(self, ttl_secs):
         if ttl_secs is None:
@@ -428,7 +394,7 @@ class TimeToLiveMixin:
                          be read
 
         """
-        self._check_valid_key(key)  # type: ignore
+        self._check_valid_key(key)
         if not isinstance(data, bytes):
             raise IOError("Provided data is not of type bytes")
         return self._put(key, data, self._valid_ttl(ttl_secs))
@@ -444,7 +410,7 @@ class TimeToLiveMixin:
         if ttl_secs is None:
             ttl_secs = self.default_ttl_secs
 
-        self._check_valid_key(key)  # type: ignore
+        self._check_valid_key(key)
 
         if isinstance(file, str):
             return self._put_filename(key, file, self._valid_ttl(ttl_secs))
@@ -475,6 +441,9 @@ class UrlKeyValueStore(UrlMixin, KeyValueStore):
 class CopyMixin(object):
     """Exposes a copy operation, if the backend supports it."""
 
+    _check_valid_key: Callable
+    _delete: Callable
+
     def copy(self, source: str, dest: str):
         """Copies a key. The destination is overwritten if it does exist.
 
@@ -485,8 +454,8 @@ class CopyMixin(object):
 
         :raises: exceptions.ValueError: If the source or target key are not valid
         :raises: exceptions.KeyError: If the source key was not found"""
-        self._check_valid_key(source)  # type: ignore
-        self._check_valid_key(dest)  # type: ignore
+        self._check_valid_key(source)
+        self._check_valid_key(dest)
         return self._copy(source, dest)
 
     def _copy(self, source: str, dest: str):
@@ -502,13 +471,13 @@ class CopyMixin(object):
 
         :raises: exceptions.ValueError: If the source or target key are not valid
         :raises: exceptions.KeyError: If the source key was not found"""
-        self._check_valid_key(source)  # type: ignore
-        self._check_valid_key(dest)  # type: ignore
+        self._check_valid_key(source)
+        self._check_valid_key(dest)
         return self._move(source, dest)
 
     def _move(self, source: str, dest: str) -> str:
         self._copy(source, dest)
-        self._delete(source)  # type: ignore
+        self._delete(source)
         return dest
 
 

@@ -1,5 +1,5 @@
 from io import BytesIO
-from typing import Dict, Iterable, Optional
+from typing import Dict, Iterable, Iterator, Optional
 
 from minimalkv import CopyMixin, KeyValueStore
 
@@ -32,5 +32,5 @@ class DictStore(KeyValueStore, CopyMixin):
         self.d[key] = file.read()
         return key
 
-    def iter_keys(self, prefix: str = "") -> Iterable[str]:
+    def iter_keys(self, prefix: str = "") -> Iterator[str]:
         return filter(lambda k: k.startswith(prefix), iter(self.d))
