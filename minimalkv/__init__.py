@@ -444,17 +444,21 @@ class TimeToLiveMixin:
             return self._put_file(key, file, self._valid_ttl(ttl_secs))
 
     # default implementations similar to KeyValueStore below:
-    def _put(self, key: str, data: bytes, ttl_secs: Optional[Union[str, float, int]]):
+    def _put(
+        self, key: str, data: bytes, ttl_secs: Optional[Union[str, float, int]] = None
+    ):
         return self._put_file(key, BytesIO(data), ttl_secs)
 
     def _put_file(
-        self, key: str, file: File, ttl_secs: Optional[Union[str, float, int]]
+        self, key: str, file: File, ttl_secs: Optional[Union[str, float, int]] = None
     ):
         raise NotImplementedError
 
-    def _put_filename(self, key: str, filename: str, ttl_secs: Union[str, float, int]):
+    def _put_filename(
+        self, key: str, filename: str, ttl_secs: Optional[Union[str, float, int]] = None
+    ):
         with open(filename, "rb") as source:
-            return self._put_file(key, source, ttl_secs)
+            return self._put_file(key, source, self._valid_ttl(ttl_secs))
 
 
 class UrlKeyValueStore(UrlMixin, KeyValueStore):

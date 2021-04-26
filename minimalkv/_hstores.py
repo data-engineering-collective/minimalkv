@@ -12,7 +12,7 @@ class HDictStore(ExtendedKeyspaceMixin, DictStore):
     pass
 
 
-class HRedisStore(ExtendedKeyspaceMixin, RedisStore):  # type: ignore
+class HRedisStore(ExtendedKeyspaceMixin, RedisStore):
     pass
 
 

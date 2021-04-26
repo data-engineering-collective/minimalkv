@@ -7,7 +7,7 @@ from io import BytesIO
 from .. import FOREVER, NOT_SET, KeyValueStore, TimeToLiveMixin
 
 
-class RedisStore(TimeToLiveMixin, KeyValueStore):  # type: ignore
+class RedisStore(TimeToLiveMixin, KeyValueStore):
     """Uses a redis-database as the backend.
 
     :param redis: An instance of :py:class:`redis.StrictRedis`.

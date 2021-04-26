@@ -34,7 +34,7 @@ class TestExtendedKeyspaceDictStore(TestRedisStore, ExtendedKeyspaceTests):
     def store(self):
         from minimalkv.memory.redisstore import RedisStore
 
-        class ExtendedKeyspaceStore(ExtendedKeyspaceMixin, RedisStore):  # type: ignore
+        class ExtendedKeyspaceStore(ExtendedKeyspaceMixin, RedisStore):
             pass
 
         r = StrictRedis()
