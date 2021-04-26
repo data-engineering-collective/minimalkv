@@ -85,7 +85,7 @@ class GoogleCloudStore(KeyValueStore):
         else:
             return Client(credentials=self._credentials, project=self.project_name)
 
-    def _delete(self, key: str):
+    def _delete(self, key: str) -> None:
         with map_gcloud_exceptions(key, error_codes_pass=("NotFound",)):
             self._bucket.delete_blob(key)
 
