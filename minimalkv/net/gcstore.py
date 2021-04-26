@@ -1,6 +1,6 @@
 import io
 from contextlib import contextmanager
-from typing import Iterable, Optional, cast
+from typing import Iterator, Optional, cast
 
 from minimalkv import KeyValueStore
 from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
@@ -85,7 +85,7 @@ class GoogleCloudStore(KeyValueStore):
         else:
             return Client(credentials=self._credentials, project=self.project_name)
 
-    def _delete(self, key: str):
+    def _delete(self, key: str) -> None:
         with map_gcloud_exceptions(key, error_codes_pass=("NotFound",)):
             self._bucket.delete_blob(key)
 
@@ -103,7 +103,7 @@ class GoogleCloudStore(KeyValueStore):
     def _has_key(self, key: str) -> bool:
         return self._bucket.blob(key).exists()
 
-    def iter_keys(self, prefix: str = "") -> Iterable[str]:
+    def iter_keys(self, prefix: str = "") -> Iterator[str]:
         return (blob.name for blob in self._bucket.list_blobs(prefix=prefix))
 
     def _open(self, key: str):

@@ -96,7 +96,7 @@ def test_json_decode():
 def test_complete():
     url, expected = ACTUAL_URL
     store = get_store_from_url(url)
-    assert store.bucket_name == expected["bucket_name"]
-    assert store._client.project == "central-splice-296415"
+    assert store.bucket_name == expected["bucket_name"]  # type: ignore
+    assert store._client.project == "central-splice-296415"  # type: ignore
     with pytest.raises(RefreshError):
         store.get("somekey")

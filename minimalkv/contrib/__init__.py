@@ -20,7 +20,7 @@ class ExtendedKeyspaceMixin:
     Note: This Mixin is unsupported and might not work correctly with all backends.
     """
 
-    def _check_valid_key(self, key: Optional[str]):
+    def _check_valid_key(self, key: Optional[str]) -> None:
         """Checks if a key is valid and raises a ValueError if its not.
 
         When in need of checking a key for validity, always use this
@@ -28,6 +28,7 @@ class ExtendedKeyspaceMixin:
 
         :param key: The key to be checked
         """
+        # TODO: Is there any case where key is None?
         if key is not None:
             if not isinstance(key, str):
                 raise ValueError("%r is not a valid key type" % key)
