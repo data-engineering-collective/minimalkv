@@ -1,13 +1,13 @@
 Microsoft Azure Blob Storage
 ****************************
 
-Simplekv supports storing data in `Microsoft Azure Block Blob Storage <https://azure.microsoft.com/en-us/services/storage/blobs/>`_.
+Minimalkv supports storing data in `Microsoft Azure Block Blob Storage <https://azure.microsoft.com/en-us/services/storage/blobs/>`_.
 
 The backend uses the `azure-storage-blob <https://github.com/Azure/azure-storage-python/tree/master/azure-storage-blob>`_
 python distribution to access the azure blob storage and currently supports versions 2.x and 12.x.
 
 Note that ``azure-storage-blob`` is not a dependency for minimalkv. You need to install it
-manually, otherwise you will see an :exc:`~exceptions.ImportError`.
+manually, otherwise you will see an :py:exc:`ImportError`.
 
 Here is a short example:
 

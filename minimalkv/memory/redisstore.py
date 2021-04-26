@@ -10,7 +10,7 @@ from .. import FOREVER, NOT_SET, KeyValueStore, TimeToLiveMixin
 class RedisStore(TimeToLiveMixin, KeyValueStore):
     """Uses a redis-database as the backend.
 
-    :param redis: An instance of :py:class:`redis.StrictRedis`.
+    :param redis: An instance of ``redis.StrictRedis``.
     """
 
     def __init__(self, redis):

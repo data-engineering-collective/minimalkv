@@ -1,10 +1,17 @@
 Changelog
 *********
 
+1.2.1
+=====
+
+* Fixed ``intersphinx`` inventory build on readthedocs to include all classes.
+
 1.2.0
 =====
 
-* Add Python to build and support matrix.
+* Add Python 3.6 / 3.9 to build and support matrix.
+* Allow creating ``GoogleCloudStore`` via URL
+* Fix sphinx intersphinx generation and cleanup docs configuration.
 
 1.1.0
 =====
@@ -44,14 +51,14 @@ Changelog
 0.12.0
 ======
 
-* Use ``BlockBlobService.list_blob_names`` in :meth:`simplekv.net.azurestore.AzureBlockBlobStore.iter_keys``.
+* Use ``BlockBlobService.list_blob_names`` in ``minimalkv.net.azurestore.AzureBlockBlobStore.iter_keys``.
   This will only parse the names from Azure's XML response thus reducing CPU time
   siginificantly for this function.
 * They ``.keys()`` method on Python 3 now returns a list. This is in line with the documentation and the
   behaviour on Python 2. It used to return a generator.
 
 0.11.11
-====
+=======
 
 * Fix file-descriptor leak in `KeyValueStore._get_file`
 
@@ -105,44 +112,44 @@ Changelog
 * Keys have to be provided as unicode strings
 * Values have to be provided as bytes (python 2) or as str (python 3)
 * keys() and iter_keys() provide a parameter to iterate just over all keys with a given prefix
-* Added :class:`simplekv.CopyMixin` to allow access to copy operations to
+* Added :class:`minimalkv.CopyMixin` to allow access to copy operations to
   backends which support a native copy operation
 * Added a decorator which provides a read-only view of a store:
-  :class:`~simplekv.decorator.ReadOnlyDecorator`
+  :class:`~minimalkv.decorator.ReadOnlyDecorator`
 * Added a decorator which url-encodes all keys:
-  :class:`~simplekv.decorator.URLEncodeKeysDecorator`
+  :class:`~minimalkv.decorator.URLEncodeKeysDecorator`
 * Added a Microsoft Azure Blob Storage backend:
-  :class:`~simplekv.net.azurestore.AzureBlockBlobStore`
-* Added :class:`~simplekv.contrib.ExtendedKeyspaceMixin` which allows slashes and spaces in key names
+  :class:`~minimalkv.net.azurestore.AzureBlockBlobStore`
+* Added ``minimalkv.contrib.ExtendedKeyspaceMixin`` which allows slashes and spaces in key names
   This mixin is experimental, unsupported and might not work with all backends.
 
 
 0.10.0
 ======
 * simplekv no longer depends on ``six``.
-* The :class:`~simplekv.decorator.PrefixDecorator` works more as expected.
+* The :class:`~minimalkv.decorator.PrefixDecorator` works more as expected.
 * An experimental git-based store has been added in
-  :class:`~simplekv.git.GitCommitStore`.
+  :class:`~minimalkv.git.GitCommitStore`.
 
 
 0.9.2
 =====
-* Added :class:`~simplekv.decorator.PrefixDecorator`.
+* Added :class:`~minimalkv.decorator.PrefixDecorator`.
 
 
 0.9
 ===
-* Deprecated the :class:`~simplekv.UrlKeyValueStore`, replaced by flexible
-  mixins like :class:`~simplekv.UrlMixin`.
-* Added :class:`~simplekv.TimeToLiveMixin` support (on
-  :class:`~simplekv.memory.redisstore.RedisStore` and
-  simplekv.memory.memcachestore.MemcacheStore).
+* Deprecated the :class:`~minimalkv.UrlKeyValueStore`, replaced by flexible
+  mixins like :class:`~minimalkv.UrlMixin`.
+* Added :class:`~minimalkv.TimeToLiveMixin` support (on
+  :class:`~minimalkv.memory.redisstore.RedisStore` and
+  minimalkv.memory.memcachestore.MemcacheStore).
 
 
 0.6
 ===
 * Now supports `redis <http://redis.io>`_ backend:
-  :class:`~simplekv.memory.redisstore.RedisStore`.
+  :class:`~minimalkv.memory.redisstore.RedisStore`.
 * Fixed bug: No initial value for String() column in SQLAlchemy store.
 
 
@@ -151,10 +158,10 @@ Changelog
 * Maximum key length that needs to be supported by all backends is 250
   characters (was 256 before).
 * Added `memcached <http://memcached.org>`_ backend:
-  simplekv.memory.memcachestore.MemcacheStore
+  minimalkv.memory.memcachestore.MemcacheStore
 * Added `SQLAlchemy <http://sqlalchemy.org>`_ support:
-  :class:`~simplekv.db.sql.SQLAlchemyStore`
-* Added :mod:`simplekv.cache` module.
+  :class:`~minimalkv.db.sql.SQLAlchemyStore`
+* Added :mod:`minimalkv.cache` module.
 
 
 0.4
@@ -168,8 +175,8 @@ Changelog
 0.3
 ===
 * **Major API Change**: Mixins replaced with decorators (see
-  :class:`simplekv.idgen.HashDecorator` for an example)
-* Added `simplekv.crypt`
+  :class:`minimalkv.idgen.HashDecorator` for an example)
+* Added `minimalkv.crypt`
 
 
 0.1

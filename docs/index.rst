@@ -13,7 +13,7 @@ automatic ID generation/hashing (in :mod:`minimalkv.idgen`). A number of
 backends are available, ranging from :class:`~.FilesystemStore` to
 support for `Amazon S3 <http://aws.amazon.com/s3/>`_ and `Google
 Storage <http://code.google.com/apis/storage/>`_ through
-:class:`~.BotoStore`.
+:class:`~minimalkv.net.boto.BotoStore`.
 
 A faster in-memory store suitable for session management and caching is
 supported through :class:`~.RedisStore`
@@ -86,13 +86,24 @@ URL and store types:
     * with storage account key: :code:`azure://account_name:account_key@container[?create_if_missing=true][?max_connections=2]`, e.g., :code:`azure://MYACCOUNT:passw0rd!@bucket_66?create_if_missing=true`
     * with SAS token: :code:`azure://account_name:shared_access_signature@container?use_sas&create_if_missing=false[?max_connections=2&socket_timeout=(20,100)]`
     * with SAS and additional parameters: :code:`azure://account_name:shared_access_signature@container?use_sas&create_if_missing=false[?max_connections=2&socket_timeout=(20,100)][?max_block_size=4*1024*1024&max_single_put_size=64*1024*1024]`
+* Google Cloud Store: (:code:`gcs://` and :code:`hgcs://`):
+    * :code:`hgcs://<base64 encoded credentials JSON>@bucket_name[?create_if_missing=true&bucket_creation_location=EUROPE-WEST3]`
+        Get the encoded credentials as a string like so:
+
+        .. code-block:: python
+
+           from pathlib import Path
+           import base64
+           json_as_bytes = Path(<path_to_json>).read_bytes()
+           json_b64 = base64.urlsafe_b64encode(json_as_bytes).decode()
+
 
 Storage URLs starting with a :code:`h` indicate extended allowed characters. This allows the usage of slashes and spaces in blob names.
 URL options with :code:`[]` are optional and the :code:`[]` need to be removed.
 
 
 Why you should  use minimalkv
-============================
+=============================
 
 no server dependencies
   *minimalkv* does only depend on python and possibly a few libraries easily

@@ -39,8 +39,8 @@ class KeyValueStore:
 
         :param key: The key whose existence should be verified.
 
-        :raises exceptions.ValueError: If the key is not valid.
-        :raises exceptions.IOError: If there was an error accessing the store.
+        :raises ValueError: If the key is not valid.
+        :raises IOError: If there was an error accessing the store.
 
         :returns: True if the key exists and False otherwise.
         """
@@ -51,7 +51,7 @@ class KeyValueStore:
     def __iter__(self) -> Iterable[str]:
         """Iterate over all keys in the store.
 
-        :raises exceptions.IOError: If there was an error accessing the store.
+        :raises IOError: If there was an error accessing the store.
         """
         return self.iter_keys()
 
@@ -60,8 +60,8 @@ class KeyValueStore:
 
         Does not raise an error if the key does not exist.
 
-        :raises exceptions.ValueError: If the key is not valid.
-        :raises exceptions.IOError: If there was an error deleting.
+        :raises ValueError: If the key is not valid.
+        :raises IOError: If there was an error deleting.
         """
         self._check_valid_key(key)
         return self._delete(key)
@@ -71,9 +71,9 @@ class KeyValueStore:
 
         :param key: Value associated with the key, as a `bytes` object.
 
-        :raises exceptions.ValueError: If the key is not valid.
-        :raises exceptions.IOError: If the file could not be read.
-        :raises exceptions.KeyError: If the key was not found.
+        :raises ValueError: If the key is not valid.
+        :raises IOError: If the file could not be read.
+        :raises KeyError: If the key was not found.
         """
         self._check_valid_key(key)
         return self._get(key)
@@ -91,9 +91,9 @@ class KeyValueStore:
         :param key: The key to be read.
         :param file: Output filename or file-like object with a *write* method.
 
-        :raises exceptions.ValueError: If the key is not valid.
-        :raises exceptions.IOError: If there was a problem reading or writing data.
-        :raises exceptions.KeyError: If the key was not found.
+        :raises ValueError: If the key is not valid.
+        :raises IOError: If there was a problem reading or writing data.
+        :raises KeyError: If the key was not found.
         """
         self._check_valid_key(key)
         if isinstance(file, str):
@@ -107,7 +107,7 @@ class KeyValueStore:
         :param prefix: Only iterate over keys starting with prefix. Iterate over all
                        keys if empty.
 
-        :raises exceptions.IOError: If there was an error accessing the store.
+        :raises IOError: If there was an error accessing the store.
         """
         raise NotImplementedError
 
@@ -124,7 +124,7 @@ class KeyValueStore:
         :param delimiter: Delimiter up to which to iterate over prefixes.
         :param prefix: Only iterate over prefixes starting with prefix.
 
-        :raises exceptions.IOError: If there was an error accessing the store.
+        :raises IOError: If there was an error accessing the store.
         """
         dlen = len(delimiter)
         plen = len(prefix)
@@ -144,7 +144,7 @@ class KeyValueStore:
 
         :param prefix: Only list keys starting with prefix. List all keys if empty.
 
-        :raises exceptions.IOError: If there was an error accessing the store.
+        :raises IOError: If there was an error accessing the store.
         """
         return list(self.iter_keys(prefix))
 
@@ -155,9 +155,9 @@ class KeyValueStore:
 
         :param key: Key to open.
 
-        :raises exceptions.ValueError: If the key is not valid.
-        :raises exceptions.IOError: If the file could not be read.
-        :raises exceptions.KeyError: If the key was not found.
+        :raises ValueError: If the key is not valid.
+        :raises IOError: If the file could not be read.
+        :raises KeyError: If the key was not found.
         """
         self._check_valid_key(key)
         return self._open(key)
@@ -170,8 +170,8 @@ class KeyValueStore:
 
         :returns: The key under which data was stored.
 
-        :raises exceptions.ValueError: If the key is not valid.
-        :raises exceptions.IOError: If storing failed or the file could not be read.
+        :raises ValueError: If the key is not valid.
+        :raises IOError: If storing failed or the file could not be read.
         """
         self._check_valid_key(key)
         if not isinstance(data, bytes):
@@ -192,8 +192,8 @@ class KeyValueStore:
 
         :returns: The key under which data was stored.
 
-        :raises exceptions.ValueError: If the key is not valid.
-        :raises exceptions.IOError: If there was a problem moving the file in.
+        :raises ValueError: If the key is not valid.
+        :raises IOError: If there was a problem moving the file in.
         """
         # FIXME: shouldn't we call self._check_valid_key here?
         if isinstance(file, str):
@@ -312,7 +312,7 @@ class UrlMixin:
 
         :param key: The key for which to generate a url for.
 
-        :raises exceptions.ValueError: If the key is not valid.
+        :raises ValueError: If the key is not valid.
 
         :return: A string containing a URL to access data at key.
         """
@@ -394,9 +394,9 @@ class TimeToLiveMixin:
 
         :returns: The key under which data was stored.
 
-        :raises exceptions.ValueError: If the key is not valid.
-        :raises exceptions.IOError: If storing failed or the file could not be read.
-        :raises exceptions.ValueError: If ``ttl_secs`` is invalid.
+        :raises ValueError: If the key is not valid.
+        :raises IOError: If storing failed or the file could not be read.
+        :raises ValueError: If ``ttl_secs`` is invalid.
         """
         self._check_valid_key(key)
         if not isinstance(data, bytes):
@@ -428,9 +428,9 @@ class TimeToLiveMixin:
 
         :returns: The key under which data was stored.
 
-        :raises exceptions.ValueError: If the key is not valid.
-        :raises exceptions.IOError: If there was a problem moving the file in.
-        :raises exceptions.ValueError: If ``ttl_secs`` is invalid.
+        :raises ValueError: If the key is not valid.
+        :raises IOError: If there was a problem moving the file in.
+        :raises ValueError: If ``ttl_secs`` is invalid.
         """
         # TODO: Remove next two lines?
         if ttl_secs is None:
@@ -485,8 +485,8 @@ class CopyMixin(object):
 
         :returns: The destination key.
 
-        :raises: exceptions.ValueError: If the source or target key are not valid.
-        :raises: exceptions.KeyError: If the source key was not found."""
+        :raises: ValueError: If the source or target key are not valid.
+        :raises: KeyError: If the source key was not found."""
         self._check_valid_key(source)
         self._check_valid_key(dest)
         return self._copy(source, dest)
@@ -503,8 +503,8 @@ class CopyMixin(object):
 
         :returns: The destination key.
 
-        :raises: exceptions.ValueError: If the source or target key are not valid.
-        :raises: exceptions.KeyError: If the source key was not found.
+        :raises: ValueError: If the source or target key are not valid.
+        :raises: KeyError: If the source key was not found.
         """
         self._check_valid_key(source)
         self._check_valid_key(dest)
@@ -544,6 +544,15 @@ def get_store_from_url(url: str) -> "KeyValueStore":
     * AzureBlockBlockStorage (SAS): ``azure://account_name:shared_access_signature@container?use_sas&create_if_missing=false``
     * AzureBlockBlockStorage (SAS): ``azure://account_name:shared_access_signature@container?use_sas&create_if_missing=false[?max_connections=2&socket_timeout=(20,100)]``
     * AzureBlockBlockStorage (SAS): ``azure://account_name:shared_access_signature@container?use_sas&create_if_missing=false[?max_connections=2&socket_timeout=(20,100)][?max_block_size=4*1024*1024&max_single_put_size=64*1024*1024]``
+    * GoogleCloudStorage: ``gcs://<base64 encoded credentials JSON>@bucket_name[?create_if_missing=true][&bucket_creation_location=EUROPE-WEST1]``
+        Get the encoded credentials as string like so:
+
+        .. code-block:: python
+
+           from pathlib import Path
+           import base64
+           json_as_bytes = Path(<path_to_json>).read_bytes()
+           json_b64_encoded = base64.urlsafe_b64encode(b).decode()
     """
     return get_store(**url2dict(url))
 
@@ -576,6 +585,17 @@ def get_store(
          otherwise, try to retrieve the bucket and fail with an ``IOError``.
     * ``"hs3"`` returns a variant of ``minimalkv.net.botostore.BotoStore`` that allows "/" in the key name.
       The parameters are the same as for ``"s3"``
+    * ``"gcs"``: Returns a ``minimalkv.net.gcstore.GoogleCloudStore``.  Parameters are
+      ``"credentials"``, ``"bucket_name"``, ``"bucket_creation_location"``, ``"project"`` and ``"create_if_missing"`` (default: ``True``).
+
+      - ``"credentials"``: either the path to a credentials.json file or a *google.auth.credentials.Credentials* object
+      - ``"bucket_name"``: Name of the bucket the blobs are stored in.
+      - ``"project"``: The name of the GCStorage project. If a credentials JSON is passed then it contains the project name
+        and this parameter will be ignored.
+      - ``"create_if_missing"``: [optional] Create new bucket to store blobs in if ``"bucket_name"`` doesn't exist yet. (default: ``True``).
+      - ``"bucket_creation_location"``: [optional] If a new bucket is created (create_if_missing=True), the location it will be created in.
+        If ``None`` then GCloud uses a default location.
+    * ``"hgcs"``: Like ``"gcs"`` but "/" are allowed in the keynames.
     * ``"fs"``: Returns a ``minimalkv.fs.FilesystemStore``. Specify the base path as "path" parameter.
     * ``"hfs"`` returns a variant of ``minimalkv.fs.FilesystemStore``  that allows "/" in the key name.
       The parameters are the same as for ``"file"``.
@@ -584,7 +604,7 @@ def get_store(
       See StrictRedis documentation for details.
 
     :param str type: Type of storage to open, with optional storage decorators
-    :param boolean create_if_missing: Create the "root" of the storage (Azure container, parent directory, S3 bucket, etc.).
+    :param bool create_if_missing: Create the "root" of the storage (Azure container, parent directory, S3 bucket, etc.).
       Has no effect for stores where this makes no sense, like `redis` or `memory`.
     :param kwargs: Parameters specific to the Store-class"""
     from ._store_creation import create_store

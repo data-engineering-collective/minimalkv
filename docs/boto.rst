@@ -15,7 +15,7 @@ reason minimalkv has a separate Google Storage implementation for Python3 at
 ``google-cloud-storage`` library.
 
 Note that boto is not a dependency for minimalkv. You need to install it
-manually, otherwise you will see an :exc:`~exceptions.ImportError`.
+manually, otherwise you will see an :py:exc:`ImportError`.
 
 Here is a short example:
 

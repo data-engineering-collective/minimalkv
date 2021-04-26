@@ -9,7 +9,7 @@ playing around with *minimalkv*.
 
 redis-backend
 =============
-The redis_-backend requires :py:mod:`redis` to be installed and uses a
+The redis_-backend requires ``redis`` to be installed and uses a
 redis_-database as a backend.
 
 Currently, minimalkv targets the latest stable redis version, but since it uses
