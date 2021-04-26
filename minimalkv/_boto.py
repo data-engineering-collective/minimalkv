@@ -6,11 +6,8 @@ def _get_s3bucket(
     force_bucket_suffix=True,
     create_if_missing=True,
 ):
-    from boto.s3.connection import (  # type: ignore
-        OrdinaryCallingFormat,
-        S3Connection,
-        S3ResponseError,
-    )
+    from boto.s3.connection import S3ResponseError  # type: ignore
+    from boto.s3.connection import OrdinaryCallingFormat, S3Connection
 
     s3con = S3Connection(
         aws_access_key_id=access_key,
