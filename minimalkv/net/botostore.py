@@ -1,7 +1,9 @@
 import os
 from contextlib import contextmanager
+from typing import Dict, Iterator
 
 from minimalkv import CopyMixin, KeyValueStore, UrlMixin
+from minimalkv._typing import File
 
 
 @contextmanager
@@ -32,9 +34,7 @@ def map_boto_exceptions(key=None, exc_pass=()):
             raise IOError(str(e))
 
 
-class BotoStore(KeyValueStore, UrlMixin, CopyMixin):
-    """ """
-
+class BotoStore(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
     def __init__(
         self,
         bucket,
@@ -44,27 +44,6 @@ class BotoStore(KeyValueStore, UrlMixin, CopyMixin):
         public=False,
         metadata=None,
     ):
-        """
-
-        Parameters
-        ----------
-        bucket :
-
-        prefix :
-             (Default value = "")
-        url_valid_time :
-             (Default value = 0)
-        reduced_redundancy :
-             (Default value = False)
-        public :
-             (Default value = False)
-        metadata :
-             (Default value = None)
-
-        Returns
-        -------
-
-        """
         self.prefix = prefix.strip().lstrip("/")
         self.bucket = bucket
         self.reduced_redundancy = reduced_redundancy
@@ -72,18 +51,7 @@ class BotoStore(KeyValueStore, UrlMixin, CopyMixin):
         self.url_valid_time = url_valid_time
         self.metadata = metadata or {}
 
-    def __new_key(self, name):
-        """
-
-        Parameters
-        ----------
-        name :
-
-
-        Returns
-        -------
-
-        """
+    def __new_key(self, name):  # noqa D
         from boto.s3.key import Key
 
         k = Key(self.bucket, self.prefix + name)
@@ -91,17 +59,12 @@ class BotoStore(KeyValueStore, UrlMixin, CopyMixin):
             k.update_metadata(self.metadata)
         return k
 
-    def __upload_args(self):
-        """Generates a dictionary of arguments to pass to various
-        set_content_from* functions. This allows us to save API calls by
-        passing the necessary parameters on with the upload.
+    def __upload_args(self) -> Dict[str, str]:
+        """
+        Generates a dictionary of arguments to pass to set_content_from* functions.
 
-        Parameters
-        ----------
-
-        Returns
-        -------
-
+        This allows us to save API calls by passing the necessary parameters on with the
+        upload.
         """
         d = {
             "reduced_redundancy": self.reduced_redundancy,
@@ -112,17 +75,18 @@ class BotoStore(KeyValueStore, UrlMixin, CopyMixin):
 
         return d
 
-    def iter_keys(self, prefix=u""):
-        """
+    def iter_keys(self, prefix="") -> Iterator[str]:
+        """Iterate over all keys in the store starting with prefix.
 
         Parameters
         ----------
-        prefix :
-             (Default value = u"")
+        prefix : str, optional, default = ''
+            Only iterate over keys starting with prefix. Iterate over all keys if empty.
 
-        Returns
-        -------
-
+        Raises
+        ------
+        IOError
+            If there was an error accessing the store.
         """
         with map_boto_exceptions():
             prefix_len = len(self.prefix)
@@ -130,33 +94,11 @@ class BotoStore(KeyValueStore, UrlMixin, CopyMixin):
                 lambda k: k.name[prefix_len:], self.bucket.list(self.prefix + prefix)
             )
 
-    def _has_key(self, key):
-        """
-
-        Parameters
-        ----------
-        key :
-
-
-        Returns
-        -------
-
-        """
+    def _has_key(self, key: str) -> bool:
         with map_boto_exceptions(key=key):
             return bool(self.bucket.get_key(self.prefix + key))
 
-    def _delete(self, key):
-        """
-
-        Parameters
-        ----------
-        key :
-
-
-        Returns
-        -------
-
-        """
+    def _delete(self, key: str) -> None:
         from boto.exception import StorageResponseError
 
         try:
@@ -165,119 +107,43 @@ class BotoStore(KeyValueStore, UrlMixin, CopyMixin):
             if e.code != "NoSuchKey":
                 raise IOError(str(e))
 
-    def _get(self, key):
-        """
-
-        Parameters
-        ----------
-        key :
-
-
-        Returns
-        -------
-
-        """
+    def _get(self, key: str) -> bytes:
         k = self.__new_key(key)
         with map_boto_exceptions(key=key):
             return k.get_contents_as_string()
 
-    def _get_file(self, key, file):
-        """
-
-        Parameters
-        ----------
-        key :
-
-        file :
-
-
-        Returns
-        -------
-
-        """
+    def _get_file(self, key: str, file: File) -> str:
         k = self.__new_key(key)
         with map_boto_exceptions(key=key):
             return k.get_contents_to_file(file)
 
-    def _get_filename(self, key, filename):
-        """
-
-        Parameters
-        ----------
-        key :
-
-        filename :
-
-
-        Returns
-        -------
-
-        """
+    def _get_filename(self, key: str, filename: str) -> str:
         k = self.__new_key(key)
         with map_boto_exceptions(key=key):
             return k.get_contents_to_filename(filename)
 
-    def _open(self, key):
-        """
-
-        Parameters
-        ----------
-        key :
-
-
-        Returns
-        -------
-
-        """
+    def _open(self, key: str) -> File:
         from boto.s3.keyfile import KeyFile
 
-        class SimpleKeyFile(KeyFile):
-            """ """
-
-            def read(self, size=-1):
-                """
-
-                Parameters
-                ----------
-                size :
-                     (Default value = -1)
-
-                Returns
-                -------
-
-                """
+        class SimpleKeyFile(KeyFile):  # noqa D
+            def read(self, size: int = -1):  # noqa D
                 if self.closed:
                     raise ValueError("I/O operation on closed file")
                 if size < 0:
                     size = self.key.size - self.location
                 return KeyFile.read(self, size)
 
-            def seekable(self):
-                """ """
+            def seekable(self):  # noqa D
                 return False
 
-            def readable(self):
-                """ """
+            def readable(self):  # noqa D
                 return True
 
         k = self.__new_key(key)
         with map_boto_exceptions(key=key):
             return SimpleKeyFile(k)
 
-    def _copy(self, source, dest):
-        """
-
-        Parameters
-        ----------
-        source :
-
-        dest :
-
-
-        Returns
-        -------
-
-        """
+    def _copy(self, source: str, dest: str) -> None:
         if not self._has_key(source):
             raise KeyError(source)
         with map_boto_exceptions(key=source):
@@ -285,75 +151,25 @@ class BotoStore(KeyValueStore, UrlMixin, CopyMixin):
                 self.prefix + dest, self.bucket.name, self.prefix + source
             )
 
-    def _put(self, key, data):
-        """
-
-        Parameters
-        ----------
-        key :
-
-        data :
-
-
-        Returns
-        -------
-
-        """
+    def _put(self, key: str, data: bytes) -> str:
         k = self.__new_key(key)
         with map_boto_exceptions(key=key):
             k.set_contents_from_string(data, **self.__upload_args())
             return key
 
-    def _put_file(self, key, file):
-        """
-
-        Parameters
-        ----------
-        key :
-
-        file :
-
-
-        Returns
-        -------
-
-        """
+    def _put_file(self, key: str, file: File) -> str:
         k = self.__new_key(key)
         with map_boto_exceptions(key=key):
             k.set_contents_from_file(file, **self.__upload_args())
             return key
 
-    def _put_filename(self, key, filename):
-        """
-
-        Parameters
-        ----------
-        key :
-
-        filename :
-
-
-        Returns
-        -------
-
-        """
+    def _put_filename(self, key: str, filename: str) -> str:
         k = self.__new_key(key)
         with map_boto_exceptions(key=key):
             k.set_contents_from_filename(filename, **self.__upload_args())
             return key
 
-    def _url_for(self, key):
-        """
-
-        Parameters
-        ----------
-        key :
-
-
-        Returns
-        -------
-
-        """
+    def _url_for(self, key: str) -> str:
         k = self.__new_key(key)
         with map_boto_exceptions(key=key):
             return k.generate_url(expires_in=self.url_valid_time, query_auth=False)

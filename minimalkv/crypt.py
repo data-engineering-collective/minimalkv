@@ -95,7 +95,7 @@ class HMACDecorator(StoreDecorator):
         self.__hashfunc = hashfunc
         self.__secret_key = bytes(secret_key)
 
-    def __new_hmac(self, key, msg=None):
+    def __new_hmac(self, key, msg=None):  # noqa D
         if not msg:
             msg = b""
 
@@ -108,7 +108,7 @@ class HMACDecorator(StoreDecorator):
 
         return hm
 
-    def get(self, key):
+    def get(self, key):  # noqa D
         buf = self._dstore.get(key)
         hm = self.__new_hmac(key)
         hash = buf[-hm.digest_size :]
@@ -123,7 +123,7 @@ class HMACDecorator(StoreDecorator):
 
         return buf
 
-    def get_file(self, key, file):
+    def get_file(self, key, file):  # noqa D
         if isinstance(file, str):
             try:
                 f = open(file, "wb")
@@ -150,11 +150,11 @@ class HMACDecorator(StoreDecorator):
                 if len(buf) != bufsize:
                     break
 
-    def open(self, key):
+    def open(self, key):  # noqa D
         source = self._dstore.open(key)
         return _HMACFileReader(self.__new_hmac(key), source)
 
-    def put(self, key, value, *args, **kwargs):
+    def put(self, key, value, *args, **kwargs):  # noqa D
         # just append hmac and put
         data = value + self.__new_hmac(key, value).digest()
         return self._dstore.put(key, data, *args, **kwargs)  # type: ignore

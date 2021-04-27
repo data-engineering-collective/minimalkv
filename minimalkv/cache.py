@@ -82,7 +82,7 @@ class CacheDecorator(StoreDecorator):
             # cache error, ignore completely and return from backend
             return self._dstore.get(key)
 
-    def get_file(self, key: str, file: Union[str, File]) -> None:
+    def get_file(self, key: str, file: Union[str, File]) -> str:
         """Write data at key to file.
 
         If a cache miss occurs, the value is retrieved, stored in the cache and

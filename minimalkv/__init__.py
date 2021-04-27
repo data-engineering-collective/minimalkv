@@ -108,7 +108,7 @@ class KeyValueStore:
         self._check_valid_key(key)
         return self._get(key)
 
-    def get_file(self, key: str, file: Union[str, File]) -> None:
+    def get_file(self, key: str, file: Union[str, File]) -> str:
         """Write data at key to file.
 
         Like :meth:`~mininmalkv.KeyValueStore.put_file`, this method allows backends to
@@ -330,7 +330,7 @@ class KeyValueStore:
 
         return buf.getvalue()
 
-    def _get_file(self, key: str, file: File) -> None:
+    def _get_file(self, key: str, file: File) -> str:
         """Write data at key to file-like object file.
 
         Parameters
@@ -357,7 +357,9 @@ class KeyValueStore:
         finally:
             source.close()
 
-    def _get_filename(self, key: str, filename: str) -> None:
+        return key
+
+    def _get_filename(self, key: str, filename: str) -> str:
         """Write data at key to file at filename.
 
         Parameters

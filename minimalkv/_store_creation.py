@@ -12,6 +12,7 @@ def create_store(type: str, params: Dict[str, Any]) -> "KeyValueStore":
     """
     Create store of type ``type`` with ``params``.
     """
+    # TODO: More detailed docstring
     if type in ("azure", "hazure"):
         return _create_store_azure(type, params)
     if type in ("hs3", "boto"):
@@ -33,7 +34,7 @@ def create_store(type: str, params: Dict[str, Any]) -> "KeyValueStore":
     raise ValueError("Unknown store type: " + str(type))
 
 
-def _create_store_gcs(store_type, params):
+def _create_store_gcs(store_type, params):  # noqa D
     import json
 
     from google.oauth2.service_account import Credentials
@@ -54,7 +55,7 @@ def _create_store_gcs(store_type, params):
     )
 
 
-def _create_store_azure(type, params):
+def _create_store_azure(type, params):  # noqa D
     from minimalkv.net.azurestore import AzureBlockBlobStore
 
     from ._hstores import HAzureBlockBlobStore
@@ -90,14 +91,14 @@ def _create_store_azure(type, params):
         )
 
 
-def _create_store_hs3(type, params):
+def _create_store_hs3(type, params):  # noqa D
     from ._boto import _get_s3bucket
     from ._hstores import HBotoStore
 
     return HBotoStore(_get_s3bucket(**params))
 
 
-def _create_store_s3(type, params):
+def _create_store_s3(type, params):  # noqa D
     from minimalkv.net.botostore import BotoStore
 
     from ._boto import _get_s3bucket
@@ -105,7 +106,7 @@ def _create_store_s3(type, params):
     return BotoStore(_get_s3bucket(**params))
 
 
-def _create_store_hfs(type, params):
+def _create_store_hfs(type, params):  # noqa D
     if params["create_if_missing"] and not os.path.exists(params["path"]):
         os.makedirs(params["path"])
     from ._hstores import HFilesystemStore
@@ -113,25 +114,25 @@ def _create_store_hfs(type, params):
     return HFilesystemStore(params["path"])
 
 
-def _create_store_fs(type, params):
+def _create_store_fs(type, params):  # noqa D
     if params["create_if_missing"] and not os.path.exists(params["path"]):
         os.makedirs(params["path"])
     return FilesystemStore(params["path"])
 
 
-def _create_store_mem(type, params):
+def _create_store_mem(type, params):  # noqa D
     from minimalkv.memory import DictStore
 
     return DictStore()
 
 
-def _create_store_hmem(type, params):
+def _create_store_hmem(type, params):  # noqa D
     from ._hstores import HDictStore
 
     return HDictStore()
 
 
-def _create_store_redis(type, params):
+def _create_store_redis(type, params):  # noqa D
     from redis import StrictRedis
 
     from minimalkv.memory.redisstore import RedisStore

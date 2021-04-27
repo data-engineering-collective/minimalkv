@@ -11,17 +11,6 @@ def _file_md5(file_, b64encode=True):
 
     For ``b64encode``, returns the base64 encoded string; otherwise, returns the
     bytes directly.
-
-    Parameters
-    ----------
-    file_ :
-
-    b64encode :
-         (Default value = True)
-
-    Returns
-    -------
-
     """
     md5 = hashlib.md5()
     chunk_size = 128 * md5.block_size
@@ -36,37 +25,13 @@ def _file_md5(file_, b64encode=True):
 
 
 def _filename_md5(filename, b64encode=True):
-    """Compute the md5 digest of a file in base64 encoding.
-
-    Parameters
-    ----------
-    filename :
-
-    b64encode :
-         (Default value = True)
-
-    Returns
-    -------
-
-    """
+    """Compute the md5 digest of a file in base64 encoding."""
     with open(filename, "rb") as f:
         return _file_md5(f, b64encode=b64encode)
 
 
 def _byte_buffer_md5(buffer_, b64encode=True):
-    """Computes the md5 digest of a byte buffer in base64 encoding.
-
-    Parameters
-    ----------
-    buffer_ :
-
-    b64encode :
-         (Default value = True)
-
-    Returns
-    -------
-
-    """
+    """Computes the md5 digest of a byte buffer in base64 encoding."""
     md5 = hashlib.md5(buffer_)
     byte_digest = md5.digest()
     if b64encode:

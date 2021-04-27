@@ -65,8 +65,9 @@ class RedisStore(TimeToLiveMixin, KeyValueStore):
             raise KeyError(key)
         return val
 
-    def _get_file(self, key: str, file: File) -> None:
+    def _get_file(self, key: str, file: File) -> str:
         file.write(self._get(key))
+        return key
 
     def _open(self, key: str) -> File:
         return BytesIO(self._get(key))
