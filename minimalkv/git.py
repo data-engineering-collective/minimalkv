@@ -204,7 +204,7 @@ class GitCommitStore(KeyValueStore):
         # FIXME: it may be worth to try to move large files directly into the
         #        store here
         bufsize = 1024 * 1024
-        return self._put(key, file.read(bufsize=bufsize))
+        return self._put(key, file.read())
 
     def _put(self, key: str, data: bytes) -> str:
         commit = self._create_top_commit()

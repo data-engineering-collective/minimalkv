@@ -1,29 +1,14 @@
 from io import BytesIO
+from typing import Iterator
 
 from sqlalchemy import Column, LargeBinary, String, Table, exists, select
 
 from minimalkv import CopyMixin, KeyValueStore
+from minimalkv._typing import File
 
 
 class SQLAlchemyStore(KeyValueStore, CopyMixin):
-    """ """
-
     def __init__(self, bind, metadata, tablename):
-        """
-
-        Parameters
-        ----------
-        bind :
-
-        metadata :
-
-        tablename :
-
-
-        Returns
-        -------
-
-        """
         self.bind = bind
 
         self.table = Table(
@@ -35,48 +20,15 @@ class SQLAlchemyStore(KeyValueStore, CopyMixin):
             Column("value", LargeBinary, nullable=False),
         )
 
-    def _has_key(self, key):
-        """
-
-        Parameters
-        ----------
-        key :
-
-
-        Returns
-        -------
-
-        """
+    def _has_key(self, key: str) -> bool:
         return self.bind.execute(
             select([exists().where(self.table.c.key == key)])
         ).scalar()
 
-    def _delete(self, key):
-        """
-
-        Parameters
-        ----------
-        key :
-
-
-        Returns
-        -------
-
-        """
+    def _delete(self, key: str) -> None:
         self.bind.execute(self.table.delete(self.table.c.key == key))
 
-    def _get(self, key):
-        """
-
-        Parameters
-        ----------
-        key :
-
-
-        Returns
-        -------
-
-        """
+    def _get(self, key: str) -> bytes:
         rv = self.bind.execute(
             select([self.table.c.value], self.table.c.key == key).limit(1)
         ).scalar()
@@ -86,34 +38,10 @@ class SQLAlchemyStore(KeyValueStore, CopyMixin):
 
         return rv
 
-    def _open(self, key):
-        """
-
-        Parameters
-        ----------
-        key :
-
-
-        Returns
-        -------
-
-        """
+    def _open(self, key: str) -> File:
         return BytesIO(self._get(key))
 
-    def _copy(self, source, dest):
-        """
-
-        Parameters
-        ----------
-        source :
-
-        dest :
-
-
-        Returns
-        -------
-
-        """
+    def _copy(self, source: str, dest: str):
         con = self.bind.connect()
         with con.begin():
             data = self.bind.execute(
@@ -135,20 +63,7 @@ class SQLAlchemyStore(KeyValueStore, CopyMixin):
         con.close()
         return dest
 
-    def _put(self, key, data):
-        """
-
-        Parameters
-        ----------
-        key :
-
-        data :
-
-
-        Returns
-        -------
-
-        """
+    def _put(self, key: str, data: bytes) -> str:
         con = self.bind.connect()
         with con.begin():
             # delete the old
@@ -162,34 +77,10 @@ class SQLAlchemyStore(KeyValueStore, CopyMixin):
         con.close()
         return key
 
-    def _put_file(self, key, file):
-        """
-
-        Parameters
-        ----------
-        key :
-
-        file :
-
-
-        Returns
-        -------
-
-        """
+    def _put_file(self, key: str, file: File) -> str:
         return self._put(key, file.read())
 
-    def iter_keys(self, prefix=u""):
-        """
-
-        Parameters
-        ----------
-        prefix :
-             (Default value = u"")
-
-        Returns
-        -------
-
-        """
+    def iter_keys(self, prefix: str = "") -> Iterator[str]:
         query = select([self.table.c.key])
         if prefix != "":
             query = query.where(self.table.c.key.like(prefix + "%"))

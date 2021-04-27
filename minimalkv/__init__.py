@@ -26,12 +26,12 @@ key_type = str
 
 
 class KeyValueStore:
-    f"""
+    """
     Class to access a key-value store.
 
     Supported keys are ascii-strings containing alphanumeric characters or symbols out
-    of {VALID_NON_NUM} of length not greater than 250. Values (or records) are stored as
-    raw bytes.
+    of ``minimalkv.VALID_NON_NUM`` of length not greater than 250. Values (or records)
+    are stored as raw bytes.
     """
 
     def __contains__(self, key: str) -> bool:

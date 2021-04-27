@@ -1,8 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 import re
 from io import BytesIO
+from typing import Iterator, List, Optional, Union
+
+from redis import StrictRedis
+
+from minimalkv._typing import File
 
 from .. import FOREVER, NOT_SET, KeyValueStore, TimeToLiveMixin
 
@@ -12,150 +16,65 @@ class RedisStore(TimeToLiveMixin, KeyValueStore):
 
     Parameters
     ----------
-    redis :
-        An instance of ``redis.StrictRedis``.
-
-    Returns
-    -------
+    redis : redis.StrictRedis
+        Backend.
 
     """
 
-    def __init__(self, redis):
-        """
-
-        Parameters
-        ----------
-        redis :
-
-
-        Returns
-        -------
-
-        """
+    def __init__(self, redis: StrictRedis):
         self.redis = redis
 
-    def _delete(self, key: str):
-        """
-
-        Parameters
-        ----------
-        key: str :
-
-
-        Returns
-        -------
-
-        """
+    def _delete(self, key: str) -> int:
         return self.redis.delete(key)
 
-    def keys(self, prefix=u""):
-        """
+    def keys(self, prefix: str = "") -> List[str]:
+        """List all keys in the store starting with prefix.
 
         Parameters
         ----------
-        prefix :
-             (Default value = u"")
+        prefix : str, optional, default = ''
+            Only list keys starting with prefix. List all keys if empty.
 
-        Returns
-        -------
-
+        Raises
+        ------
+        IOError
+            If there was an error accessing the store.
         """
         return list(
             map(lambda b: b.decode(), self.redis.keys(pattern=re.escape(prefix) + "*"))
         )
 
-    def iter_keys(self, prefix=u""):
-        """
+    def iter_keys(self, prefix="") -> Iterator[str]:
+        """Iterate over all keys in the store starting with prefix.
 
         Parameters
         ----------
-        prefix :
-             (Default value = u"")
-
-        Returns
-        -------
+        prefix : str, optional, default = ''
+            Only iterate over keys starting with prefix. Iterate over all keys if empty.
 
         """
         return iter(self.keys(prefix))
 
-    def _has_key(self, key):
-        """
+    def _has_key(self, key: str) -> bool:
+        return self.redis.exists(key) > 0
 
-        Parameters
-        ----------
-        key :
-
-
-        Returns
-        -------
-
-        """
-        return self.redis.exists(key)
-
-    def _get(self, key):
-        """
-
-        Parameters
-        ----------
-        key :
-
-
-        Returns
-        -------
-
-        """
+    def _get(self, key: str) -> bytes:
         val = self.redis.get(key)
 
         if val is None:
             raise KeyError(key)
         return val
 
-    def _get_file(self, key, file):
-        """
-
-        Parameters
-        ----------
-        key :
-
-        file :
-
-
-        Returns
-        -------
-
-        """
+    def _get_file(self, key: str, file: File) -> None:
         file.write(self._get(key))
 
-    def _open(self, key):
-        """
-
-        Parameters
-        ----------
-        key :
-
-
-        Returns
-        -------
-
-        """
+    def _open(self, key: str) -> File:
         return BytesIO(self._get(key))
 
-    def _put(self, key, value, ttl_secs):
-        """
-
-        Parameters
-        ----------
-        key :
-
-        value :
-
-        ttl_secs :
-
-
-        Returns
-        -------
-
-        """
+    def _put(
+        self, key: str, value: bytes, ttl_secs: Optional[Union[str, int, float]] = None
+    ) -> str:
+        assert ttl_secs is not None
         if ttl_secs in (NOT_SET, FOREVER):
             # if we do not care about ttl, just use set
             # in redis, using SET will also clear the timeout
@@ -176,21 +95,8 @@ class RedisStore(TimeToLiveMixin, KeyValueStore):
 
         return key
 
-    def _put_file(self, key, file, ttl_secs):
-        """
-
-        Parameters
-        ----------
-        key :
-
-        file :
-
-        ttl_secs :
-
-
-        Returns
-        -------
-
-        """
+    def _put_file(
+        self, key: str, file: File, ttl_secs: Optional[Union[str, int, float]] = None
+    ) -> str:
         self._put(key, file.read(), ttl_secs)
         return key
