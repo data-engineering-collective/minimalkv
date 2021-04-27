@@ -12,13 +12,25 @@ from minimalkv import KeyValueStore, __version__
 def _on_tree(repo, tree, components, obj):
     """Mounts an object on a tree, using the given path components.
 
-    :param tree: Tree object to mount on.
-    :param components: A list of strings of subpaths (i.e. ['foo', 'bar'] is
-                       equivalent to '/foo/bar')
-    :param obj: Object to mount. If None, removes the object found at path
-                and prunes the tree downwards.
-    :return: A list of new entities that need to be added to the object store,
-             where the last one is the new tree.
+    Parameters
+    ----------
+    tree :
+        Tree object to mount on.
+    components :
+        A list of strings of subpaths (i.e. ['foo', 'bar'] is
+        equivalent to '/foo/bar')
+    obj :
+        Object to mount. If None, removes the object found at path
+        and prunes the tree downwards.
+    repo :
+
+
+    Returns
+    -------
+    type
+        A list of new entities that need to be added to the object store,
+        where the last one is the new tree.
+
     """
 
     # pattern-matching:
@@ -63,10 +75,27 @@ def _on_tree(repo, tree, components, obj):
 
 
 class GitCommitStore(KeyValueStore):
+    """ """
+
     AUTHOR = "GitCommitStore (minimalkv {}) <>".format(__version__)
     TIMEZONE = None
 
     def __init__(self, repo_path, branch=b"master", subdir=b""):
+        """
+
+        Parameters
+        ----------
+        repo_path :
+
+        branch :
+             (Default value = b"master")
+        subdir :
+             (Default value = b"")
+
+        Returns
+        -------
+
+        """
         self.repo = Repo(repo_path)
         self.branch = branch
 
@@ -76,16 +105,30 @@ class GitCommitStore(KeyValueStore):
 
     @property
     def _subdir_components(self):
+        """ """
         return [c.encode("ascii") for c in self.subdir.split("/")]
 
     def _key_components(self, key):
+        """
+
+        Parameters
+        ----------
+        key :
+
+
+        Returns
+        -------
+
+        """
         return [c.encode("ascii") for c in key.split("/")]
 
     @property
     def _refname(self):
+        """ """
         return b"refs/heads/" + self.branch
 
     def _create_top_commit(self):
+        """ """
         # get the top commit, create empty one if it does not exist
         commit = Commit()
 
@@ -104,6 +147,17 @@ class GitCommitStore(KeyValueStore):
         return commit
 
     def _delete(self, key):
+        """
+
+        Parameters
+        ----------
+        key :
+
+
+        Returns
+        -------
+
+        """
         try:
             commit = self.repo[self._refname]
             tree = self.repo[commit.tree]
@@ -134,6 +188,17 @@ class GitCommitStore(KeyValueStore):
         self.repo.refs[self._refname] = commit.id
 
     def _get(self, key):
+        """
+
+        Parameters
+        ----------
+        key :
+
+
+        Returns
+        -------
+
+        """
         # might raise key errors, except block corrects param
         try:
             commit = self.repo[self._refname]
@@ -147,6 +212,17 @@ class GitCommitStore(KeyValueStore):
         return blob.data
 
     def iter_keys(self, prefix=u""):
+        """
+
+        Parameters
+        ----------
+        prefix :
+             (Default value = u"")
+
+        Returns
+        -------
+
+        """
         try:
             commit = self.repo[self._refname]
             tree = self.repo[commit.tree]
@@ -167,14 +243,51 @@ class GitCommitStore(KeyValueStore):
                     yield o.path.decode("ascii")
 
     def _open(self, key):
+        """
+
+        Parameters
+        ----------
+        key :
+
+
+        Returns
+        -------
+
+        """
         return BytesIO(self._get(key))
 
     def _put_file(self, key, file):
+        """
+
+        Parameters
+        ----------
+        key :
+
+        file :
+
+
+        Returns
+        -------
+
+        """
         # FIXME: it may be worth to try to move large files directly into the
         #        store here
         return self._put(key, file.read())
 
     def _put(self, key, data):
+        """
+
+        Parameters
+        ----------
+        key :
+
+        data :
+
+
+        Returns
+        -------
+
+        """
         commit = self._create_top_commit()
         commit.message = ("Updated key {}".format(self.subdir + "/" + key)).encode(
             "utf8"

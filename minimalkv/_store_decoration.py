@@ -2,6 +2,19 @@ from minimalkv.decorator import ReadOnlyDecorator, URLEncodeKeysDecorator
 
 
 def decorate_store(store, decoratorname):
+    """
+
+    Parameters
+    ----------
+    store :
+
+    decoratorname :
+
+
+    Returns
+    -------
+
+    """
     decoratorname_part = decoratorname.split("(")[0]
     if decoratorname_part == "urlencode":
         return URLEncodeKeysDecorator(store)

@@ -10,7 +10,22 @@ from .decorator import StoreDecorator
 
 
 class _HMACFileReader(object):
+    """ """
+
     def __init__(self, hm, source):
+        """
+
+        Parameters
+        ----------
+        hm :
+
+        source :
+
+
+        Returns
+        -------
+
+        """
         self.hm = hm
         self.source = source
 
@@ -22,6 +37,17 @@ class _HMACFileReader(object):
             )
 
     def read(self, n=None):
+        """
+
+        Parameters
+        ----------
+        n :
+             (Default value = None)
+
+        Returns
+        -------
+
+        """
         if b"" == self.buffer or 0 == n:
             return b""
 
@@ -47,18 +73,39 @@ class _HMACFileReader(object):
         return rv
 
     def close(self):
+        """ """
         self.source.close()
 
     def __enter__(self):
+        """ """
         return self
 
     def __exit__(self, *args):
+        """
+
+        Parameters
+        ----------
+        *args :
+
+
+        Returns
+        -------
+
+        """
         self.close()
 
 
 class VerificationException(Exception):
     """This exception is thrown whenever there was an error with an
-    authenticity check performed by any of the decorators in this module."""
+    authenticity check performed by any of the decorators in this module.
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+    """
 
     pass
 
@@ -88,15 +135,50 @@ class HMACDecorator(StoreDecorator):
     can alter any data. The key used to store data is also used to extend the
     HMAC secret key, making it impossible to copy a valid message over to a
     different key.
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+
     """
 
     def __init__(self, secret_key, decorated_store, hashfunc=hashlib.sha256):
+        """
+
+        Parameters
+        ----------
+        secret_key :
+
+        decorated_store :
+
+        hashfunc :
+             (Default value = hashlib.sha256)
+
+        Returns
+        -------
+
+        """
         super(HMACDecorator, self).__init__(decorated_store)
 
         self.__hashfunc = hashfunc
         self.__secret_key = bytes(secret_key)
 
     def __new_hmac(self, key, msg=None):
+        """
+
+        Parameters
+        ----------
+        key :
+
+        msg :
+             (Default value = None)
+
+        Returns
+        -------
+
+        """
         if not msg:
             msg = b""
 
@@ -110,6 +192,17 @@ class HMACDecorator(StoreDecorator):
         return hm
 
     def get(self, key):
+        """
+
+        Parameters
+        ----------
+        key :
+
+
+        Returns
+        -------
+
+        """
         buf = self._dstore.get(key)
         hm = self.__new_hmac(key)
         hash = buf[-hm.digest_size :]
@@ -125,6 +218,19 @@ class HMACDecorator(StoreDecorator):
         return buf
 
     def get_file(self, key, file):
+        """
+
+        Parameters
+        ----------
+        key :
+
+        file :
+
+
+        Returns
+        -------
+
+        """
         if isinstance(file, str):
             try:
                 f = open(file, "wb")
@@ -152,18 +258,76 @@ class HMACDecorator(StoreDecorator):
                     break
 
     def open(self, key):
+        """
+
+        Parameters
+        ----------
+        key :
+
+
+        Returns
+        -------
+
+        """
         source = self._dstore.open(key)
         return _HMACFileReader(self.__new_hmac(key), source)
 
     def put(self, key, value, *args, **kwargs):
+        """
+
+        Parameters
+        ----------
+        key :
+
+        value :
+
+        *args :
+
+        **kwargs :
+
+
+        Returns
+        -------
+
+        """
         # just append hmac and put
         data = value + self.__new_hmac(key, value).digest()
         return self._dstore.put(key, data, *args, **kwargs)
 
     def copy(self, source, dest):
+        """
+
+        Parameters
+        ----------
+        source :
+
+        dest :
+
+
+        Returns
+        -------
+
+        """
         raise NotImplementedError
 
     def put_file(self, key, file, *args, **kwargs):
+        """
+
+        Parameters
+        ----------
+        key :
+
+        file :
+
+        *args :
+
+        **kwargs :
+
+
+        Returns
+        -------
+
+        """
         hm = self.__new_hmac(key)
         bufsize = 1024 * 1024
 

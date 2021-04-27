@@ -8,17 +8,27 @@ TRUEVALUES = (u"true",)
 def url2dict(url, raise_on_extra_params=False):
     """
 
-    :param url: Access-URL, see below for supported forms
-    :return: Parameter dictionary suitable for get_store()
+    Parameters
+    ----------
+    url :
+        Access-URL, see below for supported forms
+    raise_on_extra_params :
+         (Default value = False)
 
-    memory://
-    redis://[[password@]host[:port]][/db]
-    fs://path
-    s3://access_key:secret_key@endpoint/bucket[?create_if_missing=true]
-    azure://account_name:account_key@container[?create_if_missing=true][?max_connections=2]
-    azure://account_name:shared_access_signature@container?use_sas&create_if_missing=false[?max_connections=2&socket_timeout=(20,100)]
-    azure://account_name:shared_access_signature@container?use_sas&create_if_missing=false[?max_connections=2&socket_timeout=(20,100)][?max_block_size=4*1024*1024&max_single_put_size=64*1024*1024]
-    gcs://<base64 encoded credentialsJSON>@bucket_name[?create_if_missing=true][?bucket_creation_location=EUROPE-WEST1]
+    Returns
+    -------
+    type
+        Parameter dictionary suitable for get_store()
+
+        memory://
+        redis://[[password@]host[:port]][/db]
+        fs://path
+        s3://access_key:secret_key@endpoint/bucket[?create_if_missing=true]
+        azure://account_name:account_key@container[?create_if_missing=true][?max_connections=2]
+        azure://account_name:shared_access_signature@container?use_sas&create_if_missing=false[?max_connections=2&socket_timeout=(20,100)]
+        azure://account_name:shared_access_signature@container?use_sas&create_if_missing=false[?max_connections=2&socket_timeout=(20,100)][?max_block_size=4*1024*1024&max_single_put_size=64*1024*1024]
+        gcs://<base64 encoded credentialsJSON>@bucket_name[?create_if_missing=true][?bucket_creation_location=EUROPE-WEST1]
+
     """
     u = urisplit(url)
     parsed = dict(
@@ -54,6 +64,27 @@ def url2dict(url, raise_on_extra_params=False):
 
 
 def extract_params(scheme, host, port, path, query, userinfo):
+    """
+
+    Parameters
+    ----------
+    scheme :
+
+    host :
+
+    port :
+
+    path :
+
+    query :
+
+    userinfo :
+
+
+    Returns
+    -------
+
+    """
     if scheme in ("memory", "hmemory"):
         return {}
     if scheme in ("redis", "hredis"):
@@ -110,7 +141,17 @@ def extract_params(scheme, host, port, path, query, userinfo):
 
 def _parse_userinfo(userinfo):
     """Try to split the URL's userinfo (the part between :// and @) into fields
-    separated by :. If anything looks wrong, remind user to percent-encode values."""
+    separated by :. If anything looks wrong, remind user to percent-encode values.
+
+    Parameters
+    ----------
+    userinfo :
+
+
+    Returns
+    -------
+
+    """
     if hasattr(userinfo, "split"):
         parts = userinfo.split(u":", 1)
 

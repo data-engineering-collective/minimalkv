@@ -13,6 +13,17 @@ def map_gcloud_exceptions(key=None, error_codes_pass=()):
     This function exists so the gcstore module can be imported
     without needing to install google-cloud-storage (as we lazily
     import the google library)
+
+    Parameters
+    ----------
+    key :
+         (Default value = None)
+    error_codes_pass :
+         (Default value = ())
+
+    Returns
+    -------
+
     """
     from google.api_core.exceptions import ClientError
     from google.cloud.exceptions import GoogleCloudError, NotFound
@@ -32,6 +43,8 @@ def map_gcloud_exceptions(key=None, error_codes_pass=()):
 
 
 class GoogleCloudStore(KeyValueStore):
+    """ """
+
     def __init__(
         self,
         credentials,
@@ -42,20 +55,22 @@ class GoogleCloudStore(KeyValueStore):
     ):
         """A store using `Google Cloud storage <https://cloud.google.com/storage>`_ as a backend.
 
-        :param: credentials: Either the path to a `credentials JSON file
-                             <https://cloud.google.com/docs/authentication/production>`_
-                             or an instance of *google.auth.credentials.Credentials*.
-        :param bucket_name: Name of the bucket the blobs will be stored in.
-                            Needs to follow the `naming conventions
-                            <https://cloud.google.com/storage/docs/naming-buckets>`_.
-        :param create_if_missing: Creates the bucket if it doesn't exist yet.
-                                  The bucket's ACL will be the default `ACL
-                                  <https://cloud.google.com/storage/docs/access-control/lists#default>`_.
-        :param bucket_creation_location: Location to create the bucket in,
-                                       if the bucket doesn't exist yet. One of `Bucket locations
-                                       <https://cloud.google.com/storage/docs/locations>`_.
-        :param project: name of the project. If credentials JSON is passed,
-                        value of *project* will be ignored as it can be inferred.
+        Parameters
+        ----------
+        credentials :
+
+        bucket_name: str :
+
+        create_if_missing :
+             (Default value = True)
+        bucket_creation_location :
+             (Default value = "EUROPE-WEST3")
+        project :
+             (Default value = None)
+
+        Returns
+        -------
+
         """
         self._credentials = credentials
         self.bucket_name = bucket_name
@@ -68,6 +83,7 @@ class GoogleCloudStore(KeyValueStore):
     # and just (re)creating the client & bucket when they're used (again).
     @lazy_property
     def _bucket(self):
+        """ """
         if self.create_if_missing and not self._client.lookup_bucket(self.bucket_name):
             return self._client.create_bucket(
                 bucket_or_name=self.bucket_name, location=self.bucket_creation_location
@@ -78,6 +94,7 @@ class GoogleCloudStore(KeyValueStore):
 
     @lazy_property
     def _client(self):
+        """ """
         from google.cloud.storage import Client
 
         if type(self._credentials) == str:
@@ -86,33 +103,114 @@ class GoogleCloudStore(KeyValueStore):
             return Client(credentials=self._credentials, project=self.project_name)
 
     def _delete(self, key: str) -> None:
+        """
+
+        Parameters
+        ----------
+        key: str :
+
+
+        Returns
+        -------
+
+        """
         with map_gcloud_exceptions(key, error_codes_pass=("NotFound",)):
             self._bucket.delete_blob(key)
 
     def _get(self, key: str) -> bytes:
+        """
+
+        Parameters
+        ----------
+        key: str :
+
+
+        Returns
+        -------
+
+        """
         blob = self._bucket.blob(key)
         with map_gcloud_exceptions(key):
             blob_bytes = blob.download_as_bytes()
         return blob_bytes
 
     def _get_file(self, key: str, file):
+        """
+
+        Parameters
+        ----------
+        key: str :
+
+        file :
+
+
+        Returns
+        -------
+
+        """
         blob = self._bucket.blob(key)
         with map_gcloud_exceptions(key):
             blob.download_to_file(file)
 
     def _has_key(self, key: str) -> bool:
+        """
+
+        Parameters
+        ----------
+        key: str :
+
+
+        Returns
+        -------
+
+        """
         return self._bucket.blob(key).exists()
 
     def iter_keys(self, prefix: str = "") -> Iterator[str]:
+        """
+
+        Parameters
+        ----------
+        prefix: str :
+             (Default value = "")
+
+        Returns
+        -------
+
+        """
         return (blob.name for blob in self._bucket.list_blobs(prefix=prefix))
 
     def _open(self, key: str):
+        """
+
+        Parameters
+        ----------
+        key: str :
+
+
+        Returns
+        -------
+
+        """
         blob = self._bucket.blob(key)
         if not blob.exists():
             raise KeyError
         return IOInterface(blob)
 
     def _put(self, key: str, data: bytes) -> str:
+        """
+
+        Parameters
+        ----------
+        key: str :
+
+        data: bytes :
+
+
+        Returns
+        -------
+
+        """
         blob = self._bucket.blob(key)
         if type(data) != bytes:
             raise IOError(f"data has to be of type 'bytes', not {type(data)}")
@@ -120,6 +218,19 @@ class GoogleCloudStore(KeyValueStore):
         return key
 
     def _put_file(self, key: str, file) -> str:
+        """
+
+        Parameters
+        ----------
+        key: str :
+
+        file :
+
+
+        Returns
+        -------
+
+        """
         blob = self._bucket.blob(key)
         with map_gcloud_exceptions(key):
             if isinstance(file, io.BytesIO):
@@ -134,6 +245,7 @@ class GoogleCloudStore(KeyValueStore):
     # skips two items: bucket & client.
     # These will be recreated after unpickling through the lazy_property decoorator
     def __getstate__(self):
+        """ """
         return {
             key: value
             for key, value in self.__dict__.items()
@@ -142,14 +254,23 @@ class GoogleCloudStore(KeyValueStore):
 
 
 class IOInterface(io.BufferedIOBase):
-    """
-    Class which provides a file-like interface to selectively read from a blob in the bucket.
-    """
+    """Class which provides a file-like interface to selectively read from a blob in the bucket."""
 
     size: int
     pos: int
 
     def __init__(self, blob):
+        """
+
+        Parameters
+        ----------
+        blob :
+
+
+        Returns
+        -------
+
+        """
         super(IOInterface, self).__init__()
         self.blob = blob
 
@@ -166,7 +287,17 @@ class IOInterface(io.BufferedIOBase):
 
     def read(self, size=-1) -> bytes:
         """Returns 'size' amount of bytes or less if there is no more data.
-        If no size is given all data is returned. size can be >= 0."""
+        If no size is given all data is returned. size can be >= 0.
+
+        Parameters
+        ----------
+        size :
+             (Default value = -1)
+
+        Returns
+        -------
+
+        """
         if self.closed:
             raise ValueError("I/O operation on closed file")
         max_size = max(0, self.size - self.pos)
@@ -190,7 +321,19 @@ class IOInterface(io.BufferedIOBase):
 
         Any seek operation which moves the position after the stream
         should succeed. tell() should report that position and read()
-        should return an empty bytes object."""
+        should return an empty bytes object.
+
+        Parameters
+        ----------
+        offset: int :
+
+        whence: int :
+             (Default value = 0)
+
+        Returns
+        -------
+
+        """
         if self.closed:
             raise ValueError("I/O operation on closed file")
         if whence == 0:
@@ -208,7 +351,9 @@ class IOInterface(io.BufferedIOBase):
         return self.pos
 
     def seekable(self) -> bool:
+        """ """
         return True
 
     def readable(self) -> bool:
+        """ """
         return True

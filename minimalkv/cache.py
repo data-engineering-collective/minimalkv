@@ -17,11 +17,32 @@ class CacheDecorator(StoreDecorator):
     store itselfs decides how large to grow the cache and which data to keep,
     which data to throw away.
 
-    :param cache: The caching backend.
-    :param store: The backing store. This is the "authorative" backend.
+    Parameters
+    ----------
+    cache :
+        The caching backend.
+    store :
+        The backing store. This is the "authorative" backend.
+
+    Returns
+    -------
+
     """
 
     def __init__(self, cache, store):
+        """
+
+        Parameters
+        ----------
+        cache :
+
+        store :
+
+
+        Returns
+        -------
+
+        """
         super(CacheDecorator, self).__init__(store)
         self.cache = cache
 
@@ -30,6 +51,15 @@ class CacheDecorator(StoreDecorator):
 
         If an exception occurs in either the cache or backing store, all are
         passing on.
+
+        Parameters
+        ----------
+        key: str :
+
+
+        Returns
+        -------
+
         """
         self._dstore.delete(key)
         self.cache.delete(key)
@@ -38,13 +68,21 @@ class CacheDecorator(StoreDecorator):
         """Implementation of :meth:`~minimalkv.KeyValueStore.get`.
 
         If a cache miss occurs, the value is retrieved, stored in the cache and
-        returned.
 
-        If the cache raises an :exc:`~IOError`, the cache is
-        ignored, and the backing store is consulted directly.
+        Parameters
+        ----------
+        key: str :
 
-        It is possible for a caching error to occur while attempting to store
-        the value in the cache. It will not be handled as well.
+
+        Returns
+        -------
+        type
+            If the cache raises an :exc:`~IOError`, the cache is
+            ignored, and the backing store is consulted directly.
+
+            It is possible for a caching error to occur while attempting to store
+            the value in the cache. It will not be handled as well.
+
         """
         try:
             return self.cache.get(key)
@@ -63,14 +101,24 @@ class CacheDecorator(StoreDecorator):
         """Implementation of :meth:`~minimalkv.KeyValueStore.get_file`.
 
         If a cache miss occurs, the value is retrieved, stored in the cache and
-        returned.
 
-        If the cache raises an :exc:`~IOError`, the retrieval cannot
-        proceed: If ``file`` was an open file, data maybe been written to it
-        already. The :exc:`~IOError` bubbles up.
+        Parameters
+        ----------
+        key: str :
 
-        It is possible for a caching error to occur while attempting to store
-        the value in the cache. It will not be handled as well.
+        file :
+
+
+        Returns
+        -------
+        type
+            If the cache raises an :exc:`~IOError`, the retrieval cannot
+            proceed: If ``file`` was an open file, data maybe been written to it
+            already. The :exc:`~IOError` bubbles up.
+
+            It is possible for a caching error to occur while attempting to store
+            the value in the cache. It will not be handled as well.
+
         """
         try:
             return self.cache.get_file(key, file)
@@ -95,6 +143,15 @@ class CacheDecorator(StoreDecorator):
 
         It is possible for a caching error to occur while attempting to store
         the value in the cache. It will not be handled as well.
+
+        Parameters
+        ----------
+        key: str :
+
+
+        Returns
+        -------
+
         """
         try:
             return self.cache.open(key)
@@ -114,6 +171,17 @@ class CacheDecorator(StoreDecorator):
         Copies the data in the backing store and removes the destination key from the cache,
          in case it was already populated.
          Does not work when the backing store does not implement copy.
+
+        Parameters
+        ----------
+        source: str :
+
+        dest: str :
+
+
+        Returns
+        -------
+
         """
         try:
             k = self._dstore.copy(source, dest)
@@ -127,6 +195,17 @@ class CacheDecorator(StoreDecorator):
         Will store the value in the backing store. After a successful or
         unsuccessful store, the cache will be invalidated by deleting the key
         from it.
+
+        Parameters
+        ----------
+        key: str :
+
+        data :
+
+
+        Returns
+        -------
+
         """
         try:
             return self._dstore.put(key, data)
@@ -139,6 +218,17 @@ class CacheDecorator(StoreDecorator):
         Will store the value in the backing store. After a successful or
         unsuccessful store, the cache will be invalidated by deleting the key
         from it.
+
+        Parameters
+        ----------
+        key: str :
+
+        file :
+
+
+        Returns
+        -------
+
         """
         try:
             return self._dstore.put_file(key, file)

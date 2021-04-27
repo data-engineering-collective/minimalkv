@@ -26,20 +26,77 @@ class HashDecorator(StoreDecorator):
 
     Overrides :meth:`.KeyValueStore.put` and :meth:`.KeyValueStore.put_file`.
     If a key of *None* is passed, the data/file is hashed using
-    ``hashfunc``, which defaults to *hashlib.sha1*."""
+    ``hashfunc``, which defaults to *hashlib.sha1*.
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+    """
 
     def __init__(self, decorated_store, hashfunc=hashlib.sha1, template=u"{}"):
+        """
+
+        Parameters
+        ----------
+        decorated_store :
+
+        hashfunc :
+             (Default value = hashlib.sha1)
+        template :
+             (Default value = u"{}")
+
+        Returns
+        -------
+
+        """
         self.hashfunc = hashfunc
         self._template = template
         super(HashDecorator, self).__init__(decorated_store)
 
     def put(self, key, data, *args, **kwargs):
+        """
+
+        Parameters
+        ----------
+        key :
+
+        data :
+
+        *args :
+
+        **kwargs :
+
+
+        Returns
+        -------
+
+        """
         if not key:
             key = self._template.format(self.hashfunc(data).hexdigest())
 
         return self._dstore.put(key, data, *args, **kwargs)
 
     def put_file(self, key, file, *args, **kwargs):
+        """
+
+        Parameters
+        ----------
+        key :
+
+        file :
+
+        *args :
+
+        **kwargs :
+
+
+        Returns
+        -------
+
+        """
         bufsize = 1024 * 1024
         phash = self.hashfunc()
 
@@ -97,22 +154,76 @@ class UUIDDecorator(StoreDecorator):
        There seems to be a bug in the uuid module that prevents initializing
        `uuidfunc` too early. For that reason, it is a string that will be
        looked up using :func:`getattr` on the :mod:`uuid` module.
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+
     """
 
     # for strange reasons, this needs to be looked up as late as possible
     uuidfunc = "uuid1"
 
     def __init__(self, store, template=u"{}"):
+        """
+
+        Parameters
+        ----------
+        store :
+
+        template :
+             (Default value = u"{}")
+
+        Returns
+        -------
+
+        """
         super(UUIDDecorator, self).__init__(store)
         self._template = template
 
     def put(self, key, data, *args, **kwargs):
+        """
+
+        Parameters
+        ----------
+        key :
+
+        data :
+
+        *args :
+
+        **kwargs :
+
+
+        Returns
+        -------
+
+        """
         if not key:
             key = str(getattr(uuid, self.uuidfunc)())
 
         return self._dstore.put(self._template.format(key), data, *args, **kwargs)
 
     def put_file(self, key, file, *args, **kwargs):
+        """
+
+        Parameters
+        ----------
+        key :
+
+        file :
+
+        *args :
+
+        **kwargs :
+
+
+        Returns
+        -------
+
+        """
         if not key:
             key = str(getattr(uuid, self.uuidfunc)())
 

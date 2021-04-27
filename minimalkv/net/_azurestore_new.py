@@ -11,7 +11,19 @@ from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
 
 @contextmanager
 def map_azure_exceptions(key=None, error_codes_pass=()):
-    """Map Azure-specific exceptions to the minimalkv-API."""
+    """Map Azure-specific exceptions to the minimalkv-API.
+
+    Parameters
+    ----------
+    key :
+         (Default value = None)
+    error_codes_pass :
+         (Default value = ())
+
+    Returns
+    -------
+
+    """
     from azure.core.exceptions import AzureError
 
     try:
@@ -26,6 +38,8 @@ def map_azure_exceptions(key=None, error_codes_pass=()):
 
 
 class AzureBlockBlobStore(KeyValueStore):
+    """ """
+
     def __init__(
         self,
         conn_string=None,
@@ -38,9 +52,33 @@ class AzureBlockBlobStore(KeyValueStore):
         checksum=False,
         socket_timeout=None,
     ):
-        """
-        Note that socket_timeout is unused;
+        """Note that socket_timeout is unused;
         it only exist for backward compatibility.
+
+        Parameters
+        ----------
+        conn_string :
+             (Default value = None)
+        container :
+             (Default value = None)
+        public :
+             (Default value = False)
+        create_if_missing :
+             (Default value = True)
+        max_connections :
+             (Default value = 2)
+        max_block_size :
+             (Default value = None)
+        max_single_put_size :
+             (Default value = None)
+        checksum :
+             (Default value = False)
+        socket_timeout :
+             (Default value = None)
+
+        Returns
+        -------
+
         """
         self.conn_string = conn_string
         self.container = container
@@ -57,6 +95,7 @@ class AzureBlockBlobStore(KeyValueStore):
     # azure.storage.blob.BlockBlobService does not support pickling.
     @lazy_property
     def blob_container_client(self):
+        """ """
         from azure.storage.blob import BlobServiceClient
 
         kwargs = {}
@@ -78,16 +117,49 @@ class AzureBlockBlobStore(KeyValueStore):
         return container_client
 
     def _delete(self, key):
+        """
+
+        Parameters
+        ----------
+        key :
+
+
+        Returns
+        -------
+
+        """
         with map_azure_exceptions(key, error_codes_pass=("BlobNotFound",)):
             self.blob_container_client.delete_blob(key)
 
     def _get(self, key):
+        """
+
+        Parameters
+        ----------
+        key :
+
+
+        Returns
+        -------
+
+        """
         with map_azure_exceptions(key):
             blob_client = self.blob_container_client.get_blob_client(key)
             downloader = blob_client.download_blob(max_concurrency=self.max_connections)
             return downloader.readall()
 
     def _has_key(self, key):
+        """
+
+        Parameters
+        ----------
+        key :
+
+
+        Returns
+        -------
+
+        """
         blob_client = self.blob_container_client.get_blob_client(key)
         with map_azure_exceptions(key, ("BlobNotFound",)):
             blob_client.get_blob_properties()
@@ -95,10 +167,22 @@ class AzureBlockBlobStore(KeyValueStore):
         return False
 
     def iter_keys(self, prefix=None):
+        """
+
+        Parameters
+        ----------
+        prefix :
+             (Default value = None)
+
+        Returns
+        -------
+
+        """
         with map_azure_exceptions():
             blobs = self.blob_container_client.list_blobs(name_starts_with=prefix)
 
         def gen_names():
+            """ """
             with map_azure_exceptions():
                 for blob in blobs:
                     yield blob.name
@@ -106,6 +190,19 @@ class AzureBlockBlobStore(KeyValueStore):
         return gen_names()
 
     def iter_prefixes(self, delimiter, prefix=u""):
+        """
+
+        Parameters
+        ----------
+        delimiter :
+
+        prefix :
+             (Default value = u"")
+
+        Returns
+        -------
+
+        """
         return (
             blob_prefix.name
             for blob_prefix in self.blob_container_client.walk_blobs(
@@ -114,11 +211,35 @@ class AzureBlockBlobStore(KeyValueStore):
         )
 
     def _open(self, key):
+        """
+
+        Parameters
+        ----------
+        key :
+
+
+        Returns
+        -------
+
+        """
         with map_azure_exceptions(key):
             blob_client = self.blob_container_client.get_blob_client(key)
             return IOInterface(blob_client, self.max_connections)
 
     def _put(self, key, data):
+        """
+
+        Parameters
+        ----------
+        key :
+
+        data :
+
+
+        Returns
+        -------
+
+        """
         from azure.storage.blob import ContentSettings
 
         if self.checksum:
@@ -140,6 +261,19 @@ class AzureBlockBlobStore(KeyValueStore):
         return key
 
     def _put_file(self, key, file):
+        """
+
+        Parameters
+        ----------
+        key :
+
+        file :
+
+
+        Returns
+        -------
+
+        """
         from azure.storage.blob import ContentSettings
 
         if self.checksum:
@@ -161,12 +295,26 @@ class AzureBlockBlobStore(KeyValueStore):
         return key
 
     def _get_file(self, key, file):
+        """
+
+        Parameters
+        ----------
+        key :
+
+        file :
+
+
+        Returns
+        -------
+
+        """
         with map_azure_exceptions(key):
             blob_client = self.blob_container_client.get_blob_client(key)
             downloader = blob_client.download_blob(max_concurrency=self.max_connections)
             downloader.readinto(file)
 
     def __getstate__(self):
+        """ """
         # keep all of __dict__, except lazy properties:
         return {
             key: value
@@ -176,11 +324,22 @@ class AzureBlockBlobStore(KeyValueStore):
 
 
 class IOInterface(io.BufferedIOBase):
-    """
-    Class which provides a file-like interface to selectively read from a blob in the blob store.
-    """
+    """Class which provides a file-like interface to selectively read from a blob in the blob store."""
 
     def __init__(self, blob_client, max_connections):
+        """
+
+        Parameters
+        ----------
+        blob_client :
+
+        max_connections :
+
+
+        Returns
+        -------
+
+        """
         super(IOInterface, self).__init__()
         self.blob_client = blob_client
         self.max_connections = max_connections
@@ -197,7 +356,17 @@ class IOInterface(io.BufferedIOBase):
 
     def read(self, size=-1):
         """Returns 'size' amount of bytes or less if there is no more data.
-        If no size is given all data is returned. size can be >= 0."""
+        If no size is given all data is returned. size can be >= 0.
+
+        Parameters
+        ----------
+        size :
+             (Default value = -1)
+
+        Returns
+        -------
+
+        """
         if self.closed:
             raise ValueError("I/O operation on closed file")
         max_size = max(0, self.size - self.pos)
@@ -222,7 +391,19 @@ class IOInterface(io.BufferedIOBase):
 
         Any seek operation which moves the position after the stream
         should succeed. tell() should report that position and read()
-        should return an empty bytes object."""
+        should return an empty bytes object.
+
+        Parameters
+        ----------
+        offset :
+
+        whence :
+             (Default value = 0)
+
+        Returns
+        -------
+
+        """
         if self.closed:
             raise ValueError("I/O operation on closed file")
         if whence == 0:
@@ -240,7 +421,9 @@ class IOInterface(io.BufferedIOBase):
         return self.pos
 
     def seekable(self):
+        """ """
         return True
 
     def readable(self):
+        """ """
         return True

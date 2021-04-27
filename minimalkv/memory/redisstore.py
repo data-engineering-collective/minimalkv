@@ -10,27 +10,100 @@ from .. import FOREVER, NOT_SET, KeyValueStore, TimeToLiveMixin
 class RedisStore(TimeToLiveMixin, KeyValueStore):
     """Uses a redis-database as the backend.
 
-    :param redis: An instance of ``redis.StrictRedis``.
+    Parameters
+    ----------
+    redis :
+        An instance of ``redis.StrictRedis``.
+
+    Returns
+    -------
+
     """
 
     def __init__(self, redis):
+        """
+
+        Parameters
+        ----------
+        redis :
+
+
+        Returns
+        -------
+
+        """
         self.redis = redis
 
     def _delete(self, key: str):
+        """
+
+        Parameters
+        ----------
+        key: str :
+
+
+        Returns
+        -------
+
+        """
         return self.redis.delete(key)
 
     def keys(self, prefix=u""):
+        """
+
+        Parameters
+        ----------
+        prefix :
+             (Default value = u"")
+
+        Returns
+        -------
+
+        """
         return list(
             map(lambda b: b.decode(), self.redis.keys(pattern=re.escape(prefix) + "*"))
         )
 
     def iter_keys(self, prefix=u""):
+        """
+
+        Parameters
+        ----------
+        prefix :
+             (Default value = u"")
+
+        Returns
+        -------
+
+        """
         return iter(self.keys(prefix))
 
     def _has_key(self, key):
+        """
+
+        Parameters
+        ----------
+        key :
+
+
+        Returns
+        -------
+
+        """
         return self.redis.exists(key)
 
     def _get(self, key):
+        """
+
+        Parameters
+        ----------
+        key :
+
+
+        Returns
+        -------
+
+        """
         val = self.redis.get(key)
 
         if val is None:
@@ -38,12 +111,51 @@ class RedisStore(TimeToLiveMixin, KeyValueStore):
         return val
 
     def _get_file(self, key, file):
+        """
+
+        Parameters
+        ----------
+        key :
+
+        file :
+
+
+        Returns
+        -------
+
+        """
         file.write(self._get(key))
 
     def _open(self, key):
+        """
+
+        Parameters
+        ----------
+        key :
+
+
+        Returns
+        -------
+
+        """
         return BytesIO(self._get(key))
 
     def _put(self, key, value, ttl_secs):
+        """
+
+        Parameters
+        ----------
+        key :
+
+        value :
+
+        ttl_secs :
+
+
+        Returns
+        -------
+
+        """
         if ttl_secs in (NOT_SET, FOREVER):
             # if we do not care about ttl, just use set
             # in redis, using SET will also clear the timeout
@@ -65,5 +177,20 @@ class RedisStore(TimeToLiveMixin, KeyValueStore):
         return key
 
     def _put_file(self, key, file, ttl_secs):
+        """
+
+        Parameters
+        ----------
+        key :
+
+        file :
+
+        ttl_secs :
+
+
+        Returns
+        -------
+
+        """
         self._put(key, file.read(), ttl_secs)
         return key

@@ -11,7 +11,19 @@ from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
 
 @contextmanager
 def map_azure_exceptions(key=None, exc_pass=()):
-    """Map Azure-specific exceptions to the minimalkv-API."""
+    """Map Azure-specific exceptions to the minimalkv-API.
+
+    Parameters
+    ----------
+    key :
+         (Default value = None)
+    exc_pass :
+         (Default value = ())
+
+    Returns
+    -------
+
+    """
     from azure.common import (
         AzureException,
         AzureHttpError,
@@ -35,6 +47,8 @@ def map_azure_exceptions(key=None, exc_pass=()):
 
 
 class AzureBlockBlobStore(KeyValueStore):
+    """ """
+
     def __init__(
         self,
         conn_string=None,
@@ -47,6 +61,33 @@ class AzureBlockBlobStore(KeyValueStore):
         checksum=False,
         socket_timeout=None,
     ):
+        """
+
+        Parameters
+        ----------
+        conn_string :
+             (Default value = None)
+        container :
+             (Default value = None)
+        public :
+             (Default value = False)
+        create_if_missing :
+             (Default value = True)
+        max_connections :
+             (Default value = 2)
+        max_block_size :
+             (Default value = None)
+        max_single_put_size :
+             (Default value = None)
+        checksum :
+             (Default value = False)
+        socket_timeout :
+             (Default value = None)
+
+        Returns
+        -------
+
+        """
         self.conn_string = conn_string
         self.container = container
         self.public = public
@@ -63,6 +104,7 @@ class AzureBlockBlobStore(KeyValueStore):
     # azure.storage.blob.BlockBlobService does not support pickling.
     @lazy_property
     def block_blob_service(self):
+        """ """
         from azure.storage.blob import BlockBlobService, PublicAccess
 
         block_blob_service = BlockBlobService(
@@ -82,10 +124,32 @@ class AzureBlockBlobStore(KeyValueStore):
         return block_blob_service
 
     def _delete(self, key):
+        """
+
+        Parameters
+        ----------
+        key :
+
+
+        Returns
+        -------
+
+        """
         with map_azure_exceptions(key=key, exc_pass=["AzureMissingResourceHttpError"]):
             self.block_blob_service.delete_blob(self.container, key)
 
     def _get(self, key):
+        """
+
+        Parameters
+        ----------
+        key :
+
+
+        Returns
+        -------
+
+        """
         with map_azure_exceptions(key=key):
             return self.block_blob_service.get_blob_to_bytes(
                 container_name=self.container,
@@ -94,10 +158,32 @@ class AzureBlockBlobStore(KeyValueStore):
             ).content
 
     def _has_key(self, key):
+        """
+
+        Parameters
+        ----------
+        key :
+
+
+        Returns
+        -------
+
+        """
         with map_azure_exceptions(key=key):
             return self.block_blob_service.exists(self.container, key)
 
     def iter_keys(self, prefix=u""):
+        """
+
+        Parameters
+        ----------
+        prefix :
+             (Default value = u"")
+
+        Returns
+        -------
+
+        """
         if prefix == "":
             prefix = None
         with map_azure_exceptions():
@@ -110,6 +196,19 @@ class AzureBlockBlobStore(KeyValueStore):
             )
 
     def iter_prefixes(self, delimiter, prefix=u""):
+        """
+
+        Parameters
+        ----------
+        delimiter :
+
+        prefix :
+             (Default value = u"")
+
+        Returns
+        -------
+
+        """
         if prefix == "":
             prefix = None
         with map_azure_exceptions():
@@ -122,12 +221,36 @@ class AzureBlockBlobStore(KeyValueStore):
             )
 
     def _open(self, key):
+        """
+
+        Parameters
+        ----------
+        key :
+
+
+        Returns
+        -------
+
+        """
         with map_azure_exceptions(key=key):
             return IOInterface(
                 self.block_blob_service, self.container, key, self.max_connections
             )
 
     def _put(self, key, data):
+        """
+
+        Parameters
+        ----------
+        key :
+
+        data :
+
+
+        Returns
+        -------
+
+        """
         from azure.storage.blob.models import ContentSettings
 
         if self.checksum:
@@ -146,6 +269,19 @@ class AzureBlockBlobStore(KeyValueStore):
             return key
 
     def _put_file(self, key, file):
+        """
+
+        Parameters
+        ----------
+        key :
+
+        file :
+
+
+        Returns
+        -------
+
+        """
         from azure.storage.blob.models import ContentSettings
 
         if self.checksum:
@@ -164,6 +300,19 @@ class AzureBlockBlobStore(KeyValueStore):
             return key
 
     def _get_file(self, key, file):
+        """
+
+        Parameters
+        ----------
+        key :
+
+        file :
+
+
+        Returns
+        -------
+
+        """
         with map_azure_exceptions(key=key):
             self.block_blob_service.get_blob_to_stream(
                 container_name=self.container,
@@ -173,6 +322,19 @@ class AzureBlockBlobStore(KeyValueStore):
             )
 
     def _get_filename(self, key, filename):
+        """
+
+        Parameters
+        ----------
+        key :
+
+        filename :
+
+
+        Returns
+        -------
+
+        """
         with map_azure_exceptions(key=key):
             self.block_blob_service.get_blob_to_path(
                 container_name=self.container,
@@ -182,6 +344,19 @@ class AzureBlockBlobStore(KeyValueStore):
             )
 
     def _put_filename(self, key, filename):
+        """
+
+        Parameters
+        ----------
+        key :
+
+        filename :
+
+
+        Returns
+        -------
+
+        """
         from azure.storage.blob.models import ContentSettings
 
         if self.checksum:
@@ -200,6 +375,7 @@ class AzureBlockBlobStore(KeyValueStore):
             return key
 
     def __getstate__(self):
+        """ """
         # keep all of __dict__, except lazy properties:
         return {
             key: value
@@ -209,11 +385,26 @@ class AzureBlockBlobStore(KeyValueStore):
 
 
 class IOInterface(io.BufferedIOBase):
-    """
-    Class which provides a file-like interface to selectively read from a blob in the blob store.
-    """
+    """Class which provides a file-like interface to selectively read from a blob in the blob store."""
 
     def __init__(self, block_blob_service, container_name, key, max_connections):
+        """
+
+        Parameters
+        ----------
+        block_blob_service :
+
+        container_name :
+
+        key :
+
+        max_connections :
+
+
+        Returns
+        -------
+
+        """
         super(IOInterface, self).__init__()
         self.block_blob_service = block_blob_service
         self.container_name = container_name
@@ -232,7 +423,17 @@ class IOInterface(io.BufferedIOBase):
 
     def read(self, size=-1):
         """Returns 'size' amount of bytes or less if there is no more data.
-        If no size is given all data is returned. size can be >= 0."""
+        If no size is given all data is returned. size can be >= 0.
+
+        Parameters
+        ----------
+        size :
+             (Default value = -1)
+
+        Returns
+        -------
+
+        """
         if self.closed:
             raise ValueError("I/O operation on closed file")
         with map_azure_exceptions(key=self.key):
@@ -262,7 +463,19 @@ class IOInterface(io.BufferedIOBase):
 
         Any seek operation which moves the position after the stream
         should succeed. tell() should report that position and read()
-        should return an empty bytes object."""
+        should return an empty bytes object.
+
+        Parameters
+        ----------
+        offset :
+
+        whence :
+             (Default value = 0)
+
+        Returns
+        -------
+
+        """
         if self.closed:
             raise ValueError("I/O operation on closed file")
         if whence == 0:
@@ -280,7 +493,9 @@ class IOInterface(io.BufferedIOBase):
         return self.pos
 
     def seekable(self):
+        """ """
         return True
 
     def readable(self):
+        """ """
         return True
