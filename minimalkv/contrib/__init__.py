@@ -28,7 +28,6 @@ class ExtendedKeyspaceMixin:
 
         :param key: The key to be checked
         """
-        # TODO: Is there any case where key is None?
         if key is not None:
             if not isinstance(key, str):
                 raise ValueError("%r is not a valid key type" % key)

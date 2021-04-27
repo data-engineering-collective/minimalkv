@@ -195,7 +195,7 @@ class KeyValueStore:
         :raises ValueError: If the key is not valid.
         :raises IOError: If there was a problem moving the file in.
         """
-        # FIXME: shouldn't we call self._check_valid_key here?
+        self._check_valid_key(key)
         if isinstance(file, str):
             return self._put_filename(key, file)
         else:
@@ -432,10 +432,6 @@ class TimeToLiveMixin:
         :raises IOError: If there was a problem moving the file in.
         :raises ValueError: If ``ttl_secs`` is invalid.
         """
-        # TODO: Remove next two lines?
-        if ttl_secs is None:
-            ttl_secs = self.default_ttl_secs
-
         self._check_valid_key(key)
 
         if isinstance(file, str):
