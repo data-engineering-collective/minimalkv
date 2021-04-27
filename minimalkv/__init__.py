@@ -26,7 +26,7 @@ key_type = str
 
 
 class KeyValueStore:
-    """
+    f"""
     Class to access a key-value store.
 
     Supported keys are ascii-strings containing alphanumeric characters or symbols out
@@ -39,15 +39,8 @@ class KeyValueStore:
 
         Parameters
         ----------
-        key :
+        key : str
             The key whose existence should be verified.
-        key: str :
-
-
-        Returns
-        -------
-        type
-            True if the key exists and False otherwise.
 
         Raises
         ------
@@ -55,7 +48,6 @@ class KeyValueStore:
             If the key is not valid.
         IOError
             If there was an error accessing the store.
-
         """
 
         self._check_valid_key(key)
@@ -64,32 +56,22 @@ class KeyValueStore:
     def __iter__(self) -> Iterable[str]:
         """Iterate over all keys in the store.
 
-        Parameters
-        ----------
-
-        Returns
-        -------
-
         Raises
         ------
         IOError
             If there was an error accessing the store.
-
         """
         return self.iter_keys()
 
-    def delete(self, key: str):
+    def delete(self, key: str) -> Optional[str]:
         """Delete data at key.
 
         Does not raise an error if the key does not exist.
 
         Parameters
         ----------
-        key: str :
-
-
-        Returns
-        -------
+        key: str
+            The key of data to be deleted.
 
         Raises
         ------
@@ -97,7 +79,6 @@ class KeyValueStore:
             If the key is not valid.
         IOError
             If there was an error deleting.
-
         """
         self._check_valid_key(key)
         return self._delete(key)
@@ -107,13 +88,8 @@ class KeyValueStore:
 
         Parameters
         ----------
-        key :
-            Value associated with the key, as a `bytes` object.
-        key: str :
-
-
-        Returns
-        -------
+        key : str
+            Value associated with the key as a ``bytes`` object.
 
         Raises
         ------
@@ -123,7 +99,6 @@ class KeyValueStore:
             If the file could not be read.
         KeyError
             If the key was not found.
-
         """
         self._check_valid_key(key)
         return self._get(key)
@@ -131,28 +106,20 @@ class KeyValueStore:
     def get_file(self, key: str, file: Union[str, File]) -> None:
         """Write data at key to file.
 
-        Like :meth:`.KeyValueStore.put_file`, this method allows backends to implement a
-        specialized function if data needs to be written to disk or streamed.
+        Like :meth:`~mininmalkv.KeyValueStore.put_file`, this method allows backends to
+        implement a specialized function if data needs to be written to disk or streamed.
 
-        If *file* is a string, contents of *key* are written to a newly created file
-        with the filename *file*. Otherwise the data will be written using the *write*
-        method of *file*.
+        If ``file`` is a string, contents of ``key`` are written to a newly created file
+        with the filename ``file``. Otherwise the data will be written using the
+        ``write`` method of ``file``.
 
         Parameters
         ----------
-        key :
+        key : str
             The key to be read.
-        file :
-            Output filename or file-like object with a *write* method.
+        file : file-like or str
+            Output filename or file-like object with a ``write`` method.
         key: str :
-
-        file: Union[str :
-
-        File] :
-
-
-        Returns
-        -------
 
         Raises
         ------
@@ -162,7 +129,6 @@ class KeyValueStore:
             If there was a problem reading or writing data.
         KeyError
             If the key was not found.
-
         """
         self._check_valid_key(key)
         if isinstance(file, str):
@@ -175,51 +141,37 @@ class KeyValueStore:
 
         Parameters
         ----------
-        prefix :
-            Only iterate over keys starting with prefix. Iterate over all
-            keys if empty.
-        prefix: str :
-             (Default value = "")
-
-        Returns
-        -------
+        prefix : str, optional, default = ''
+            Only iterate over keys starting with prefix. Iterate over all keys if empty.
 
         Raises
         ------
         IOError
             If there was an error accessing the store.
-
         """
         raise NotImplementedError
 
     def iter_prefixes(self, delimiter: str, prefix: str = "") -> Iterator[str]:
-        """Iterate over unique prefixes in the store up to delimiter, starting with prefix.
+        """
+        Iterate over unique prefixes in the store up to delimiter, starting with prefix.
 
-        If *prefix* contains *delimiter*, return the prefix up to the first occurence of
-        delimiter after the prefix.
+        If ``prefix`` contains ``delimiter``, return the prefix up to the first
+        occurence of delimiter after the prefix.
 
         The default uses an naive key iteration. Some backends may implement more
         efficient methods.
 
         Parameters
         ----------
-        delimiter :
+        delimiter : str, optional, default = ''
             Delimiter up to which to iterate over prefixes.
-        prefix :
+        prefix : str, optional, default = ''
             Only iterate over prefixes starting with prefix.
-        delimiter: str :
-
-        prefix: str :
-             (Default value = "")
-
-        Returns
-        -------
 
         Raises
         ------
         IOError
             If there was an error accessing the store.
-
         """
         dlen = len(delimiter)
         plen = len(prefix)
@@ -239,36 +191,28 @@ class KeyValueStore:
 
         Parameters
         ----------
-        prefix :
+        prefix : str, optional, default = ''
             Only list keys starting with prefix. List all keys if empty.
-        prefix: str :
-             (Default value = "")
-
-        Returns
-        -------
 
         Raises
         ------
         IOError
             If there was an error accessing the store.
-
         """
         return list(self.iter_keys(prefix))
 
     def open(self, key: str) -> File:
         """Open record at key.
 
-        Returns a read-only file-like object for reading data at key.
-
         Parameters
         ----------
-        key :
+        key : str
             Key to open.
-        key: str :
-
 
         Returns
         -------
+        file: file-like
+            Read-only file-like object for reading data at key.
 
         Raises
         ------
@@ -278,7 +222,6 @@ class KeyValueStore:
             If the file could not be read.
         KeyError
             If the key was not found.
-
         """
         self._check_valid_key(key)
         return self._open(key)
@@ -288,14 +231,10 @@ class KeyValueStore:
 
         Parameters
         ----------
-        key :
+        key : str
             The key under which the data is to be stored.
-        data :
-            Data to be stored at key, must be `bytes`.
-        key: str :
-
-        data: bytes :
-
+        data : bytes
+            Data to be stored at key, must be of type  ``bytes``.
 
         Returns
         -------
@@ -308,7 +247,6 @@ class KeyValueStore:
             If the key is not valid.
         IOError
             If storing failed or the file could not be read.
-
         """
         self._check_valid_key(key)
         if not isinstance(data, bytes):
@@ -326,20 +264,14 @@ class KeyValueStore:
 
         Parameters
         ----------
-        key :
+        key : str
             Key where to store data in file.
-        file :
-            A filename or an object with a read method.
-        key: str :
-
-        file: Union[str :
-
-        File] :
-
+        file : file-like or str
+            A filename or a file-like object with a read method.
 
         Returns
         -------
-        type
+        key: str
             The key under which data was stored.
 
         Raises
@@ -363,14 +295,13 @@ class KeyValueStore:
 
         Parameters
         ----------
-        key :
+        key : str
             The key to be checked.
-        key: str :
 
-
-        Returns
-        -------
-
+        Raises
+        ------
+        ValueError
+            If the key is not valid.
         """
         if not isinstance(key, key_type):
             raise ValueError(f"The key {key} is not a valid key type.")
@@ -378,17 +309,7 @@ class KeyValueStore:
             raise ValueError(f"The key {key} contains illegal characters.")
 
     def _delete(self, key: str):
-        """Delete the data at key in store.
-
-        Parameters
-        ----------
-        key: str :
-
-
-        Returns
-        -------
-
-        """
+        """Delete the data at key in store."""
         raise NotImplementedError
 
     def _get(self, key: str) -> bytes:
@@ -396,14 +317,8 @@ class KeyValueStore:
 
         Parameters
         ----------
-        key :
+        key : str
             Key of value to be retrieved.
-        key: str :
-
-
-        Returns
-        -------
-
         """
         buf = BytesIO()
 
@@ -416,18 +331,10 @@ class KeyValueStore:
 
         Parameters
         ----------
-        key :
+        key : str
             Key of data to be written to file.
-        file :
+        file : file-like
             File-like object with a *write* method to be written.
-        key: str :
-
-        file: File :
-
-
-        Returns
-        -------
-
         """
         bufsize = 1024 * 1024
 
@@ -446,40 +353,26 @@ class KeyValueStore:
         finally:
             source.close()
 
-    def _get_filename(self, key: str, filename: str):
+    def _get_filename(self, key: str, filename: str) -> None:
         """Write data at key to file at filename.
 
         Parameters
         ----------
-        key :
+        key : str
             Key of data to be written to file at filename.
-        file :
-            File-like object to be written.
-        key: str :
-
-        filename: str :
-
-
-        Returns
-        -------
-
+        filename : str
+            Name of file to be written.
         """
         with open(filename, "wb") as dest:
             return self._get_file(key, dest)
 
     def _has_key(self, key: str) -> bool:
-        """Check existence of key in store.
+        """Check the existence of key in store.
 
         Parameters
         ----------
-        key :
+        key : str
             Key to check the existance of.
-        key: str :
-
-
-        Returns
-        -------
-
         """
         return key in self.keys()
 
@@ -488,33 +381,30 @@ class KeyValueStore:
 
         Parameters
         ----------
-        key :
+        key : str
             Key of record to open.
-        key: str :
-
 
         Returns
         -------
-
+        file: file-like
+            Opened file.
         """
         raise NotImplementedError
 
-    def _put(self, key: str, data: bytes):
+    def _put(self, key: str, data: bytes) -> str:
         """Store bytestring data at key.
 
         Parameters
         ----------
-        key :
+        key : str
             Key under which data should be stored.
-        data :
+        data : bytes
             Data to be stored.
-        key: str :
-
-        data: bytes :
-
 
         Returns
         -------
+        key : str
+            Key where data was stored.
 
         """
         return self._put_file(key, BytesIO(data))
@@ -524,17 +414,15 @@ class KeyValueStore:
 
         Parameters
         ----------
-        key :
+        key : str
             Key at which to store contents of file.
-        file :
+        file : file-like
             File-like object to store data from.
-        key: str :
-
-        file: File :
-
 
         Returns
         -------
+        key : str
+            Key where data was stored.
 
         """
         raise NotImplementedError
@@ -544,17 +432,15 @@ class KeyValueStore:
 
         Parameters
         ----------
-        key :
+        key : str
             Key under which data should be stored.
-        file :
+        filename : str
             Filename of file to store.
-        key: str :
-
-        filename: str :
-
 
         Returns
         -------
+        key: str
+            Key where data was stored.
 
         """
         with open(filename, "rb") as source:
@@ -567,20 +453,18 @@ class UrlMixin:
     _check_valid_key: Callable
 
     def url_for(self, key: str) -> str:
-        """Return a full external URL that can be used to retrieve data at *key*.
+        """Return a full external URL that can be used to retrieve data at ``key``.
 
-        Only checks whether *key* is valid.
+        Only checks whether ``key`` is valid.
 
         Parameters
         ----------
-        key :
+        key : str
             The key for which to generate a url for.
-        key: str :
-
 
         Returns
         -------
-        type
+        url: str
             A string containing a URL to access data at key.
 
         Raises
@@ -593,15 +477,17 @@ class UrlMixin:
         return self._url_for(key)
 
     def _url_for(self, key: str) -> str:
-        """
+        """Return a full external URL that can be used to retrieve data at ``key``.
 
         Parameters
         ----------
-        key: str :
-
+        key : str
+            The key for which to generate a url for.
 
         Returns
         -------
+        url: str
+            A string containing a URL to access data at key.
 
         """
         raise NotImplementedError
@@ -632,12 +518,6 @@ class TimeToLiveMixin:
        ``ttl_secs`` argument. For more information on how to implement
        backends, see :ref:`implement`.
 
-    Parameters
-    ----------
-
-    Returns
-    -------
-
     """
 
     ttl_support = True
@@ -654,20 +534,22 @@ class TimeToLiveMixin:
     def _valid_ttl(
         self, ttl_secs: Optional[Union[float, int, str]]
     ) -> Union[float, int, str]:
-        """Check ttl_secs for validity and replace None with default.
+        """Check ``ttl_secs`` for validity and replace ``None`` with default.
 
         Parameters
         ----------
-        ttl_secs: Optional[Union[float :
+        ttl_secs: numeric or string or None
+            Time to live. Numeric or one of ``minimalkv.FOREVER`` or
+            ``minimalkv.NOT_SET``. ``None`` will be replaced with
+            ``minimalkv.TimeToLiveMixin.default_ttl_secs``.
 
-        int :
-
-        str]] :
-
-
-        Returns
-        -------
-
+        Raises
+        ------
+        ValueError:
+            If ``ttl_secs`` is neither numeric, ``None`` nor one of ``NOT_SET`` and
+            ``FOREVER``.
+        ValueError:
+            If ``ttl_secs`` is a negative numeric.
         """
         if ttl_secs is None:
             ttl_secs = self.default_ttl_secs
@@ -685,36 +567,26 @@ class TimeToLiveMixin:
 
     def put(
         self, key: str, data: bytes, ttl_secs: Optional[Union[str, float, int]] = None
-    ):
+    ) -> str:
         """Store bytestring data at key.
 
-        If *ttl_secs* is a positive number, the key will expire after *ttl_secs*. Other
-        possible values for *ttl_secs* are `minimalkv.FOREVER` (no expiration) and
-        `minimalkv.NOT_SET` (no TTL configuration). `None` will be replaced with
-        `minimalkv.TimeToLiveMixin.default_ttl_secs`.
+        If ``ttl_secs`` is a positive number, the key will expire after ``ttl_secs``.
+        Other possible values for ``ttl_secs`` are ``minimalkv.FOREVER`` (no expiration)
+        and ``minimalkv.NOT_SET`` (no TTL configuration). ``None`` will be replaced with
+        ``minimalkv.TimeToLiveMixin.default_ttl_secs``.
 
         Parameters
         ----------
-        key :
+        key : str
             The key under which the data is to be stored.
-        data :
-            Data to be stored at key, must be `bytes`.
-        ttl_secs :
+        data : bytes
+            Data to be stored at key, must be of types ``bytes``.
+        ttl_secs : numeric or str
             Number of seconds until the key expires.
-        key: str :
-
-        data: bytes :
-
-        ttl_secs: Optional[Union[str :
-
-        float :
-
-        int]] :
-             (Default value = None)
 
         Returns
         -------
-        type
+        key: str
             The key under which data was stored.
 
         Raises
@@ -737,44 +609,32 @@ class TimeToLiveMixin:
         key: str,
         file: Union[str, File],
         ttl_secs: Optional[Union[float, int, str]] = None,
-    ):
+    ) -> str:
         """Store contents of file at key.
 
-        Store data from a file into key. *file* can be a string, which will be
-        interpreted as a filename, or an object with a *read()* method.
+        Store data from a file into key. ``file`` can be a string, which will be
+        interpreted as a filename, or an object with a ``read()`` method.
 
-        If *file* is a filename, the file might be removed while storing to avoid
+        If ``file`` is a filename, the file might be removed while storing to avoid
         unnecessary copies. To prevent this, pass the opened file instead.
 
-        If *ttl_secs* is a positive number, the key will expire after *ttl_secs*. Other
-        possible values for *ttl_secs* are `minimalkv.FOREVER` (no expiration) and
-        `minimalkv.NOT_SET` (no TTL configuration). `None` will be replaced with
-        `minimalkv.TimeToLiveMixin.default_ttl_secs`.
+        If ``ttl_secs`` is a positive number, the key will expire after ``ttl_secs``.
+        Other possible values for ``ttl_secs`` are `minimalkv.FOREVER` (no expiration)
+        and ``minimalkv.NOT_SET`` (no TTL configuration). ``None`` will be replaced with
+        ``minimalkv.TimeToLiveMixin.default_ttl_secs``.
 
         Parameters
         ----------
-        key :
+        key : str
             Key where to store data in file.
-        file :
+        file : file-like or str
             A filename or an object with a read method.
-        ttl_secs :
+        ttl_secs : str or numeric or None, optional, default = None
             Number of seconds until the key expires.
-        key: str :
-
-        file: Union[str :
-
-        File] :
-
-        ttl_secs: Optional[Union[float :
-
-        int :
-
-        str]] :
-             (Default value = None)
 
         Returns
         -------
-        type
+        key: str
             The key under which data was stored.
 
         Raises
@@ -797,24 +657,22 @@ class TimeToLiveMixin:
     # default implementations similar to KeyValueStore below:
     def _put(
         self, key: str, data: bytes, ttl_secs: Optional[Union[str, float, int]] = None
-    ):
-        """
+    ) -> str:
+        """Store bytestring data at key.
 
         Parameters
         ----------
-        key: str :
-
-        data: bytes :
-
-        ttl_secs: Optional[Union[str :
-
-        float :
-
-        int]] :
-             (Default value = None)
+        key : str
+            Key under which data should be stored.
+        data : bytes
+            Data to be stored.
+        ttl_secs : str or numeric or None, optional, default = None
+            Number of seconds until the key expires.
 
         Returns
         -------
+        key : str
+            Key where data was stored.
 
         """
         return self._put_file(key, BytesIO(data), ttl_secs)
@@ -822,23 +680,21 @@ class TimeToLiveMixin:
     def _put_file(
         self, key: str, file: File, ttl_secs: Optional[Union[str, float, int]] = None
     ):
-        """
+        """Store contents of file at key.
 
         Parameters
         ----------
-        key: str :
-
-        file: File :
-
-        ttl_secs: Optional[Union[str :
-
-        float :
-
-        int]] :
-             (Default value = None)
+        key : str
+            Key under which data should be stored.
+        file : file-like
+            File-like object with a ``read`` method.
+        ttl_secs : str or numeric or None, optional, default = None
+            Number of seconds until the key expires.
 
         Returns
         -------
+        key : str
+            Key where data was stored.
 
         """
         raise NotImplementedError
@@ -846,23 +702,21 @@ class TimeToLiveMixin:
     def _put_filename(
         self, key: str, filename: str, ttl_secs: Optional[Union[str, float, int]] = None
     ):
-        """
+        """Store contents of file at key.
 
         Parameters
         ----------
-        key: str :
-
-        filename: str :
-
-        ttl_secs: Optional[Union[str :
-
-        float :
-
-        int]] :
-             (Default value = None)
+        key : str
+            Key under which data should be stored.
+        filename : str
+            Filename of file from which to read data.
+        ttl_secs : str or numeric or None, optional, default = None
+            Number of seconds until the key expires.
 
         Returns
         -------
+        key : str
+            Key where data was stored.
 
         """
         with open(filename, "rb") as source:
@@ -871,13 +725,7 @@ class TimeToLiveMixin:
 
 class UrlKeyValueStore(UrlMixin, KeyValueStore):
     """.. deprecated:: 0.9
-       Use the :class:`.UrlMixin` instead.
-
-    Parameters
-    ----------
-
-    Returns
-    -------
+    Use the :class:`.UrlMixin` instead.
 
     """
 
@@ -890,23 +738,28 @@ class CopyMixin(object):
     _check_valid_key: Callable
     _delete: Callable
 
-    def copy(self, source: str, dest: str):
-        """Copies data at source to dest. The destination is overwritten if it does exist.
+    def copy(self, source: str, dest: str) -> str:
+        """Copies data at key ``source`` to key ``dest``.
+
+        The destination is overwritten if it does exist.
 
         Parameters
         ----------
-        source :
+        source : str
             The source key of data to copy.
-        dest :
+        dest : str
             The destination for the copy.
-        source: str :
 
-        dest: str :
-
+        Raises
+        ------
+        ValueError
+            If ``source`` is not a valid key.
+        ValueError
+            If ``dest`` is not a valid key.
 
         Returns
         -------
-        type
+        key : str
             The destination key.
 
         """
@@ -915,38 +768,47 @@ class CopyMixin(object):
         return self._copy(source, dest)
 
     def _copy(self, source: str, dest: str):
-        """
+        """Copies data at key ``source`` to key ``dest``.
+
+        The destination is overwritten if it does exist.
 
         Parameters
         ----------
-        source: str :
-
-        dest: str :
-
+        source : str
+            The source key of data to copy.
+        dest : str
+            The destination for the copy.
 
         Returns
         -------
+        key : str
+            The destination key.
 
         """
         raise NotImplementedError
 
     def move(self, source: str, dest: str) -> str:
-        """Moves data at source to dest. The destination is overwritten if it does exist.
+        """Moves data from key ``source`` to key ``dest``.
+
+        The destination is overwritten if it does exist.
 
         Parameters
         ----------
-        source :
+        source : str
             The source key of data to be moved.
-        dest :
+        dest : str
             The destination for the data.
-        source: str :
 
-        dest: str :
-
+        Raises
+        ------
+        ValueError
+            If ``source`` is not a valid key.
+        ValueError
+            If ``dest`` is not a valid key.
 
         Returns
         -------
-        type
+        key : str
             The destination key.
 
         """
@@ -955,17 +817,21 @@ class CopyMixin(object):
         return self._move(source, dest)
 
     def _move(self, source: str, dest: str) -> str:
-        """
+        """Moves data from key ``source`` to key ``dest``.
+
+        The destination is overwritten if it does exist.
 
         Parameters
         ----------
-        source: str :
-
-        dest: str :
-
+        source : str
+            The source key of data to be moved.
+        dest : str
+            The destination for the data.
 
         Returns
         -------
+        key : str
+            The destination key.
 
         """
         self._copy(source, dest)
@@ -976,30 +842,27 @@ class CopyMixin(object):
 def get_store_from_url(url: str) -> "KeyValueStore":
     """Take a URL and return a minimalkv store according to the parameters in the URL.
 
-    .. note::
-       User credentials like secret keys have to be percent-encoded before they can be
-       used in a URL (see *azure* and *s3* store types), since they can contain characters
-       that are not valid in this part of a URL, like forward-slashes.
-
-
-       You can use Python to percent-encode your secret key on the commandline like so::
-
-           $ python -c "import urllib; print urllib.quote_plus('''dead/beef''')"
-           dead%2Fbeef
-
     Parameters
     ----------
-    url :
-        Access-URL, see below for supported forms
-    url: str :
+    url : str
+        Access-URL, see below for supported formats.
 
+    Returns:
+    store : KeyValueStore
+        Value Store as described in url.
 
-    Returns
-    -------
-    type
-        Parameter dictionary suitable for get_store()
+    Notes
+    -----
+    User credentials like secret keys have to be percent-encoded before they can be used
+    in a URL (see ``azure`` and ``s3`` store types), since they can contain characters
+    that are not valid in this part of a URL, like forward-slashes.
 
-        Store types and URL forms:
+    You can use Python to percent-encode your secret key on the commandline like so::
+
+        $ python -c "import urllib; print urllib.quote_plus('''dead/beef''')"
+        dead%2Fbeef
+
+    Store types and URL forms:
 
         * DictStore: ``memory://``
         * RedisStore: ``redis://[[password@]host[:port]][/db]``
@@ -1010,14 +873,15 @@ def get_store_from_url(url: str) -> "KeyValueStore":
         * AzureBlockBlockStorage (SAS): ``azure://account_name:shared_access_signature@container?use_sas&create_if_missing=false[?max_connections=2&socket_timeout=(20,100)]``
         * AzureBlockBlockStorage (SAS): ``azure://account_name:shared_access_signature@container?use_sas&create_if_missing=false[?max_connections=2&socket_timeout=(20,100)][?max_block_size=4*1024*1024&max_single_put_size=64*1024*1024]``
         * GoogleCloudStorage: ``gcs://<base64 encoded credentials JSON>@bucket_name[?create_if_missing=true][&bucket_creation_location=EUROPE-WEST1]``
-        Get the encoded credentials as string like so:
 
-        .. code-block:: python
+    Get the encoded credentials as string like so:
 
-        from pathlib import Path
-        import base64
-        json_as_bytes = Path(<path_to_json>).read_bytes()
-        json_b64_encoded = base64.urlsafe_b64encode(b).decode()
+    .. code-block:: python
+
+    from pathlib import Path
+    import base64
+    json_as_bytes = Path(<path_to_json>).read_bytes()
+    json_b64_encoded = base64.urlsafe_b64encode(b).decode()
 
     """
     return get_store(**url2dict(url))
@@ -1026,10 +890,10 @@ def get_store_from_url(url: str) -> "KeyValueStore":
 def get_store(
     type: str, create_if_missing: bool = True, **params: Any
 ) -> "KeyValueStore":
-    """Return a storage object according to the `type` and additional parameters.
+    """Return a storage object according to the ``type`` and additional parameters.
 
-    The *type* must be one of the types below, where each allows
-    different parameters:
+    The ``type`` must be one of the types below, where each allows requires different
+    parameters:
 
     * ``"azure"``: Returns a ``minimalkv.azure.AzureBlockBlobStorage``. Parameters are
       ``"account_name"``, ``"account_key"``, ``"container"``, ``"use_sas"`` and ``"create_if_missing"`` (default: ``True``).
@@ -1071,22 +935,19 @@ def get_store(
 
     Parameters
     ----------
-    str :
-        type: Type of storage to open, with optional storage decorators
-    bool :
-        create_if_missing: Create the "root" of the storage (Azure container, parent directory, S3 bucket, etc.).
-        Has no effect for stores where this makes no sense, like `redis` or `memory`.
-    kwargs :
-        Parameters specific to the Store-clas
-    type: str :
-
-    create_if_missing: bool :
-         (Default value = True)
-    **params: Any :
-
+    type : str
+        Type of storage to open, with optional storage decorators.
+    create_if_missing : bool, optional, default = True
+        Create the "root" of the storage (Azure container, parent directory, S3 bucket,
+        etc.). Has no effect for stores where this makes no sense, like ``redis`` or
+        ``memory``.
+    kwargs
+        Parameters specific to the store type.
 
     Returns
     -------
+    store: KeyValueStore
+        Key value store of type ``type`` as described in ``kwargs`` parameters.
 
     """
     from ._store_creation import create_store
