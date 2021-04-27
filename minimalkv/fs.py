@@ -5,22 +5,28 @@ import urllib.parse
 from typing import Any, Callable, Iterator, List, Optional, Union, cast
 
 from minimalkv import CopyMixin, KeyValueStore, UrlMixin
+from minimalkv._typing import File
 
 
 class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
-    """Store data in files on the filesystem.
+    """Store data in files on the filesystem under a common directory.
 
-    The *FilesystemStore* stores every value as its own file on the filesystem,
-    all under a common directory.
+    When files are created, they will receive permissions depending on the current umask
+    if ``perm`` is ``None``. Otherwise, permissions are set explicitly.
 
-    Any call to :meth:`.url_for` will result in a `file://`-URL pointing
-    towards the internal storage to be generated.
+    Note that when using :func:`put_file` with a filename, an attempt to move the file
+    will be made. Permissions and ownership of the file will be preserved that way. If
+    ``perm`` is set, permissions will be changed.
+
+    The method :meth:`.url_for` can be used to get a `file://`-URL pointing to the
+    internal storage.
 
     Parameters
     ----------
-
-    Returns
-    -------
+    root : str
+        The base directory for the store.
+    perm : int or None, optional, default = None
+        The permissions for files in the filesystem store.
 
     """
 
@@ -28,47 +34,13 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
     perm: Optional[int]
     bufsize: int
 
-    def __init__(self, root, perm: Optional[int] = None):
-        """Initialize new FilesystemStore
-
-        When files are created, they will receive permissions depending on the
-        current umask if *perm* is `None`. Otherwise, permissions are set
-        expliicitly.
-
-        Note that when using :func:`put_file` with a filename, an attempt to
-        move the file will be made. Permissions and ownership of the file will
-        be preserved that way. If *perm* is set, permissions will be changed.
-
-        Parameters
-        ----------
-        root :
-            the base directory for the store
-        perm :
-            the permissions for files in the filesystem store
-        perm: Optional[int] :
-             (Default value = None)
-
-        Returns
-        -------
-
-        """
+    def __init__(self, root: str, perm: Optional[int] = None):
         super(FilesystemStore, self).__init__()
         self.root = str(root)
         self.perm = perm
         self.bufsize = 1024 * 1024  # 1m
 
-    def _remove_empty_parents(self, path):
-        """
-
-        Parameters
-        ----------
-        path :
-
-
-        Returns
-        -------
-
-        """
+    def _remove_empty_parents(self, path: str):
         parents = os.path.relpath(path, os.path.abspath(self.root))
         while len(parents) > 0:
             absparent = os.path.join(self.root, parents)
@@ -80,31 +52,9 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
             parents = os.path.dirname(parents)
 
     def _build_filename(self, key: str) -> str:
-        """
-
-        Parameters
-        ----------
-        key: str :
-
-
-        Returns
-        -------
-
-        """
         return os.path.abspath(os.path.join(self.root, key))
 
     def _delete(self, key: str) -> None:
-        """
-
-        Parameters
-        ----------
-        key: str :
-
-
-        Returns
-        -------
-
-        """
         try:
             targetname = self._build_filename(key)
             os.unlink(targetname)
@@ -114,17 +64,6 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
                 raise
 
     def _fix_permissions(self, filename: str) -> None:
-        """
-
-        Parameters
-        ----------
-        filename: str :
-
-
-        Returns
-        -------
-
-        """
         current_umask = os.umask(0)
         os.umask(current_umask)
 
@@ -135,31 +74,9 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
         os.chmod(filename, cast(int, perm))
 
     def _has_key(self, key: str) -> bool:
-        """
-
-        Parameters
-        ----------
-        key: str :
-
-
-        Returns
-        -------
-
-        """
         return os.path.exists(self._build_filename(key))
 
-    def _open(self, key: str):
-        """
-
-        Parameters
-        ----------
-        key: str :
-
-
-        Returns
-        -------
-
-        """
+    def _open(self, key: str) -> File:
         try:
             f = open(self._build_filename(key), "rb")
             return f
@@ -170,19 +87,6 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
                 raise
 
     def _copy(self, source: str, dest: str) -> str:
-        """
-
-        Parameters
-        ----------
-        source: str :
-
-        dest: str :
-
-
-        Returns
-        -------
-
-        """
         try:
             source_file_name = self._build_filename(source)
             dest_file_name = self._build_filename(dest)
@@ -198,17 +102,6 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
                 raise
 
     def _ensure_dir_exists(self, path: str) -> None:
-        """
-
-        Parameters
-        ----------
-        path: str :
-
-
-        Returns
-        -------
-
-        """
         if not os.path.isdir(path):
             try:
                 os.makedirs(path)
@@ -216,24 +109,7 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
                 if not os.path.isdir(path):
                     raise e
 
-    def _put_file(self, key: str, file, *args, **kwargs) -> str:
-        """
-
-        Parameters
-        ----------
-        key: str :
-
-        file :
-
-        *args :
-
-        **kwargs :
-
-
-        Returns
-        -------
-
-        """
+    def _put_file(self, key: str, file: File, *args, **kwargs) -> str:
         bufsize = self.bufsize
 
         target = self._build_filename(key)
@@ -253,24 +129,7 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
 
         return key
 
-    def _put_filename(self, key: str, filename, *args, **kwargs) -> str:
-        """
-
-        Parameters
-        ----------
-        key: str :
-
-        filename :
-
-        *args :
-
-        **kwargs :
-
-
-        Returns
-        -------
-
-        """
+    def _put_filename(self, key: str, filename: str, *args, **kwargs) -> str:
         target = self._build_filename(key)
         self._ensure_dir_exists(os.path.dirname(target))
         shutil.move(filename, target)
@@ -280,32 +139,18 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
         return key
 
     def _url_for(self, key: str) -> str:
-        """
-
-        Parameters
-        ----------
-        key: str :
-
-
-        Returns
-        -------
-
-        """
         full = os.path.abspath(self._build_filename(key))
         parts = full.split(os.sep)
         location = "/".join(urllib.parse.quote(p, safe="") for p in parts)
         return "file://" + location
 
     def keys(self, prefix: str = "") -> List[str]:
-        """
+        """List all keys in the store starting with prefix.
 
         Parameters
         ----------
-        prefix: str :
-             (Default value = "")
-
-        Returns
-        -------
+        prefix : str, optional, default = ''
+            Only list keys starting with prefix. List all keys if empty.
 
         """
         root = os.path.abspath(self.root)
@@ -318,31 +163,29 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
         return result
 
     def iter_keys(self, prefix: str = "") -> Iterator[str]:
-        """
+        """Iterate over all keys in the store starting with prefix.
 
         Parameters
         ----------
-        prefix: str :
-             (Default value = "")
-
-        Returns
-        -------
+        prefix : str, optional, default = ''
+            Only iterate over keys starting with prefix. Iterate over all keys if empty.
 
         """
         return iter(self.keys(prefix))
 
     def iter_prefixes(self, delimiter: str, prefix: str = "") -> Iterator[str]:
         """
+        Iterate over unique prefixes in the store up to delimiter, starting with prefix.
+
+        If ``prefix`` contains ``delimiter``, return the prefix up to the first
+        occurence of delimiter after the prefix.
 
         Parameters
         ----------
-        delimiter: str :
-
-        prefix: str :
-             (Default value = "")
-
-        Returns
-        -------
+        delimiter : str, optional, default = ''
+            Delimiter up to which to iterate over prefixes.
+        prefix : str, optional, default = ''
+            Only iterate over prefixes starting with prefix.
 
         """
         if delimiter != os.sep:
@@ -355,19 +198,6 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
     def _iter_prefixes_efficient(
         self, delimiter: str, prefix: str = ""
     ) -> Iterator[str]:
-        """
-
-        Parameters
-        ----------
-        delimiter: str :
-
-        prefix: str :
-             (Default value = "")
-
-        Returns
-        -------
-
-        """
         if delimiter in prefix:
             pos = prefix.rfind(delimiter)
             search_prefix: Optional[str] = prefix[:pos]
@@ -394,23 +224,29 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
 
 
 class WebFilesystemStore(FilesystemStore):
-    """FilesystemStore that supports generating URLs suitable for web
-    applications. Most common use is to make the *root* directory of the
-    filesystem store available through a webserver. Example:
+    """
+    FilesystemStore supporting generating URLS for web applications
 
+    The most common use is to make the ``root`` directory of the filesystem store
+    available through a webserver.
 
-    Note that the prefix is simply prepended to the relative URL for the key.
-    It therefore, in most cases, must include a trailing slash.
+    Note that the prefix is simply prepended to the relative URL for the key. It must
+    therefore include a trailing slash in most cases.
 
-    *url_prefix* may also be a callable, in which case it gets called with the
+    ``url_prefix`` may also be a callable, in which case it gets called with the
     filestore and key as an argument and should return an url_prefix.
 
     Parameters
     ----------
+    root : str
+        The base directory for the store.
+    perm : int or None, optional, default = None
+        The permissions for files in the filesystem store.
+    url_prefix : Callable or str
+        Prefix that will get prepended to every url.
 
-    Returns
+    Example
     -------
-
     >>> from minimalkv.fs import WebFilesystemStore
     >>> webserver_url_prefix = 'https://some.domain.invalid/files/'
     >>> webserver_root = '/var/www/some.domain.invalid/www-data/files/'
@@ -430,42 +266,11 @@ class WebFilesystemStore(FilesystemStore):
     def __init__(
         self, root, url_prefix: Union[Callable[[Any, str], str], str], **kwargs
     ):
-        """Initialize new WebFilesystemStore.
-
-        Parameters
-        ----------
-        root :
-            see :func:`minimalkv.FilesystemStore.__init__`
-        url_prefix :
-            will get prepended to every url generated with
-            url_for.
-        url_prefix: Union[Callable[[Any :
-
-        str] :
-
-        **kwargs :
-
-
-        Returns
-        -------
-
-        """
         super(WebFilesystemStore, self).__init__(root, **kwargs)
 
         self.url_prefix = url_prefix
 
     def _url_for(self, key: str) -> str:
-        """
-
-        Parameters
-        ----------
-        key: str :
-
-
-        Returns
-        -------
-
-        """
         rel = key
 
         if callable(self.url_prefix):

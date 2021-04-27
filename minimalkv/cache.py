@@ -1,6 +1,6 @@
 from typing import Union
 
-from minimalkv import KeyValueStore
+from minimalkv import CopyMixin, KeyValueStore
 from minimalkv._typing import File
 from minimalkv.decorator import StoreDecorator
 
@@ -156,8 +156,6 @@ class CacheDecorator(StoreDecorator):
         Copies the data in the backing store and removes the destination key from the
         cache, in case it was already populated.
 
-        Does not work when the backing store does not implement copy.
-
         Parameters
         ----------
         source : str
@@ -169,12 +167,20 @@ class CacheDecorator(StoreDecorator):
         -------
         key : str
             The destination key.
+
+        Raises
+        ------
+        ValueError
+            If the underlying store does not support copy.
         """
-        try:
-            k = self._dstore.copy(source, dest)
-        finally:
-            self.cache.delete(dest)
-        return k
+        if not hasattr(self._dsctore, "copy"):
+            raise ValueError(f"Store {type(self._dsctore)} does not support copy.")
+        else:
+            try:
+                k = self._dstore.copy(source, dest)  # type: ignore
+            finally:
+                self.cache.delete(dest)
+            return k
 
     def put(self, key: str, data: bytes) -> str:
         """Store bytestring data at key.
@@ -191,7 +197,7 @@ class CacheDecorator(StoreDecorator):
 
         Returns
         -------
-        str
+        key: str
             The key under which data was stored.
 
         """

@@ -260,10 +260,10 @@ class KeyValueStore:
     def put_file(self, key: str, file: Union[str, File]) -> str:
         """Store contents of file at key.
 
-        Store data from a file into key. *file* can be a string, which will be
-        interpreted as a filename, or an object with a *read()* method.
+        Store data from a file into key. ``file`` can be a string, which will be
+        interpreted as a filename, or an object with a ``read()`` method.
 
-        If *file* is a filename, the file might be removed while storing to avoid
+        If ``file`` is a filename, the file might be removed while storing to avoid
         unnecessary copies. To prevent this, pass the opened file instead.
 
         Parameters
