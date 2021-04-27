@@ -1,22 +1,16 @@
 import os
 import os.path
+from typing import TYPE_CHECKING, Any, Dict
 
 from minimalkv.fs import FilesystemStore
 
+if TYPE_CHECKING:
+    from minimalkv import KeyValueStore
 
-def create_store(type, params):
+
+def create_store(type: str, params: Dict[str, Any]) -> "KeyValueStore":
     """
-
-    Parameters
-    ----------
-    type :
-
-    params :
-
-
-    Returns
-    -------
-
+    Create store of type ``type`` with ``params``.
     """
     if type in ("azure", "hazure"):
         return _create_store_azure(type, params)
@@ -40,19 +34,6 @@ def create_store(type, params):
 
 
 def _create_store_gcs(store_type, params):
-    """
-
-    Parameters
-    ----------
-    store_type :
-
-    params :
-
-
-    Returns
-    -------
-
-    """
     import json
 
     from google.oauth2.service_account import Credentials
@@ -74,19 +55,6 @@ def _create_store_gcs(store_type, params):
 
 
 def _create_store_azure(type, params):
-    """
-
-    Parameters
-    ----------
-    type :
-
-    params :
-
-
-    Returns
-    -------
-
-    """
     from minimalkv.net.azurestore import AzureBlockBlobStore
 
     from ._hstores import HAzureBlockBlobStore
@@ -123,19 +91,6 @@ def _create_store_azure(type, params):
 
 
 def _create_store_hs3(type, params):
-    """
-
-    Parameters
-    ----------
-    type :
-
-    params :
-
-
-    Returns
-    -------
-
-    """
     from ._boto import _get_s3bucket
     from ._hstores import HBotoStore
 
@@ -143,19 +98,6 @@ def _create_store_hs3(type, params):
 
 
 def _create_store_s3(type, params):
-    """
-
-    Parameters
-    ----------
-    type :
-
-    params :
-
-
-    Returns
-    -------
-
-    """
     from minimalkv.net.botostore import BotoStore
 
     from ._boto import _get_s3bucket
@@ -164,19 +106,6 @@ def _create_store_s3(type, params):
 
 
 def _create_store_hfs(type, params):
-    """
-
-    Parameters
-    ----------
-    type :
-
-    params :
-
-
-    Returns
-    -------
-
-    """
     if params["create_if_missing"] and not os.path.exists(params["path"]):
         os.makedirs(params["path"])
     from ._hstores import HFilesystemStore
@@ -185,76 +114,24 @@ def _create_store_hfs(type, params):
 
 
 def _create_store_fs(type, params):
-    """
-
-    Parameters
-    ----------
-    type :
-
-    params :
-
-
-    Returns
-    -------
-
-    """
     if params["create_if_missing"] and not os.path.exists(params["path"]):
         os.makedirs(params["path"])
     return FilesystemStore(params["path"])
 
 
 def _create_store_mem(type, params):
-    """
-
-    Parameters
-    ----------
-    type :
-
-    params :
-
-
-    Returns
-    -------
-
-    """
     from minimalkv.memory import DictStore
 
     return DictStore()
 
 
 def _create_store_hmem(type, params):
-    """
-
-    Parameters
-    ----------
-    type :
-
-    params :
-
-
-    Returns
-    -------
-
-    """
     from ._hstores import HDictStore
 
     return HDictStore()
 
 
 def _create_store_redis(type, params):
-    """
-
-    Parameters
-    ----------
-    type :
-
-    params :
-
-
-    Returns
-    -------
-
-    """
     from redis import StrictRedis
 
     from minimalkv.memory.redisstore import RedisStore
@@ -271,27 +148,6 @@ def _build_azure_url(
     use_sas=False,
     **kwargs
 ):
-    """
-
-    Parameters
-    ----------
-    account_name :
-         (Default value = None)
-    account_key :
-         (Default value = None)
-    default_endpoints_protocol :
-         (Default value = None)
-    blob_endpoint :
-         (Default value = None)
-    use_sas :
-         (Default value = False)
-    **kwargs :
-
-
-    Returns
-    -------
-
-    """
     protocol = default_endpoints_protocol or "https"
     if use_sas:
         return (

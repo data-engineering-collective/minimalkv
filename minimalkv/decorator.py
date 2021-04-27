@@ -44,6 +44,7 @@ class StoreDecorator:
         -------
 
         """
+        # TODO: Why not use getattr
         store = object.__getattribute__(self, "_dstore")
         return getattr(store, attr)
 

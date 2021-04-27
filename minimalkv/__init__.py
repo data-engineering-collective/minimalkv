@@ -89,6 +89,11 @@ class KeyValueStore:
         Parameters
         ----------
         key : str
+            The key to be read.
+
+        Returns
+        -------
+        data : str
             Value associated with the key as a ``bytes`` object.
 
         Raises
@@ -119,7 +124,6 @@ class KeyValueStore:
             The key to be read.
         file : file-like or str
             Output filename or file-like object with a ``write`` method.
-        key: str :
 
         Raises
         ------
@@ -238,7 +242,7 @@ class KeyValueStore:
 
         Returns
         -------
-        type
+        str
             The key under which data was stored.
 
         Raises

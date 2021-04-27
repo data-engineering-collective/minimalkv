@@ -6,27 +6,7 @@ def _get_s3bucket(
     force_bucket_suffix=True,
     create_if_missing=True,
 ):
-    """
-
-    Parameters
-    ----------
-    host :
-
-    bucket :
-
-    access_key :
-
-    secret_key :
-
-    force_bucket_suffix :
-         (Default value = True)
-    create_if_missing :
-         (Default value = True)
-
-    Returns
-    -------
-
-    """
+    # TODO: Write docstring.
     from boto.s3.connection import S3ResponseError  # type: ignore
     from boto.s3.connection import OrdinaryCallingFormat, S3Connection
 
