@@ -40,23 +40,24 @@ class StoreDecorator:
 
 
 class KeyTransformingDecorator(StoreDecorator):  # noqa D
+    # TODO Document KeyTransformingDecorator.
     # currently undocumented (== not advertised as a feature)
-    def _map_key(self, key: str) -> str:  # noqa D
+    def _map_key(self, key: str) -> str:
         return key
 
-    def _map_key_prefix(self, key_prefix: str) -> str:  # noqa D
+    def _map_key_prefix(self, key_prefix: str) -> str:
         return key_prefix
 
-    def _unmap_key(self, key: str) -> str:  # noqa D
+    def _unmap_key(self, key: str) -> str:
         return key
 
-    def _filter(self, key: str) -> bool:  # noqa D
+    def _filter(self, key: str) -> bool:
         return True
 
-    def __contains__(self, key: str) -> bool:  # noqa D
+    def __contains__(self, key: str) -> bool:
         return self._map_key(key) in self._dstore
 
-    def __iter__(self) -> Iterable[str]:  # noqa D
+    def __iter__(self) -> Iterable[str]:
         return self.iter_keys()
 
     def delete(self, key: str):  # noqa D
@@ -133,17 +134,17 @@ class PrefixDecorator(KeyTransformingDecorator):
         super(PrefixDecorator, self).__init__(store)
         self.prefix = prefix
 
-    def _filter(self, key: str) -> bool:  # noqa D
+    def _filter(self, key: str) -> bool:
         return key.startswith(self.prefix)
 
-    def _map_key(self, key: str) -> str:  # noqa D
+    def _map_key(self, key: str) -> str:
         self._check_valid_key(key)
         return self.prefix + key
 
-    def _map_key_prefix(self, key_prefix: str) -> str:  # noqa D
+    def _map_key_prefix(self, key_prefix: str) -> str:
         return self.prefix + key_prefix
 
-    def _unmap_key(self, key: str) -> str:  # noqa D
+    def _unmap_key(self, key: str) -> str:
         assert key.startswith(self.prefix)
 
         return key[len(self.prefix) :]

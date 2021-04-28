@@ -95,7 +95,8 @@ class HMACDecorator(StoreDecorator):
         self.__hashfunc = hashfunc
         self.__secret_key = bytes(secret_key)
 
-    def __new_hmac(self, key, msg=None):  # noqa D
+    def __new_hmac(self, key, msg=None):
+        # TODO: Comment / Docstring to describe function
         if not msg:
             msg = b""
 

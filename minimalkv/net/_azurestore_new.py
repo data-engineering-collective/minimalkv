@@ -75,17 +75,17 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
                 )
         return container_client
 
-    def _delete(self, key):  # noqa D
+    def _delete(self, key):
         with map_azure_exceptions(key, error_codes_pass=("BlobNotFound",)):
             self.blob_container_client.delete_blob(key)
 
-    def _get(self, key):  # noqa D
+    def _get(self, key):
         with map_azure_exceptions(key):
             blob_client = self.blob_container_client.get_blob_client(key)
             downloader = blob_client.download_blob(max_concurrency=self.max_connections)
             return downloader.readall()
 
-    def _has_key(self, key):  # noqa D
+    def _has_key(self, key):
         blob_client = self.blob_container_client.get_blob_client(key)
         with map_azure_exceptions(key, ("BlobNotFound",)):
             blob_client.get_blob_properties()
@@ -111,12 +111,12 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
             )
         )
 
-    def _open(self, key):  # noqa D
+    def _open(self, key):
         with map_azure_exceptions(key):
             blob_client = self.blob_container_client.get_blob_client(key)
             return IOInterface(blob_client, self.max_connections)
 
-    def _put(self, key, data):  # noqa D
+    def _put(self, key, data):
         from azure.storage.blob import ContentSettings
 
         if self.checksum:
@@ -137,7 +137,7 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
             )
         return key
 
-    def _put_file(self, key, file):  # noqa D
+    def _put_file(self, key, file):
         from azure.storage.blob import ContentSettings
 
         if self.checksum:
@@ -158,13 +158,13 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
             )
         return key
 
-    def _get_file(self, key, file):  # noqa D
+    def _get_file(self, key, file):
         with map_azure_exceptions(key):
             blob_client = self.blob_container_client.get_blob_client(key)
             downloader = blob_client.download_blob(max_concurrency=self.max_connections)
             downloader.readinto(file)
 
-    def __getstate__(self):  # noqa D
+    def __getstate__(self):
         # keep all of __dict__, except lazy properties:
         return {
             key: value

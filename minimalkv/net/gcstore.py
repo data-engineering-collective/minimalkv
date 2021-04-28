@@ -148,7 +148,7 @@ class GoogleCloudStore(KeyValueStore):
 
     # skips two items: bucket & client.
     # These will be recreated after unpickling through the lazy_property decoorator
-    def __getstate__(self):  # noqa D
+    def __getstate__(self):
         return {
             key: value
             for key, value in self.__dict__.items()

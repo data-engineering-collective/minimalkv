@@ -34,7 +34,8 @@ def create_store(type: str, params: Dict[str, Any]) -> "KeyValueStore":
     raise ValueError("Unknown store type: " + str(type))
 
 
-def _create_store_gcs(store_type, params):  # noqa D
+def _create_store_gcs(store_type, params):
+    # TODO: Docstring with required params.
     import json
 
     from google.oauth2.service_account import Credentials
@@ -55,7 +56,8 @@ def _create_store_gcs(store_type, params):  # noqa D
     )
 
 
-def _create_store_azure(type, params):  # noqa D
+def _create_store_azure(type, params):
+    # TODO: Docstring with required params.
     from minimalkv.net.azurestore import AzureBlockBlobStore
 
     from ._hstores import HAzureBlockBlobStore
@@ -91,14 +93,16 @@ def _create_store_azure(type, params):  # noqa D
         )
 
 
-def _create_store_hs3(type, params):  # noqa D
+def _create_store_hs3(type, params):
+    # TODO: Docstring with required params.
     from ._boto import _get_s3bucket
     from ._hstores import HBotoStore
 
     return HBotoStore(_get_s3bucket(**params))
 
 
-def _create_store_s3(type, params):  # noqa D
+def _create_store_s3(type, params):
+    # TODO: Docstring with required params.
     from minimalkv.net.botostore import BotoStore
 
     from ._boto import _get_s3bucket
@@ -106,7 +110,8 @@ def _create_store_s3(type, params):  # noqa D
     return BotoStore(_get_s3bucket(**params))
 
 
-def _create_store_hfs(type, params):  # noqa D
+def _create_store_hfs(type, params):
+    # TODO: Docstring with required params.
     if params["create_if_missing"] and not os.path.exists(params["path"]):
         os.makedirs(params["path"])
     from ._hstores import HFilesystemStore
@@ -114,25 +119,29 @@ def _create_store_hfs(type, params):  # noqa D
     return HFilesystemStore(params["path"])
 
 
-def _create_store_fs(type, params):  # noqa D
+def _create_store_fs(type, params):
+    # TODO: Docstring with required params.
     if params["create_if_missing"] and not os.path.exists(params["path"]):
         os.makedirs(params["path"])
     return FilesystemStore(params["path"])
 
 
-def _create_store_mem(type, params):  # noqa D
+def _create_store_mem(type, params):
+    # TODO: Docstring with required params.
     from minimalkv.memory import DictStore
 
     return DictStore()
 
 
-def _create_store_hmem(type, params):  # noqa D
+def _create_store_hmem(type, params):
+    # TODO: Docstring with required params.
     from ._hstores import HDictStore
 
     return HDictStore()
 
 
-def _create_store_redis(type, params):  # noqa D
+def _create_store_redis(type, params):
+    # TODO: Docstring with required params.
     from redis import StrictRedis
 
     from minimalkv.memory.redisstore import RedisStore
@@ -149,6 +158,7 @@ def _build_azure_url(
     use_sas=False,
     **kwargs
 ):
+    # TODO: Docstring
     protocol = default_endpoints_protocol or "https"
     if use_sas:
         return (

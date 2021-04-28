@@ -51,7 +51,7 @@ class BotoStore(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
         self.url_valid_time = url_valid_time
         self.metadata = metadata or {}
 
-    def __new_key(self, name):  # noqa D
+    def __new_key(self, name):
         from boto.s3.key import Key
 
         k = Key(self.bucket, self.prefix + name)
