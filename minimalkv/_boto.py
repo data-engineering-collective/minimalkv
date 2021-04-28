@@ -5,7 +5,7 @@ def _get_s3bucket(
     secret_key,
     force_bucket_suffix=True,
     create_if_missing=True,
-):  # noqa D
+):
     # TODO: Write docstring.
     from boto.s3.connection import S3ResponseError  # type: ignore
     from boto.s3.connection import OrdinaryCallingFormat, S3Connection

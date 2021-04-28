@@ -35,7 +35,6 @@ class HBotoStore(ExtendedKeyspaceMixin, BotoStore):
         size : int
             Size of value at key in bytes.
         """
-        # TODO: Verify docstring.
         k = self.bucket.lookup(self.prefix + key)
         return k.size
 

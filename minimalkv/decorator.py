@@ -27,7 +27,8 @@ class StoreDecorator:
         self._dstore = store
 
     def __getattr__(self, attr):
-        # TODO: Why not use getattr
+        # Use object.__getattritbute__ as getattr  would make a recursive call to
+        # StoreDecorator.__getattr__.
         store = object.__getattribute__(self, "_dstore")
         return getattr(store, attr)
 
