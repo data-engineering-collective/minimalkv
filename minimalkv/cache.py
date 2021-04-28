@@ -1,6 +1,6 @@
 from typing import Union
 
-from minimalkv import CopyMixin, KeyValueStore
+from minimalkv import KeyValueStore
 from minimalkv._typing import File
 from minimalkv.decorator import StoreDecorator
 

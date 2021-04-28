@@ -26,7 +26,6 @@ def map_gcloud_exceptions(
         Errors to be passed.
 
     """
-    from google.api_core.exceptions import ClientError
     from google.cloud.exceptions import GoogleCloudError, NotFound
 
     try:

@@ -6,6 +6,6 @@ max-complexity = 18
 select = B,C,E,F,W,T4,B9,D
 enable-extensions = flake8-docstrings
 per-file-ignores =
-    tests/**:D101,D102,D103
+    tests/**:D101,D102,D103,E402
     examples/**:E402
 docstring-convention = numpy

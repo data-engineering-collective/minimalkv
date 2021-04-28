@@ -165,7 +165,6 @@ class TestExtendedKeyspaceFilesystemStore(
         return ExtendedKeyspaceStore(tmpdir)
 
     def test_prefix_iterator_ossep(self, store, value):
-        delimiter = u"X"
         for k in [
             u"a1" + os.sep + u"b1",
             u"a1" + os.sep + u"b1",
@@ -178,30 +177,30 @@ class TestExtendedKeyspaceFilesystemStore(
         ]:
             store.put(k, value)
 
-        l = sorted(store.iter_prefixes(os.sep))
-        assert l == [
+        out = sorted(store.iter_prefixes(os.sep))
+        assert out == [
             u"a1" + os.sep,
             u"a2" + os.sep,
             u"a3",
             u"a4" + os.sep,
         ]
 
-        l = sorted(
+        out = sorted(
             store.iter_prefixes(
                 os.sep,
                 prefix=u"a4" + os.sep,
             )
         )
-        assert l == [
+        assert out == [
             u"a4" + os.sep + "b1" + os.sep,
             u"a4" + os.sep + "b2" + os.sep,
             u"a4" + os.sep + "b3",
         ]
 
-        l = sorted(
+        out = sorted(
             store.iter_prefixes(
                 os.sep,
                 prefix=u"foo" + os.sep,
             )
         )
-        assert l == []
+        assert out == []

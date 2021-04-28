@@ -1,7 +1,7 @@
 import re
 from functools import reduce
 from io import BytesIO
-from typing import Any, Callable, Iterable, Iterator, List, Optional, Sequence, Union
+from typing import Any, Callable, Iterable, Iterator, List, Optional, Union
 
 from minimalkv._typing import File
 from minimalkv._urls import url2dict

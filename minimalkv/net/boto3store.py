@@ -1,7 +1,7 @@
 import io
 from contextlib import contextmanager
 from shutil import copyfileobj
-from typing import List, Optional, Tuple
+from typing import List
 
 from minimalkv import CopyMixin, KeyValueStore, UrlMixin
 
