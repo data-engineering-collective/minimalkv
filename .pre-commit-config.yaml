@@ -22,7 +22,7 @@ repos:
        additional_dependencies: [toml]
        verbose: true
   -   repo: https://github.com/pycqa/flake8
-      rev: '3.9.1'  # pick a git hash / tag to point to
+      rev: '3.9.1'
       hooks:
       -   id: flake8
           additional_dependencies: [flake8-docstrings, flake8-rst-docstrings]
