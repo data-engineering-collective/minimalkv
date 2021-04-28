@@ -19,29 +19,18 @@ class ExtendedKeyspaceMixin:
     and then by the desired store.
     Note: This Mixin is unsupported and might not work correctly with all backends.
 
-    Parameters
-    ----------
-
-    Returns
-    -------
-
     """
 
     def _check_valid_key(self, key: Optional[str]) -> None:
-        """Checks if a key is valid and raises a ValueError if its not.
+        """Check if a key is valid and raises a ValueError if its not.
 
         When in need of checking a key for validity, always use this
         method if possible.
 
         Parameters
         ----------
-        key :
+        key : str
             The key to be checked
-        key: Optional[str] :
-
-
-        Returns
-        -------
 
         """
         if key is not None:

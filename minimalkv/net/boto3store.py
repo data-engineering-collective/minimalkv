@@ -43,7 +43,7 @@ class Boto3SimpleKeyFile(io.RawIOBase):  # noqa D
         self.s3_object = s3_object
         self.position = 0
 
-    def __repr__(self):
+    def __repr__(self):  # noqa D
         return "<{} s3_object={!r} >".format(type(self).__name__, self.s3_object)
 
     @property
@@ -120,7 +120,7 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
     def __new_object(self, name):
         return self.bucket.Object(self.prefix + name)
 
-    def iter_keys(self, prefix=""):
+    def iter_keys(self, prefix=""):  # noqa D
         with map_boto3_exceptions():
             prefix_len = len(self.prefix)
             return map(

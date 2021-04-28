@@ -160,10 +160,10 @@ class HMACDecorator(StoreDecorator):
         data = value + self.__new_hmac(key, value).digest()
         return self._dstore.put(key, data, *args, **kwargs)  # type: ignore
 
-    def copy(self, source, dest):
+    def copy(self, source, dest):  # noqa D
         raise NotImplementedError
 
-    def put_file(self, key, file, *args, **kwargs):
+    def put_file(self, key, file, *args, **kwargs):  # noqa D
         hm = self.__new_hmac(key)
         bufsize = 1024 * 1024
 

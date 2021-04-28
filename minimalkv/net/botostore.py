@@ -7,19 +7,7 @@ from minimalkv._typing import File
 
 @contextmanager
 def map_boto_exceptions(key=None, exc_pass=()):
-    """Map boto-specific exceptions to the minimalkv-API.
-
-    Parameters
-    ----------
-    key :
-         (Default value = None)
-    exc_pass :
-         (Default value = ())
-
-    Returns
-    -------
-
-    """
+    """Map boto-specific exceptions to the minimalkv-API."""
     from boto.exception import BotoClientError, BotoServerError, StorageResponseError
 
     try:
@@ -60,7 +48,7 @@ class BotoStore(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
 
     def __upload_args(self) -> Dict[str, str]:
         """
-        Generates a dictionary of arguments to pass to set_content_from* functions.
+        Generate a dictionary of arguments to pass to ``set_content_from`` functions.
 
         This allows us to save API calls by passing the necessary parameters on with the
         upload.

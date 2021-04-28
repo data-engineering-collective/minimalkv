@@ -1,6 +1,4 @@
-"""
-This implements the AzureBlockBlobStore for `azure-storage-blob~=12`
-"""
+"""Implement the AzureBlockBlobStore for `azure-storage-blob~=12`."""
 import io
 from contextlib import contextmanager
 
@@ -164,7 +162,7 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
             downloader = blob_client.download_blob(max_concurrency=self.max_connections)
             downloader.readinto(file)
 
-    def __getstate__(self):
+    def __getstate__(self):  # noqa D
         # keep all of __dict__, except lazy properties:
         return {
             key: value
@@ -186,13 +184,13 @@ class IOInterface(io.BufferedIOBase):
         self.pos = 0
 
     def tell(self):
-        """Returns he current offset as int. Always >= 0."""
+        """Return the current offset as int. Always >= 0."""
         if self.closed:
             raise ValueError("I/O operation on closed file")
         return self.pos
 
     def read(self, size=-1):
-        """Returns 'size' amount of bytes or less if there is no more data.
+        """Return 'size' amount of bytes or less if there is no more data.
 
         If no size is given all data is returned. size can be >= 0.
 

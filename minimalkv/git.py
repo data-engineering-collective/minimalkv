@@ -16,7 +16,7 @@ def _on_tree(
     components: List[bytes],
     obj: Optional[Union[Blob, Tree]],
 ) -> List[Tree]:
-    """Mounts an object on a tree, using the given path components.
+    """Mount an object on a tree, using the given path components.
 
     Parameters
     ----------
@@ -38,7 +38,6 @@ def _on_tree(
         one is the new tree.
 
     """
-
     # pattern-matching:
     if len(components) == 1:
         if isinstance(obj, Blob):
@@ -203,7 +202,6 @@ class GitCommitStore(KeyValueStore):
     def _put_file(self, key: str, file: File) -> str:
         # FIXME: it may be worth to try to move large files directly into the
         #        store here
-        bufsize = 1024 * 1024
         return self._put(key, file.read())
 
     def _put(self, key: str, data: bytes) -> str:

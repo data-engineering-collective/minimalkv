@@ -9,19 +9,19 @@ from minimalkv.net.botostore import BotoStore
 from minimalkv.net.gcstore import GoogleCloudStore
 
 
-class HDictStore(ExtendedKeyspaceMixin, DictStore):
+class HDictStore(ExtendedKeyspaceMixin, DictStore):  # noqa D
     pass
 
 
-class HRedisStore(ExtendedKeyspaceMixin, RedisStore):
+class HRedisStore(ExtendedKeyspaceMixin, RedisStore):  # noqa D
     pass
 
 
-class HAzureBlockBlobStore(ExtendedKeyspaceMixin, AzureBlockBlobStore):
+class HAzureBlockBlobStore(ExtendedKeyspaceMixin, AzureBlockBlobStore):  # noqa D
     pass
 
 
-class HBotoStore(ExtendedKeyspaceMixin, BotoStore):
+class HBotoStore(ExtendedKeyspaceMixin, BotoStore):  # noqa D
     def size(self, key: str) -> bytes:
         """Get size of data at key in bytes.
 
@@ -39,11 +39,11 @@ class HBotoStore(ExtendedKeyspaceMixin, BotoStore):
         return k.size
 
 
-class HGoogleCloudStore(ExtendedKeyspaceMixin, GoogleCloudStore):
+class HGoogleCloudStore(ExtendedKeyspaceMixin, GoogleCloudStore):  # noqa D
     pass
 
 
-class HFilesystemStore(ExtendedKeyspaceMixin, FilesystemStore):
+class HFilesystemStore(ExtendedKeyspaceMixin, FilesystemStore):  # noqa D
     def size(self, key: str) -> int:
         """Get size of data at key in bytes.
 

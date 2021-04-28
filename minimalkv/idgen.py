@@ -1,6 +1,7 @@
 """
-In cases where you want to generate IDs automatically, decorators are
-available. These should be the outermost decorators, as they change the
+In cases where you want to generate IDs automatically, decorators are available.
+
+These should be the outermost decorators, as they change the
 signature of some of the put methods slightly.
 
 >>> from minimalkv.memory import DictStore

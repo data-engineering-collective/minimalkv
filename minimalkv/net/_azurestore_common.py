@@ -1,6 +1,4 @@
-"""
-Internal utilities for aztorestore_old and azurestore_new
-"""
+"""Internal utilities for ``aztorestore_old`` and ``azurestore_new``."""
 
 import base64
 import hashlib
@@ -31,7 +29,7 @@ def _filename_md5(filename, b64encode=True):
 
 
 def _byte_buffer_md5(buffer_, b64encode=True):
-    """Computes the md5 digest of a byte buffer in base64 encoding."""
+    """Compute the md5 digest of a byte buffer in base64 encoding."""
     md5 = hashlib.md5(buffer_)
     byte_digest = md5.digest()
     if b64encode:

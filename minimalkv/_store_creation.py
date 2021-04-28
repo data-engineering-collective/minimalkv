@@ -9,9 +9,7 @@ if TYPE_CHECKING:
 
 
 def create_store(type: str, params: Dict[str, Any]) -> "KeyValueStore":
-    """
-    Create store of type ``type`` with ``params``.
-    """
+    """Create store of type ``type`` with ``params``."""
     # TODO: More detailed docstring
     if type in ("azure", "hazure"):
         return _create_store_azure(type, params)
