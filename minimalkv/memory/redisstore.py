@@ -1,8 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 import re
 from io import BytesIO
+from typing import Iterator, List, Optional, Union
+
+from redis import StrictRedis
+
+from minimalkv._typing import File
 
 from .. import FOREVER, NOT_SET, KeyValueStore, TimeToLiveMixin
 
@@ -10,40 +14,68 @@ from .. import FOREVER, NOT_SET, KeyValueStore, TimeToLiveMixin
 class RedisStore(TimeToLiveMixin, KeyValueStore):
     """Uses a redis-database as the backend.
 
-    :param redis: An instance of ``redis.StrictRedis``.
+    Parameters
+    ----------
+    redis : redis.StrictRedis
+        Backend.
+
     """
 
-    def __init__(self, redis):
+    def __init__(self, redis: StrictRedis):
         self.redis = redis
 
-    def _delete(self, key: str):
+    def _delete(self, key: str) -> int:
         return self.redis.delete(key)
 
-    def keys(self, prefix=u""):
+    def keys(self, prefix: str = "") -> List[str]:
+        """List all keys in the store starting with prefix.
+
+        Parameters
+        ----------
+        prefix : str, optional, default = ''
+            Only list keys starting with prefix. List all keys if empty.
+
+        Raises
+        ------
+        IOError
+            If there was an error accessing the store.
+        """
         return list(
             map(lambda b: b.decode(), self.redis.keys(pattern=re.escape(prefix) + "*"))
         )
 
-    def iter_keys(self, prefix=u""):
+    def iter_keys(self, prefix="") -> Iterator[str]:
+        """Iterate over all keys in the store starting with prefix.
+
+        Parameters
+        ----------
+        prefix : str, optional, default = ''
+            Only iterate over keys starting with prefix. Iterate over all keys if empty.
+
+        """
         return iter(self.keys(prefix))
 
-    def _has_key(self, key):
-        return self.redis.exists(key)
+    def _has_key(self, key: str) -> bool:
+        return self.redis.exists(key) > 0
 
-    def _get(self, key):
+    def _get(self, key: str) -> bytes:
         val = self.redis.get(key)
 
         if val is None:
             raise KeyError(key)
         return val
 
-    def _get_file(self, key, file):
+    def _get_file(self, key: str, file: File) -> str:
         file.write(self._get(key))
+        return key
 
-    def _open(self, key):
+    def _open(self, key: str) -> File:
         return BytesIO(self._get(key))
 
-    def _put(self, key, value, ttl_secs):
+    def _put(
+        self, key: str, value: bytes, ttl_secs: Optional[Union[str, int, float]] = None
+    ) -> str:
+        assert ttl_secs is not None
         if ttl_secs in (NOT_SET, FOREVER):
             # if we do not care about ttl, just use set
             # in redis, using SET will also clear the timeout
@@ -64,6 +96,8 @@ class RedisStore(TimeToLiveMixin, KeyValueStore):
 
         return key
 
-    def _put_file(self, key, file, ttl_secs):
+    def _put_file(
+        self, key: str, file: File, ttl_secs: Optional[Union[str, int, float]] = None
+    ) -> str:
         self._put(key, file.read(), ttl_secs)
         return key

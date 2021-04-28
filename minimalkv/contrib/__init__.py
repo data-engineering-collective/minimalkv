@@ -18,6 +18,13 @@ class ExtendedKeyspaceMixin:
     Use it by extending first from ` :class:`~minimalkv.ExtendedKeyspaceMixin`
     and then by the desired store.
     Note: This Mixin is unsupported and might not work correctly with all backends.
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+
     """
 
     def _check_valid_key(self, key: Optional[str]) -> None:
@@ -26,7 +33,16 @@ class ExtendedKeyspaceMixin:
         When in need of checking a key for validity, always use this
         method if possible.
 
-        :param key: The key to be checked
+        Parameters
+        ----------
+        key :
+            The key to be checked
+        key: Optional[str] :
+
+
+        Returns
+        -------
+
         """
         if key is not None:
             if not isinstance(key, str):

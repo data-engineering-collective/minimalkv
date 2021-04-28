@@ -22,7 +22,19 @@ class HAzureBlockBlobStore(ExtendedKeyspaceMixin, AzureBlockBlobStore):
 
 
 class HBotoStore(ExtendedKeyspaceMixin, BotoStore):
-    def size(self, key):
+    def size(self, key: str) -> bytes:
+        """Get size of data at key in bytes.
+
+        Parameters
+        ----------
+        key : str
+            Key of data.
+
+        Returns
+        -------
+        size : int
+            Size of value at key in bytes.
+        """
         k = self.bucket.lookup(self.prefix + key)
         return k.size
 
@@ -32,5 +44,17 @@ class HGoogleCloudStore(ExtendedKeyspaceMixin, GoogleCloudStore):
 
 
 class HFilesystemStore(ExtendedKeyspaceMixin, FilesystemStore):
-    def size(self, key):
+    def size(self, key: str) -> int:
+        """Get size of data at key in bytes.
+
+        Parameters
+        ----------
+        key : str
+            Key of data.
+
+        Returns
+        -------
+        size : int
+            Size of value at key in bytes.
+        """
         return os.path.getsize(self._build_filename(key))

@@ -6,7 +6,7 @@ import hmac
 import os
 import tempfile
 
-from .decorator import StoreDecorator
+from minimalkv.decorator import StoreDecorator
 
 
 class _HMACFileReader(object):
@@ -57,8 +57,7 @@ class _HMACFileReader(object):
 
 
 class VerificationException(Exception):
-    """This exception is thrown whenever there was an error with an
-    authenticity check performed by any of the decorators in this module."""
+    """Exception thrown if there was an error checking authenticity."""
 
     pass
 
@@ -97,6 +96,7 @@ class HMACDecorator(StoreDecorator):
         self.__secret_key = bytes(secret_key)
 
     def __new_hmac(self, key, msg=None):
+        # TODO: Comment / Docstring to describe function
         if not msg:
             msg = b""
 
@@ -109,7 +109,7 @@ class HMACDecorator(StoreDecorator):
 
         return hm
 
-    def get(self, key):
+    def get(self, key):  # noqa D
         buf = self._dstore.get(key)
         hm = self.__new_hmac(key)
         hash = buf[-hm.digest_size :]
@@ -124,7 +124,7 @@ class HMACDecorator(StoreDecorator):
 
         return buf
 
-    def get_file(self, key, file):
+    def get_file(self, key, file):  # noqa D
         if isinstance(file, str):
             try:
                 f = open(file, "wb")
@@ -151,14 +151,14 @@ class HMACDecorator(StoreDecorator):
                 if len(buf) != bufsize:
                     break
 
-    def open(self, key):
+    def open(self, key):  # noqa D
         source = self._dstore.open(key)
         return _HMACFileReader(self.__new_hmac(key), source)
 
-    def put(self, key, value, *args, **kwargs):
+    def put(self, key, value, *args, **kwargs):  # noqa D
         # just append hmac and put
         data = value + self.__new_hmac(key, value).digest()
-        return self._dstore.put(key, data, *args, **kwargs)
+        return self._dstore.put(key, data, *args, **kwargs)  # type: ignore
 
     def copy(self, source, dest):
         raise NotImplementedError
@@ -182,7 +182,7 @@ class HMACDecorator(StoreDecorator):
                 source.write(hm.digest())
 
             # after the file has been closed, hand it over
-            return self._dstore.put_file(key, file, *args, **kwargs)
+            return self._dstore.put_file(key, file, *args, **kwargs)  # type: ignore
         else:
             tmpfile = tempfile.NamedTemporaryFile(delete=False)
             try:
@@ -197,6 +197,6 @@ class HMACDecorator(StoreDecorator):
                 tmpfile.write(hm.digest())
                 tmpfile.close()
 
-                return self._dstore.put_file(key, tmpfile.name, *args, **kwargs)
+                return self._dstore.put_file(key, tmpfile.name, *args, **kwargs)  # type: ignore
             finally:
                 os.unlink(tmpfile.name)

@@ -1,11 +1,12 @@
 import io
 from contextlib import contextmanager
 from shutil import copyfileobj
+from typing import List, Optional, Tuple
 
 from minimalkv import CopyMixin, KeyValueStore, UrlMixin
 
 
-def _public_readable(grants):
+def _public_readable(grants: List) -> bool:  # TODO: What kind of list
     """Take a list of grants from an ACL and check if they allow public read access."""
     for grant in grants:
         # see: https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html
@@ -34,7 +35,8 @@ def map_boto3_exceptions(key=None, exc_pass=()):
         raise IOError(str(ex))
 
 
-class Boto3SimpleKeyFile(io.RawIOBase):
+class Boto3SimpleKeyFile(io.RawIOBase):  # noqa D
+
     # see: https://alexwlchan.net/2019/02/working-with-large-s3-objects/
     # author: Alex Chan, license: MIT
     def __init__(self, s3_object):
@@ -45,13 +47,13 @@ class Boto3SimpleKeyFile(io.RawIOBase):
         return "<{} s3_object={!r} >".format(type(self).__name__, self.s3_object)
 
     @property
-    def size(self):
+    def size(self):  # noqa D
         return self.s3_object.content_length
 
-    def tell(self):
+    def tell(self):  # noqa D
         return self.position
 
-    def seek(self, offset, whence=io.SEEK_SET):
+    def seek(self, offset, whence=io.SEEK_SET):  # noqa D
         if whence == io.SEEK_SET:
             self.position = offset
         elif whence == io.SEEK_CUR:
@@ -66,10 +68,10 @@ class Boto3SimpleKeyFile(io.RawIOBase):
 
         return self.position
 
-    def seekable(self):
+    def seekable(self):  # noqa D
         return True
 
-    def read(self, size=-1):
+    def read(self, size=-1):  # noqa D
         if size == -1:
             # Read to the end of the file
             range_header = "bytes=%d-" % self.position
@@ -87,11 +89,11 @@ class Boto3SimpleKeyFile(io.RawIOBase):
 
         return self.s3_object.get(Range=range_header)["Body"].read()
 
-    def readable(self):
+    def readable(self):  # noqa D
         return True
 
 
-class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):
+class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
     def __init__(
         self,
         bucket,
@@ -118,7 +120,7 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):
     def __new_object(self, name):
         return self.bucket.Object(self.prefix + name)
 
-    def iter_keys(self, prefix=u""):
+    def iter_keys(self, prefix=""):
         with map_boto3_exceptions():
             prefix_len = len(self.prefix)
             return map(

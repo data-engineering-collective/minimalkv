@@ -1,18 +1,30 @@
 import io
 from contextlib import contextmanager
-from typing import Iterator, Optional, cast
+from typing import Iterator, Optional, Tuple, cast
 
 from minimalkv import KeyValueStore
+from minimalkv._typing import File
 from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
 
 
 @contextmanager
-def map_gcloud_exceptions(key=None, error_codes_pass=()):
-    """Map Google Cloud specific exceptions to the minimalkv-API.
+def map_gcloud_exceptions(
+    key: Optional[str] = None, error_codes_pass: Tuple[str, ...] = ()
+):
+    """
+    Map Google Cloud specific exceptions to the minimalkv-API.
 
     This function exists so the gcstore module can be imported
     without needing to install google-cloud-storage (as we lazily
     import the google library)
+
+    Parameters
+    ----------
+    key : str, optional, default = None
+        Key to be mentioned in KeyError message.
+    error_codes_pass : tuple of str
+        Errors to be passed.
+
     """
     from google.api_core.exceptions import ClientError
     from google.cloud.exceptions import GoogleCloudError, NotFound
@@ -32,31 +44,20 @@ def map_gcloud_exceptions(key=None, error_codes_pass=()):
 
 
 class GoogleCloudStore(KeyValueStore):
+    """A store using ``Google Cloud storage`` as a backend.
+
+    See ``https://cloud.google.com/storage``.
+    """
+
     def __init__(
         self,
         credentials,
         bucket_name: str,
-        create_if_missing=True,
-        bucket_creation_location="EUROPE-WEST3",
+        create_if_missing: bool = True,
+        bucket_creation_location: str = "EUROPE-WEST3",
         project=None,
     ):
-        """A store using `Google Cloud storage <https://cloud.google.com/storage>`_ as a backend.
 
-        :param: credentials: Either the path to a `credentials JSON file
-                             <https://cloud.google.com/docs/authentication/production>`_
-                             or an instance of *google.auth.credentials.Credentials*.
-        :param bucket_name: Name of the bucket the blobs will be stored in.
-                            Needs to follow the `naming conventions
-                            <https://cloud.google.com/storage/docs/naming-buckets>`_.
-        :param create_if_missing: Creates the bucket if it doesn't exist yet.
-                                  The bucket's ACL will be the default `ACL
-                                  <https://cloud.google.com/storage/docs/access-control/lists#default>`_.
-        :param bucket_creation_location: Location to create the bucket in,
-                                       if the bucket doesn't exist yet. One of `Bucket locations
-                                       <https://cloud.google.com/storage/docs/locations>`_.
-        :param project: name of the project. If credentials JSON is passed,
-                        value of *project* will be ignored as it can be inferred.
-        """
         self._credentials = credentials
         self.bucket_name = bucket_name
         self.create_if_missing = create_if_missing
@@ -85,9 +86,10 @@ class GoogleCloudStore(KeyValueStore):
         else:
             return Client(credentials=self._credentials, project=self.project_name)
 
-    def _delete(self, key: str) -> None:
+    def _delete(self, key: str) -> str:
         with map_gcloud_exceptions(key, error_codes_pass=("NotFound",)):
             self._bucket.delete_blob(key)
+        return key
 
     def _get(self, key: str) -> bytes:
         blob = self._bucket.blob(key)
@@ -95,18 +97,31 @@ class GoogleCloudStore(KeyValueStore):
             blob_bytes = blob.download_as_bytes()
         return blob_bytes
 
-    def _get_file(self, key: str, file):
+    def _get_file(self, key: str, file: File) -> str:
         blob = self._bucket.blob(key)
         with map_gcloud_exceptions(key):
             blob.download_to_file(file)
+        return key
 
     def _has_key(self, key: str) -> bool:
         return self._bucket.blob(key).exists()
 
     def iter_keys(self, prefix: str = "") -> Iterator[str]:
+        """Iterate over all keys in the store starting with prefix.
+
+        Parameters
+        ----------
+        prefix : str, optional, default = ''
+            Only iterate over keys starting with prefix. Iterate over all keys if empty.
+
+        Raises
+        ------
+        IOError
+            If there was an error accessing the store.
+        """
         return (blob.name for blob in self._bucket.list_blobs(prefix=prefix))
 
-    def _open(self, key: str):
+    def _open(self, key: str) -> File:
         blob = self._bucket.blob(key)
         if not blob.exists():
             raise KeyError
@@ -119,7 +134,7 @@ class GoogleCloudStore(KeyValueStore):
         blob.upload_from_string(data, content_type="application/octet-stream")
         return key
 
-    def _put_file(self, key: str, file) -> str:
+    def _put_file(self, key: str, file: File) -> str:
         blob = self._bucket.blob(key)
         with map_gcloud_exceptions(key):
             if isinstance(file, io.BytesIO):
@@ -142,9 +157,7 @@ class GoogleCloudStore(KeyValueStore):
 
 
 class IOInterface(io.BufferedIOBase):
-    """
-    Class which provides a file-like interface to selectively read from a blob in the bucket.
-    """
+    """Class which provides a file-like interface to selectively read from a blob in the bucket."""
 
     size: int
     pos: int
@@ -158,15 +171,25 @@ class IOInterface(io.BufferedIOBase):
         self.size = cast(int, blob.size)
         self.pos = 0
 
-    def tell(self):
-        """Returns he current offset as int. Always >= 0."""
+    def tell(self) -> int:
+        """Return the current offset as int. Always >= 0."""
         if self.closed:
             raise ValueError("I/O operation on closed file")
         return self.pos
 
-    def read(self, size=-1) -> bytes:
-        """Returns 'size' amount of bytes or less if there is no more data.
-        If no size is given all data is returned. size can be >= 0."""
+    def read(self, size: Optional[int] = -1) -> bytes:
+        """Returns first ``size`` bytes of data.
+
+        If no size is given all data is returned.
+
+        Parameters
+        ----------
+        size : int, optional, default = -1
+            Number of bytes to be returned.
+
+        """
+        size = -1 if size is None else size
+        # TODO: What happens for size < 0?
         if self.closed:
             raise ValueError("I/O operation on closed file")
         max_size = max(0, self.size - self.pos)
@@ -180,17 +203,33 @@ class IOInterface(io.BufferedIOBase):
         self.pos += len(blob_bytes)
         return blob_bytes
 
-    def seek(self, offset: int, whence: int = 0):
-        """Move to a new offset either relative or absolute. whence=0 is
-        absolute, whence=1 is relative, whence=2 is relative to the end.
+    def seek(self, offset: int, whence: int = 0) -> int:
+        """
+        Move to a new offset either relative or absolute.
+
+        whence=0 is absolute, whence=1 is relative, whence=2 is relative to the end.
 
         Any relative or absolute seek operation which would result in a
         negative position is undefined and that case can be ignored
         in the implementation.
 
         Any seek operation which moves the position after the stream
-        should succeed. tell() should report that position and read()
-        should return an empty bytes object."""
+        should succeed. ``tell()`` should report that position and ``read()``
+        should return an empty bytes object.
+
+        Parameters
+        ----------
+        offset : int
+            TODO
+        whence : int, optional, default = 0
+            TODO
+
+        Returns
+        -------
+        pos : int
+            TODO
+
+        """
         if self.closed:
             raise ValueError("I/O operation on closed file")
         if whence == 0:
@@ -207,8 +246,8 @@ class IOInterface(io.BufferedIOBase):
             self.pos = self.size + offset
         return self.pos
 
-    def seekable(self) -> bool:
+    def seekable(self) -> bool:  # noqa
         return True
 
-    def readable(self) -> bool:
+    def readable(self) -> bool:  # noqa
         return True

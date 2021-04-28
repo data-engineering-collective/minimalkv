@@ -9,6 +9,7 @@ class DictStore(KeyValueStore, CopyMixin):
 
     This store uses a dictionary as the backend for storing, its implementation
     is straightforward. The dictionary containing all data is available as `d`.
+
     """
 
     d: Dict[str, bytes]
@@ -33,4 +34,12 @@ class DictStore(KeyValueStore, CopyMixin):
         return key
 
     def iter_keys(self, prefix: str = "") -> Iterator[str]:
+        """Iterate over all keys in the store starting with prefix.
+
+        Parameters
+        ----------
+        prefix : str, optional, default = ''
+            Only iterate over keys starting with prefix. Iterate over all keys if empty.
+
+        """
         return filter(lambda k: k.startswith(prefix), iter(self.d))

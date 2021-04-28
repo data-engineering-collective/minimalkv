@@ -1,3 +1,7 @@
+from typing import Union
+
+from minimalkv import CopyMixin, KeyValueStore
+from minimalkv._typing import File
 from minimalkv.decorator import StoreDecorator
 
 
@@ -17,34 +21,53 @@ class CacheDecorator(StoreDecorator):
     store itselfs decides how large to grow the cache and which data to keep,
     which data to throw away.
 
-    :param cache: The caching backend.
-    :param store: The backing store. This is the "authorative" backend.
+    Parameters
+    ----------
+    cache : KeyValueStore
+        The caching backend.
+    store : KeyValueStore
+        The backing store. This is the "authorative" backend.
     """
 
-    def __init__(self, cache, store):
+    def __init__(self, cache: KeyValueStore, store: KeyValueStore):
         super(CacheDecorator, self).__init__(store)
         self.cache = cache
 
-    def delete(self, key: str):
-        """Implementation of :meth:`~minimalkv.KeyValueStore.delete`.
+    def delete(self, key: str) -> None:
+        """Delete data at key.
 
-        If an exception occurs in either the cache or backing store, all are
-        passing on.
+        Deletes data from both the cache and the backing store.
+
+        Parameters
+        ----------
+        key : str
+            Key of data to be deleted.
         """
         self._dstore.delete(key)
         self.cache.delete(key)
 
-    def get(self, key: str):
-        """Implementation of :meth:`~minimalkv.KeyValueStore.get`.
+    def get(self, key: str) -> bytes:
+        """Return data at key as a bytestring.
 
         If a cache miss occurs, the value is retrieved, stored in the cache and
         returned.
 
-        If the cache raises an :exc:`~IOError`, the cache is
-        ignored, and the backing store is consulted directly.
+        If the cache raises an :exc:`~IOError`, the cache is ignored, and the backing
+        store is consulted directly.
 
-        It is possible for a caching error to occur while attempting to store
-        the value in the cache. It will not be handled as well.
+        It is possible for a caching error to occur while attempting to store the value
+        in the cache. It will not be handled as well.
+
+        Parameters
+        ----------
+        key : str
+            The key to be read.
+
+        Returns
+        -------
+        data : bytes
+            Value associated with the key as a ``bytes`` object.
+
         """
         try:
             return self.cache.get(key)
@@ -59,18 +82,26 @@ class CacheDecorator(StoreDecorator):
             # cache error, ignore completely and return from backend
             return self._dstore.get(key)
 
-    def get_file(self, key: str, file):
-        """Implementation of :meth:`~minimalkv.KeyValueStore.get_file`.
+    def get_file(self, key: str, file: Union[str, File]) -> str:
+        """Write data at key to file.
 
         If a cache miss occurs, the value is retrieved, stored in the cache and
         returned.
 
-        If the cache raises an :exc:`~IOError`, the retrieval cannot
-        proceed: If ``file`` was an open file, data maybe been written to it
-        already. The :exc:`~IOError` bubbles up.
+        If the cache raises an :exc:`~IOError`, the retrieval cannot proceed: If
+        ``file`` was an open file, data maybe been written to it already.
+        The :exc:`~IOError` bubbles up.
 
-        It is possible for a caching error to occur while attempting to store
-        the value in the cache. It will not be handled as well.
+        It is possible for a caching error to occur while attempting to store the value
+        in the cache. It will not be handled as well.
+
+        Parameters
+        ----------
+        key : str
+            The key to be read.
+        file : file-like or str
+            Output filename or file-like object with a ``write`` method.
+
         """
         try:
             return self.cache.get_file(key, file)
@@ -84,8 +115,8 @@ class CacheDecorator(StoreDecorator):
         # if an IOError occured, file pointer may be dirty - cannot proceed
         # safely
 
-    def open(self, key: str):
-        """Implementation of :meth:`~minimalkv.KeyValueStore.open`.
+    def open(self, key: str) -> File:
+        """Open record at key.
 
         If a cache miss occurs, the value is retrieved, stored in the cache,
         then then another open is issued on the cache.
@@ -95,6 +126,17 @@ class CacheDecorator(StoreDecorator):
 
         It is possible for a caching error to occur while attempting to store
         the value in the cache. It will not be handled as well.
+
+        Parameters
+        ----------
+        key : str
+            Key to open.
+
+        Returns
+        -------
+        file: file-like
+            Read-only file-like object for reading data at key.
+
         """
         try:
             return self.cache.open(key)
@@ -108,37 +150,80 @@ class CacheDecorator(StoreDecorator):
             # cache error, ignore completely and return from backend
             return self._dstore.open(key)
 
-    def copy(self, source: str, dest: str):
-        """Implementation of :meth:`~minimalkv.CopyMixin.copy`.
+    def copy(self, source: str, dest: str) -> str:
+        """Copies data at key ``source`` to key ``dest``.
 
-        Copies the data in the backing store and removes the destination key from the cache,
-         in case it was already populated.
-         Does not work when the backing store does not implement copy.
+        Copies the data in the backing store and removes the destination key from the
+        cache, in case it was already populated.
+
+        Parameters
+        ----------
+        source : str
+            The source key of data to copy.
+        dest : str
+            The destination for the copy.
+
+        Returns
+        -------
+        key : str
+            The destination key.
+
+        Raises
+        ------
+        ValueError
+            If the underlying store does not support copy.
         """
-        try:
-            k = self._dstore.copy(source, dest)
-        finally:
-            self.cache.delete(dest)
-        return k
+        if not hasattr(self._dsctore, "copy"):
+            raise ValueError(f"Store {type(self._dsctore)} does not support copy.")
+        else:
+            try:
+                k = self._dstore.copy(source, dest)  # type: ignore
+            finally:
+                self.cache.delete(dest)
+            return k
 
-    def put(self, key: str, data):
-        """Implementation of :meth:`~minimalkv.KeyValueStore.put`.
+    def put(self, key: str, data: bytes) -> str:
+        """Store bytestring data at key.
 
-        Will store the value in the backing store. After a successful or
-        unsuccessful store, the cache will be invalidated by deleting the key
-        from it.
+        Will store the value in the backing store. Afterwards delete the (original)
+        value at key from the cache.
+
+        Parameters
+        ----------
+        key : str
+            The key under which the data is to be stored.
+        data : bytes
+            Data to be stored at key, must be of type  ``bytes``.
+
+        Returns
+        -------
+        key: str
+            The key under which data was stored.
+
         """
         try:
             return self._dstore.put(key, data)
         finally:
             self.cache.delete(key)
 
-    def put_file(self, key: str, file):
-        """Implementation of :meth:`~minimalkv.KeyValueStore.put_file`.
+    def put_file(self, key: str, file: Union[str, File]) -> str:
+        """Store contents of file at key.
 
-        Will store the value in the backing store. After a successful or
-        unsuccessful store, the cache will be invalidated by deleting the key
-        from it.
+        Will store the value in the backing store. Afterwards delete the (original)
+        value at key from the cache.
+
+        Parameters
+        ----------
+        key : str
+            Key where to store data in file.
+        file : file-like or str
+            A filename or a file-like object with a read method.
+
+        Returns
+        -------
+        key: str
+            The key under which data was stored.
+
         """
         try:
             return self._dstore.put_file(key, file)

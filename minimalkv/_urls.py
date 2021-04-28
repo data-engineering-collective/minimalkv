@@ -1,24 +1,38 @@
 import base64
+from typing import Any, Dict, List
 
 from uritools import urisplit
 
 TRUEVALUES = (u"true",)
 
 
-def url2dict(url, raise_on_extra_params=False):
-    """
+def url2dict(url: str, raise_on_extra_params: bool = False) -> Dict[str, Any]:
+    """Create dictionary with parameters from url.
 
-    :param url: Access-URL, see below for supported forms
-    :return: Parameter dictionary suitable for get_store()
+    Parameters
+    ----------
+    url : str
+        Access-URL, see below for supported forms.
+    raise_on_extra_params : bool, optional, default = False
+        Whether to raise on unexpected params.
 
-    memory://
-    redis://[[password@]host[:port]][/db]
-    fs://path
-    s3://access_key:secret_key@endpoint/bucket[?create_if_missing=true]
-    azure://account_name:account_key@container[?create_if_missing=true][?max_connections=2]
-    azure://account_name:shared_access_signature@container?use_sas&create_if_missing=false[?max_connections=2&socket_timeout=(20,100)]
-    azure://account_name:shared_access_signature@container?use_sas&create_if_missing=false[?max_connections=2&socket_timeout=(20,100)][?max_block_size=4*1024*1024&max_single_put_size=64*1024*1024]
-    gcs://<base64 encoded credentialsJSON>@bucket_name[?create_if_missing=true][?bucket_creation_location=EUROPE-WEST1]
+    Returns
+    -------
+    params : dict
+        Parameter dictionary suitable for get_store()
+
+    Note
+    ----
+    Supported formats:
+        ``memory://``
+        ``redis://[[password@]host[:port]][/db]``
+        ``fs://path``
+        ``s3://access_key:secret_key@endpoint/bucket[?create_if_missing=true]``
+        ``azure://account_name:account_key@container[?create_if_missing=true][?max_connections=2]``
+        ``azure://account_name:shared_access_signature@container?use_sas&create_if_missing=false[?max_connections=2&socket_timeout=(20,100)]``
+        ``azure://account_name:shared_access_signature@container?use_sas&create_if_missing=false[?max_connections=2&socket_timeout=(20,100)][?max_block_size=4*1024*1024&max_single_put_size=64*1024*1024]``
+        ``gcs://<base64 encoded credentialsJSON>@bucket_name[?create_if_missing=true][?bucket_creation_location=EUROPE-WEST1]``
+
     """
     u = urisplit(url)
     parsed = dict(
@@ -53,7 +67,7 @@ def url2dict(url, raise_on_extra_params=False):
     return params
 
 
-def extract_params(scheme, host, port, path, query, userinfo):
+def extract_params(scheme, host, port, path, query, userinfo):  # noqa D
     if scheme in ("memory", "hmemory"):
         return {}
     if scheme in ("redis", "hredis"):
@@ -108,9 +122,23 @@ def extract_params(scheme, host, port, path, query, userinfo):
     raise ValueError('Unknown storage type "{}"'.format(scheme))
 
 
-def _parse_userinfo(userinfo):
-    """Try to split the URL's userinfo (the part between :// and @) into fields
-    separated by :. If anything looks wrong, remind user to percent-encode values."""
+def _parse_userinfo(userinfo: str) -> List[str]:
+    """Try to split the URL's userinfo into fields separated by :.
+
+    The user info is the part between ``://`` and ``@``. If anything looks wrong, remind
+    the user to percent-encode values.
+
+    Parameters
+    ----------
+    userinfo : str
+        URL-encoded user-info.
+
+    Returns
+    -------
+    parts: list of str
+        URL-encoded user-info split at ``:``.
+
+    """
     if hasattr(userinfo, "split"):
         parts = userinfo.split(u":", 1)
 
@@ -118,5 +146,6 @@ def _parse_userinfo(userinfo):
             return parts
 
     raise ValueError(
-        "Could not parse user/key in store-URL. Note that values have to be percent-encoded, eg. with urllib.quote_plus()."
+        "Could not parse user/key in store-URL. Note that values have to be "
+        "percent-encoded, eg. with urllib.quote_plus()."
     )

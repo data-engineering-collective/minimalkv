@@ -25,7 +25,7 @@ def map_azure_exceptions(key=None, error_codes_pass=()):
         raise IOError(str(ex))
 
 
-class AzureBlockBlobStore(KeyValueStore):
+class AzureBlockBlobStore(KeyValueStore):  # noqa D
     def __init__(
         self,
         conn_string=None,
@@ -38,10 +38,8 @@ class AzureBlockBlobStore(KeyValueStore):
         checksum=False,
         socket_timeout=None,
     ):
-        """
-        Note that socket_timeout is unused;
-        it only exist for backward compatibility.
-        """
+        # Note that socket_timeout is unused; it only exist for backward compatibility.
+        # TODO: Docstring
         self.conn_string = conn_string
         self.container = container
         self.public = public
@@ -56,7 +54,7 @@ class AzureBlockBlobStore(KeyValueStore):
     # AzureBlockBlobStore to be pickled, even if
     # azure.storage.blob.BlockBlobService does not support pickling.
     @lazy_property
-    def blob_container_client(self):
+    def blob_container_client(self):  # noqa D
         from azure.storage.blob import BlobServiceClient
 
         kwargs = {}
@@ -94,18 +92,18 @@ class AzureBlockBlobStore(KeyValueStore):
             return True
         return False
 
-    def iter_keys(self, prefix=None):
+    def iter_keys(self, prefix=None):  # noqa D
         with map_azure_exceptions():
             blobs = self.blob_container_client.list_blobs(name_starts_with=prefix)
 
-        def gen_names():
+        def gen_names():  # noqa D
             with map_azure_exceptions():
                 for blob in blobs:
                     yield blob.name
 
         return gen_names()
 
-    def iter_prefixes(self, delimiter, prefix=u""):
+    def iter_prefixes(self, delimiter, prefix=""):  # noqa D
         return (
             blob_prefix.name
             for blob_prefix in self.blob_container_client.walk_blobs(
@@ -176,9 +174,7 @@ class AzureBlockBlobStore(KeyValueStore):
 
 
 class IOInterface(io.BufferedIOBase):
-    """
-    Class which provides a file-like interface to selectively read from a blob in the blob store.
-    """
+    """Class which provides a file-like interface to selectively read from a blob in the blob store."""
 
     def __init__(self, blob_client, max_connections):
         super(IOInterface, self).__init__()
@@ -197,7 +193,10 @@ class IOInterface(io.BufferedIOBase):
 
     def read(self, size=-1):
         """Returns 'size' amount of bytes or less if there is no more data.
-        If no size is given all data is returned. size can be >= 0."""
+
+        If no size is given all data is returned. size can be >= 0.
+
+        """
         if self.closed:
             raise ValueError("I/O operation on closed file")
         max_size = max(0, self.size - self.pos)
@@ -213,8 +212,10 @@ class IOInterface(io.BufferedIOBase):
         return b
 
     def seek(self, offset, whence=0):
-        """Move to a new offset either relative or absolute. whence=0 is
-        absolute, whence=1 is relative, whence=2 is relative to the end.
+        """Move to a new offset either relative or absolute.
+
+        whence=0 is absolute, whence=1 is relative, whence=2 is relative to the
+        end.
 
         Any relative or absolute seek operation which would result in a
         negative position is undefined and that case can be ignored
@@ -222,7 +223,9 @@ class IOInterface(io.BufferedIOBase):
 
         Any seek operation which moves the position after the stream
         should succeed. tell() should report that position and read()
-        should return an empty bytes object."""
+        should return an empty bytes object.
+
+        """
         if self.closed:
             raise ValueError("I/O operation on closed file")
         if whence == 0:
@@ -239,8 +242,8 @@ class IOInterface(io.BufferedIOBase):
             self.pos = self.size + offset
         return self.pos
 
-    def seekable(self):
+    def seekable(self):  # noqa D
         return True
 
-    def readable(self):
+    def readable(self):  # noqa D
         return True

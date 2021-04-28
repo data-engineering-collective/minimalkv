@@ -1,6 +1,11 @@
 Changelog
 *********
 
+1.2.2
+=====
+
+* Improved the API documentation of ``minimalkv``.
+
 1.2.1
 =====
 

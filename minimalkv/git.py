@@ -1,24 +1,42 @@
 import re
 import time
 from io import BytesIO
-from typing import Optional
+from typing import Iterator, List, Optional, Union
 
 from dulwich.objects import Blob, Commit, Tree
 from dulwich.repo import Repo
 
 from minimalkv import KeyValueStore, __version__
+from minimalkv._typing import File
 
 
-def _on_tree(repo, tree, components, obj):
+def _on_tree(
+    repo: Repo,
+    tree: Tree,
+    components: List[bytes],
+    obj: Optional[Union[Blob, Tree]],
+) -> List[Tree]:
     """Mounts an object on a tree, using the given path components.
 
-    :param tree: Tree object to mount on.
-    :param components: A list of strings of subpaths (i.e. ['foo', 'bar'] is
-                       equivalent to '/foo/bar')
-    :param obj: Object to mount. If None, removes the object found at path
-                and prunes the tree downwards.
-    :return: A list of new entities that need to be added to the object store,
-             where the last one is the new tree.
+    Parameters
+    ----------
+    repo : dulwich.objects.Repo
+        Repository.
+    tree : dulwich.objects.Tree
+        Tree object to mount on.
+    components : list of str
+        A list of strings (or bytes) of subpaths (e.g. ['foo', 'bar'] is equivalent to
+        '/foo/bar').
+    obj : dulwich.objects.Blob or dulwich.objects.Tree or None
+        Object to mount. If None, removes the object found at path and prunes the tree
+        downwards.
+
+    Returns
+    -------
+    list of dulwich.objects:
+        A list of new entities that need to be added to the object store, where the last
+        one is the new tree.
+
     """
 
     # pattern-matching:
@@ -63,10 +81,23 @@ def _on_tree(repo, tree, components, obj):
 
 
 class GitCommitStore(KeyValueStore):
+    """Store using git.
+
+    Parameters
+    ----------
+    repo_path : str
+        Path to the repository.
+    branch : bytes, optional, default = b"master"
+        Branch to use.
+    subdir : bytes, optional, default = b""
+        Subdirectory of the repository to use.
+
+    """
+
     AUTHOR = "GitCommitStore (minimalkv {}) <>".format(__version__)
     TIMEZONE = None
 
-    def __init__(self, repo_path, branch=b"master", subdir=b""):
+    def __init__(self, repo_path: str, branch: bytes = b"master", subdir: bytes = b""):
         self.repo = Repo(repo_path)
         self.branch = branch
 
@@ -75,10 +106,10 @@ class GitCommitStore(KeyValueStore):
         self.subdir = re.sub("#/+#", "/", subdir.decode("ascii").strip("/"))
 
     @property
-    def _subdir_components(self):
+    def _subdir_components(self) -> List[bytes]:
         return [c.encode("ascii") for c in self.subdir.split("/")]
 
-    def _key_components(self, key):
+    def _key_components(self, key: str) -> List[bytes]:
         return [c.encode("ascii") for c in key.split("/")]
 
     @property
@@ -103,7 +134,7 @@ class GitCommitStore(KeyValueStore):
 
         return commit
 
-    def _delete(self, key):
+    def _delete(self, key: str) -> None:
         try:
             commit = self.repo[self._refname]
             tree = self.repo[commit.tree]
@@ -133,7 +164,7 @@ class GitCommitStore(KeyValueStore):
 
         self.repo.refs[self._refname] = commit.id
 
-    def _get(self, key):
+    def _get(self, key: str) -> bytes:
         # might raise key errors, except block corrects param
         try:
             commit = self.repo[self._refname]
@@ -146,7 +177,7 @@ class GitCommitStore(KeyValueStore):
 
         return blob.data
 
-    def iter_keys(self, prefix=u""):
+    def iter_keys(self, prefix: str = "") -> Iterator[str]:  # noqa D
         try:
             commit = self.repo[self._refname]
             tree = self.repo[commit.tree]
@@ -166,15 +197,16 @@ class GitCommitStore(KeyValueStore):
                 if o.path.decode("ascii").startswith(prefix):
                     yield o.path.decode("ascii")
 
-    def _open(self, key):
+    def _open(self, key: str) -> File:
         return BytesIO(self._get(key))
 
-    def _put_file(self, key, file):
+    def _put_file(self, key: str, file: File) -> str:
         # FIXME: it may be worth to try to move large files directly into the
         #        store here
+        bufsize = 1024 * 1024
         return self._put(key, file.read())
 
-    def _put(self, key, data):
+    def _put(self, key: str, data: bytes) -> str:
         commit = self._create_top_commit()
         commit.message = ("Updated key {}".format(self.subdir + "/" + key)).encode(
             "utf8"

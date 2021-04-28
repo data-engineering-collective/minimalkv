@@ -7,8 +7,7 @@ import hashlib
 
 
 def _file_md5(file_, b64encode=True):
-    """
-    Compute the md5 digest of a file in base64 encoding.
+    """Compute the md5 digest of a file in base64 encoding.
 
     For ``b64encode``, returns the base64 encoded string; otherwise, returns the
     bytes directly.
@@ -26,17 +25,13 @@ def _file_md5(file_, b64encode=True):
 
 
 def _filename_md5(filename, b64encode=True):
-    """
-    Compute the md5 digest of a file in base64 encoding.
-    """
+    """Compute the md5 digest of a file in base64 encoding."""
     with open(filename, "rb") as f:
         return _file_md5(f, b64encode=b64encode)
 
 
 def _byte_buffer_md5(buffer_, b64encode=True):
-    """
-    Computes the md5 digest of a byte buffer in base64 encoding.
-    """
+    """Computes the md5 digest of a byte buffer in base64 encoding."""
     md5 = hashlib.md5(buffer_)
     byte_digest = md5.digest()
     if b64encode:
