@@ -1,15 +1,14 @@
-# noqa D
 from typing import Any
 
 from typing_extensions import Protocol
 
 
-class File(Protocol):
-    def read(self, bufsize: Any = 1024) -> bytes:
+class File(Protocol):  # noqa D
+    def read(self, bufsize: Any = 1024) -> bytes:  # noqa D
         ...
 
-    def write(self, buffer: Any) -> int:
+    def write(self, buffer: Any) -> int:  # noqa D
         ...
 
-    def close(self) -> None:
+    def close(self) -> None:  # noqa D
         ...

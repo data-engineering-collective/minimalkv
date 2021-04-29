@@ -1,6 +1,6 @@
 from typing import Union
 
-from minimalkv import CopyMixin, KeyValueStore
+from minimalkv import KeyValueStore
 from minimalkv._typing import File
 from minimalkv.decorator import StoreDecorator
 
@@ -151,7 +151,7 @@ class CacheDecorator(StoreDecorator):
             return self._dstore.open(key)
 
     def copy(self, source: str, dest: str) -> str:
-        """Copies data at key ``source`` to key ``dest``.
+        """Copy data at key ``source`` to key ``dest``.
 
         Copies the data in the backing store and removes the destination key from the
         cache, in case it was already populated.

@@ -1,5 +1,5 @@
 from io import BytesIO
-from typing import Dict, Iterable, Iterator, Optional
+from typing import Dict, Iterator, Optional
 
 from minimalkv import CopyMixin, KeyValueStore
 

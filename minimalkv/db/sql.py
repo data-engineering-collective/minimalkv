@@ -7,7 +7,7 @@ from minimalkv import CopyMixin, KeyValueStore
 from minimalkv._typing import File
 
 
-class SQLAlchemyStore(KeyValueStore, CopyMixin):
+class SQLAlchemyStore(KeyValueStore, CopyMixin):  # noqa D
     def __init__(self, bind, metadata, tablename):
         self.bind = bind
 
@@ -80,7 +80,7 @@ class SQLAlchemyStore(KeyValueStore, CopyMixin):
     def _put_file(self, key: str, file: File) -> str:
         return self._put(key, file.read())
 
-    def iter_keys(self, prefix: str = "") -> Iterator[str]:
+    def iter_keys(self, prefix: str = "") -> Iterator[str]:  # noqa D
         query = select([self.table.c.key])
         if prefix != "":
             query = query.where(self.table.c.key.like(prefix + "%"))

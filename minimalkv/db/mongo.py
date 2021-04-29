@@ -49,7 +49,6 @@ class MongoStore(KeyValueStore):
         return key
 
     def _put_file(self, key: str, file: File) -> str:
-        bufsize = 1024 * 1024
         return self._put(key, file.read())
 
     def iter_keys(self, prefix: str = "") -> Iterator[str]:

@@ -225,7 +225,7 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
 
 class WebFilesystemStore(FilesystemStore):
     """
-    FilesystemStore supporting generating URLS for web applications
+    FilesystemStore supporting generating URLS for web applications.
 
     The most common use is to make the ``root`` directory of the filesystem store
     available through a webserver.

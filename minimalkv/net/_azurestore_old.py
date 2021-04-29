@@ -1,6 +1,4 @@
-"""
-This implements the AzureBlockBlobStore for `azure-storage-blob<12`
-"""
+"""Implement the AzureBlockBlobStore for ``azure-storage-blob<12``."""
 import io
 from contextlib import contextmanager
 
@@ -34,7 +32,7 @@ def map_azure_exceptions(key=None, exc_pass=()):
             raise IOError(str(ex))
 
 
-class AzureBlockBlobStore(KeyValueStore):
+class AzureBlockBlobStore(KeyValueStore):  # noqa D
     def __init__(
         self,
         conn_string=None,
@@ -62,7 +60,7 @@ class AzureBlockBlobStore(KeyValueStore):
     # AzureBlockBlobStore to be pickled, even if
     # azure.storage.blob.BlockBlobService does not support pickling.
     @lazy_property
-    def block_blob_service(self):
+    def block_blob_service(self):  # noqa D
         from azure.storage.blob import BlockBlobService, PublicAccess
 
         block_blob_service = BlockBlobService(
@@ -97,7 +95,7 @@ class AzureBlockBlobStore(KeyValueStore):
         with map_azure_exceptions(key=key):
             return self.block_blob_service.exists(self.container, key)
 
-    def iter_keys(self, prefix=""):
+    def iter_keys(self, prefix=""):  # noqa D
         if prefix == "":
             prefix = None
         with map_azure_exceptions():
@@ -109,7 +107,7 @@ class AzureBlockBlobStore(KeyValueStore):
                 for blob in blobs
             )
 
-    def iter_prefixes(self, delimiter, prefix=""):
+    def iter_prefixes(self, delimiter, prefix=""):  # noqa D
         if prefix == "":
             prefix = None
         with map_azure_exceptions():
@@ -199,7 +197,7 @@ class AzureBlockBlobStore(KeyValueStore):
             )
             return key
 
-    def __getstate__(self):
+    def __getstate__(self):  # noqa D
         # keep all of __dict__, except lazy properties:
         return {
             key: value
@@ -209,7 +207,7 @@ class AzureBlockBlobStore(KeyValueStore):
 
 
 class IOInterface(io.BufferedIOBase):
-    """Class which provides a file-like interface to selectively read from a blob in the blob store."""
+    """File-like interface to selectively read from a blob in the blob store."""
 
     def __init__(self, block_blob_service, container_name, key, max_connections):
         super(IOInterface, self).__init__()
@@ -223,13 +221,13 @@ class IOInterface(io.BufferedIOBase):
         self.pos = 0
 
     def tell(self):
-        """Returns he current offset as int. Always >= 0."""
+        """Return the current offset as int. Always >= 0."""
         if self.closed:
             raise ValueError("I/O operation on closed file")
         return self.pos
 
     def read(self, size=-1):
-        """Returns 'size' amount of bytes or less if there is no more data.
+        """Return 'size' amount of bytes or less if there is no more data.
 
         If no size is given all data is returned. size can be >= 0.
         """
@@ -266,16 +264,6 @@ class IOInterface(io.BufferedIOBase):
         should succeed. tell() should report that position and read()
         should return an empty bytes object.
 
-        Parameters
-        ----------
-        offset :
-
-        whence :
-             (Default value = 0)
-
-        Returns
-        -------
-
         """
         if self.closed:
             raise ValueError("I/O operation on closed file")
@@ -293,8 +281,8 @@ class IOInterface(io.BufferedIOBase):
             self.pos = self.size + offset
         return self.pos
 
-    def seekable(self):
+    def seekable(self):  # noqa
         return True
 
-    def readable(self):
+    def readable(self):  # noqa
         return True

@@ -212,14 +212,14 @@ class BasicStore(object):
         store.put(key, value)
         store.put(key2, value2)
 
-        l = []
+        keys = []
         for k in store.iter_keys():
             assert isinstance(k, str)
-            l.append(k)
+            keys.append(k)
 
-        l.sort()
+        keys.sort()
 
-        assert l == sorted([key, key2])
+        assert keys == sorted([key, key2])
 
     def test_key_iterator_with_prefix(self, store, key, key2, value):
         prefix = key
@@ -229,21 +229,20 @@ class BasicStore(object):
         store.put(key_prefix_2, value)
         store.put(key2, value)
 
-        l = []
+        key_prefixes = []
         for k in store.iter_keys():
-            l.append(k)
-        l.sort()
+            key_prefixes.append(k)
+        key_prefixes.sort()
 
-        assert l == sorted([key_prefix_1, key_prefix_2, key2])
+        assert key_prefixes == sorted([key_prefix_1, key_prefix_2, key2])
 
-        l = []
+        key_prefixes = []
         for k in store.iter_keys(prefix):
-            l.append(k)
-        l.sort()
-        assert l == sorted([key_prefix_1, key_prefix_2])
+            key_prefixes.append(k)
+        key_prefixes.sort()
+        assert key_prefixes == sorted([key_prefix_1, key_prefix_2])
 
     def test_prefix_iterator(self, store, value):
-        delimiter = u"X"
         for k in [
             u"X",
             u"a1Xb1",
@@ -258,25 +257,25 @@ class BasicStore(object):
         ]:
             store.put(k, value)
 
-        l = sorted(store.iter_prefixes(u"X"))
-        assert l == [u"X", u"a1X", u"a2X", u"a3", u"a4X"]
+        prefixes = sorted(store.iter_prefixes(u"X"))
+        assert prefixes == [u"X", u"a1X", u"a2X", u"a3", u"a4X"]
 
-        l = sorted(store.iter_prefixes(u"X", prefix=u"a4X"))
-        assert l == [u"a4Xb1X", u"a4Xb2X", u"a4Xb3"]
+        prefixes = sorted(store.iter_prefixes(u"X", prefix=u"a4X"))
+        assert prefixes == [u"a4Xb1X", u"a4Xb2X", u"a4Xb3"]
 
-        l = sorted(store.iter_prefixes(u"X", prefix=u"foo"))
-        assert l == []
+        prefixes = sorted(store.iter_prefixes(u"X", prefix=u"foo"))
+        assert prefixes == []
 
     def test_keys(self, store, key, key2, value, value2):
         store.put(key, value)
         store.put(key2, value2)
 
-        l = store.keys()
-        assert isinstance(l, list)
-        for k in l:
+        keys = store.keys()
+        assert isinstance(keys, list)
+        for k in keys:
             assert isinstance(k, str)
 
-        assert set(l) == {key, key2}
+        assert set(keys) == {key, key2}
 
     def test_keys_with_prefix(self, store, key, key2, value):
         prefix = key
@@ -286,13 +285,13 @@ class BasicStore(object):
         store.put(key_prefix_2, value)
         store.put(key2, value)
 
-        l = store.keys()
-        assert isinstance(l, list)
-        assert set(l) == {key_prefix_1, key_prefix_2, key2}
+        keys = store.keys()
+        assert isinstance(keys, list)
+        assert set(keys) == {key_prefix_1, key_prefix_2, key2}
 
-        l = store.keys(prefix)
-        assert isinstance(l, list)
-        assert set(l) == {key_prefix_1, key_prefix_2}
+        keys = store.keys(prefix)
+        assert isinstance(keys, list)
+        assert set(keys) == {key_prefix_1, key_prefix_2}
 
     def test_has_key(self, store, key, key2, value):
         store.put(key, value)

@@ -1,7 +1,7 @@
 import re
 from functools import reduce
 from io import BytesIO
-from typing import Any, Callable, Iterable, Iterator, List, Optional, Sequence, Union
+from typing import Any, Callable, Iterable, Iterator, List, Optional, Union
 
 from minimalkv._typing import File
 from minimalkv._urls import url2dict
@@ -49,7 +49,6 @@ class KeyValueStore:
         IOError
             If there was an error accessing the store.
         """
-
         self._check_valid_key(key)
         return self._has_key(key)
 
@@ -730,8 +729,9 @@ class TimeToLiveMixin:
 
 
 class UrlKeyValueStore(UrlMixin, KeyValueStore):
-    """.. deprecated:: 0.9
-    Use the :class:`.UrlMixin` instead.
+    """Class is deprecated. Use the :class:`.UrlMixin` instead.
+
+    .. deprecated:: 0.9
 
     """
 
@@ -745,7 +745,7 @@ class CopyMixin(object):
     _delete: Callable
 
     def copy(self, source: str, dest: str) -> str:
-        """Copies data at key ``source`` to key ``dest``.
+        """Copy data at key ``source`` to key ``dest``.
 
         The destination is overwritten if it does exist.
 
@@ -774,7 +774,7 @@ class CopyMixin(object):
         return self._copy(source, dest)
 
     def _copy(self, source: str, dest: str):
-        """Copies data at key ``source`` to key ``dest``.
+        """Copy data at key ``source`` to key ``dest``.
 
         The destination is overwritten if it does exist.
 
@@ -794,7 +794,7 @@ class CopyMixin(object):
         raise NotImplementedError
 
     def move(self, source: str, dest: str) -> str:
-        """Moves data from key ``source`` to key ``dest``.
+        """Move data from key ``source`` to key ``dest``.
 
         The destination is overwritten if it does exist.
 
@@ -823,7 +823,7 @@ class CopyMixin(object):
         return self._move(source, dest)
 
     def _move(self, source: str, dest: str) -> str:
-        """Moves data from key ``source`` to key ``dest``.
+        """Move data from key ``source`` to key ``dest``.
 
         The destination is overwritten if it does exist.
 
@@ -846,14 +846,16 @@ class CopyMixin(object):
 
 
 def get_store_from_url(url: str) -> "KeyValueStore":
-    """Take a URL and return a minimalkv store according to the parameters in the URL.
+    """
+    Take a URL and return a minimalkv store according to the parameters in the URL.
 
     Parameters
     ----------
     url : str
         Access-URL, see below for supported formats.
 
-    Returns:
+    Returns
+    -------
     store : KeyValueStore
         Value Store as described in url.
 

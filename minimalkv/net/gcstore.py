@@ -26,7 +26,6 @@ def map_gcloud_exceptions(
         Errors to be passed.
 
     """
-    from google.api_core.exceptions import ClientError
     from google.cloud.exceptions import GoogleCloudError, NotFound
 
     try:
@@ -148,7 +147,7 @@ class GoogleCloudStore(KeyValueStore):
 
     # skips two items: bucket & client.
     # These will be recreated after unpickling through the lazy_property decoorator
-    def __getstate__(self):
+    def __getstate__(self):  # noqa D
         return {
             key: value
             for key, value in self.__dict__.items()
@@ -178,7 +177,7 @@ class IOInterface(io.BufferedIOBase):
         return self.pos
 
     def read(self, size: Optional[int] = -1) -> bytes:
-        """Returns first ``size`` bytes of data.
+        """Return first ``size`` bytes of data.
 
         If no size is given all data is returned.
 

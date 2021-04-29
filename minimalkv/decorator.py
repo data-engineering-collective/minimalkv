@@ -26,16 +26,16 @@ class StoreDecorator:
     def __init__(self, store: KeyValueStore):
         self._dstore = store
 
-    def __getattr__(self, attr):
+    def __getattr__(self, attr):  # noqa D
         # Use object.__getattritbute__ as getattr  would make a recursive call to
         # StoreDecorator.__getattr__.
         store = object.__getattribute__(self, "_dstore")
         return getattr(store, attr)
 
-    def __contains__(self, key: str) -> bool:
+    def __contains__(self, key: str) -> bool:  # noqa D
         return self._dstore.__contains__(key)
 
-    def __iter__(self) -> Iterable[str]:
+    def __iter__(self) -> Iterable[str]:  # noqa D
         return self._dstore.__iter__()
 
 
@@ -54,10 +54,10 @@ class KeyTransformingDecorator(StoreDecorator):  # noqa D
     def _filter(self, key: str) -> bool:
         return True
 
-    def __contains__(self, key: str) -> bool:
+    def __contains__(self, key: str) -> bool:  # noqa D
         return self._map_key(key) in self._dstore
 
-    def __iter__(self) -> Iterable[str]:
+    def __iter__(self) -> Iterable[str]:  # noqa D
         return self.iter_keys()
 
     def delete(self, key: str):  # noqa D
@@ -76,9 +76,9 @@ class KeyTransformingDecorator(StoreDecorator):  # noqa D
             if self._filter(k)
         )
 
-    def iter_prefixes(
+    def iter_prefixes(  # noqa D
         self, delimiter: str, prefix: str = ""
-    ) -> Iterable[str]:  # noqa D
+    ) -> Iterable[str]:
         dlen = len(delimiter)
         plen = len(prefix)
         memory = set()
@@ -181,7 +181,7 @@ class ReadOnlyDecorator(StoreDecorator):
 
     """
 
-    def __getattr__(self, attr):
+    def __getattr__(self, attr):  # noqa D
         if attr in ("get", "iter_keys", "keys", "open", "get_file"):
             return super(ReadOnlyDecorator, self).__getattr__(attr)
         else:

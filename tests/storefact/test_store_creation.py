@@ -73,7 +73,6 @@ def test_create_store_azure_inconsistent_params():
 
 def test_create_store_hs3(mocker):
     mock_hs3 = mocker.patch("minimalkv._boto._get_s3bucket")
-    mock_hbotostores = mocker.patch("minimalkv._hstores.HBotoStore")
     create_store(
         "hs3",
         {
@@ -93,7 +92,6 @@ def test_create_store_hs3(mocker):
 
 def test_create_store_s3(mocker):
     mock_s3 = mocker.patch("minimalkv._boto._get_s3bucket")
-    mock_hbotostores = mocker.patch("minimalkv._hstores.HBotoStore")
     create_store(
         "s3",
         {

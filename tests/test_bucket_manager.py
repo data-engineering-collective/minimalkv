@@ -1,8 +1,6 @@
 import pytest
 
 boto = pytest.importorskip("boto")
-from boto.exception import StorageResponseError
-from boto.s3.key import Key
 from bucket_manager import boto_bucket, boto_credentials
 
 

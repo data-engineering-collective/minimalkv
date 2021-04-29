@@ -9,7 +9,6 @@ from configparser import ConfigParser
 from typing import Optional
 from uuid import uuid4
 
-import google
 from basic_store import BasicStore, OpenSeekTellStore
 from conftest import ExtendedKeyspaceTests
 from google.api_core.exceptions import NotFound
