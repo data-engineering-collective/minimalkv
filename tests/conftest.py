@@ -15,12 +15,12 @@ def secret_key(request):
 
 
 # values are short payloads to store
-@pytest.fixture(params=[b"a_short_value", b"another_short_value"])
+@pytest.fixture(params=[b"a_short_value"])
 def value(request):
     return request.param
 
 
-@pytest.fixture(params=[b"the_other_value", b"other_value_2"])
+@pytest.fixture(params=[b"the_other_value"])
 def value2(request):
     return request.param
 
@@ -36,14 +36,12 @@ def long_value(request):
 
 
 # keys are always strings. only ascii chars are allowed
-@pytest.fixture(
-    params=[u"short_key", u"different_key", u"""'!"`#$%&'()+,-.<=>?@[]^_{}~'"""]
-)
+@pytest.fixture(params=[u"short_key", u"""'!"`#$%&'()+,-.<=>?@[]^_{}~'"""])
 def key(request):
     return request.param
 
 
-@pytest.fixture(params=[u"key_number_2", u"and_again_a_second_key"])
+@pytest.fixture(params=[u"key_number_2"])
 def key2(request):
     return request.param
 
@@ -53,15 +51,13 @@ def invalid_key(request):
     return request.param
 
 
-@pytest.fixture(
-    params=[b"short_key", b"different_key", b"""'!"`#$%&'()+,-.<=>?@[]^_{}~'"""]
-)
+@pytest.fixture(params=[b"short_key", b"""'!"`#$%&'()+,-.<=>?@[]^_{}~'"""])
 def bytestring_key(request):
     return request.param
 
 
 # maximum length key
-@pytest.fixture(params=[u"a" * 250, u"b" * 250])
+@pytest.fixture(params=[u"a" * 250])
 def max_key(request):
     return request.param
 
@@ -72,14 +68,13 @@ class ExtendedKeyspaceTests:
         params=[
             u"short ke/y",
             u"short_key",
-            u"spaces  in key",
             u"""'!"`#$%&'()+,-.<=>?@[]^_{}~/'""",
         ]
     )
     def key(self, request):
         return request.param
 
-    @pytest.fixture(params=[u"key_number/2 with space", u"and_again_a_second_key"])
+    @pytest.fixture(params=[u"key_number/2 with space"])
     def key2(self, request):
         return request.param
 

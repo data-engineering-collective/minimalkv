@@ -13,9 +13,7 @@ class TestGitCommitStore(BasicStore, UUIDGen, HashGen):
     def branch(self, request):
         return request.param
 
-    @pytest.fixture(
-        params=[b"", b"/", b"subdir", b"sub/subdir/", b"/sub/subdir", b"/sub/subdir/"]
-    )
+    @pytest.fixture(params=[b"", b"/sub/subdir"])
     def subdir_name(self, request):
         return request.param
 
@@ -28,7 +26,12 @@ class TestGitCommitStore(BasicStore, UUIDGen, HashGen):
     def store(self, repo_path, branch, subdir_name):
         return GitCommitStore(repo_path, branch=branch, subdir=subdir_name)
 
-    def test_uses_subdir(self, repo_path, store, subdir_name, branch):
+    @pytest.mark.parametrize(
+        "subdir_name",
+        [b"", b"/", b"subdir", b"sub/subdir/", b"/sub/subdir", b"/sub/subdir/"],
+    )
+    def test_uses_subdir(self, repo_path, subdir_name, branch):
+        store = GitCommitStore(repo_path, branch=branch, subdir=subdir_name)
         # add a key
         store.put(u"foo", b"bar")
 

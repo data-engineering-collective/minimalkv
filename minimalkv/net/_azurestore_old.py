@@ -79,7 +79,7 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
             )
         return block_blob_service
 
-    def _delete(self, key):
+    def _delete(self, key: str) -> None:
         with map_azure_exceptions(key=key, exc_pass=["AzureMissingResourceHttpError"]):
             self.block_blob_service.delete_blob(self.container, key)
 
