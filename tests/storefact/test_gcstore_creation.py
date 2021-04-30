@@ -4,8 +4,9 @@ import pathlib
 
 import pytest
 
-from minimalkv import get_store_from_url, url2dict
-from minimalkv._store_creation import create_store
+from minimalkv.storefact._store_creation import create_store
+from minimalkv.storefact._urls import url2dict
+from minimalkv.storefact.access import get_store_from_url
 
 storage = pytest.importorskip("google.cloud.storage")
 from google.auth.credentials import AnonymousCredentials

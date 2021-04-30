@@ -1,7 +1,7 @@
 from typing import Iterable
 from urllib.parse import quote_plus, unquote_plus
 
-from minimalkv import KeyValueStore
+from minimalkv.key_value_store import KeyValueStore
 
 
 class StoreDecorator:

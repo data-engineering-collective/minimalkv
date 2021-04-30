@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any, Dict
 from minimalkv.fs import FilesystemStore
 
 if TYPE_CHECKING:
-    from minimalkv import KeyValueStore
+    from minimalkv.key_value_store import KeyValueStore
 
 
 def create_store(type: str, params: Dict[str, Any]) -> "KeyValueStore":

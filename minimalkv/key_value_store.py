@@ -1,17 +1,8 @@
-import re
 from io import BytesIO
-from typing import Iterable, Iterator, List, Optional, Union
+from typing import IO, Iterable, Iterator, List, Optional, Union
 
-from minimalkv._typing import File
+from minimalkv.constants import VALID_KEY_RE
 from minimalkv.mixins import UrlMixin
-
-VALID_NON_NUM = r"""\`\!"#$%&'()+,-.<=>?@[]^_{}~"""
-VALID_KEY_REGEXP = "^[%s0-9a-zA-Z]+$" % re.escape(VALID_NON_NUM)
-"""This regular expression tests if a key is valid. Allowed are all
-alphanumeric characters, as well as ``!"`#$%&'()+,-.<=>?@[]^_{}~``."""
-
-VALID_KEY_RE = re.compile(VALID_KEY_REGEXP)
-"""A compiled version of :data:`~minimalkv.VALID_KEY_REGEXP`."""
 
 # Only here to keep backwards-compatability
 key_type = str
@@ -99,7 +90,7 @@ class KeyValueStore:
         self._check_valid_key(key)
         return self._get(key)
 
-    def get_file(self, key: str, file: Union[str, File]) -> str:
+    def get_file(self, key: str, file: Union[str, IO]) -> str:
         """Write data at key to file.
 
         Like :meth:`~mininmalkv.KeyValueStore.put_file`, this method allows backends to
@@ -196,7 +187,7 @@ class KeyValueStore:
         """
         return list(self.iter_keys(prefix))
 
-    def open(self, key: str) -> File:
+    def open(self, key: str) -> IO:
         """Open record at key.
 
         Parameters
@@ -248,7 +239,7 @@ class KeyValueStore:
             raise IOError("Provided data is not of type bytes")
         return self._put(key, data)
 
-    def put_file(self, key: str, file: Union[str, File]) -> str:
+    def put_file(self, key: str, file: Union[str, IO]) -> str:
         """Store contents of file at key.
 
         Store data from a file into key. ``file`` can be a string, which will be
@@ -321,7 +312,7 @@ class KeyValueStore:
 
         return buf.getvalue()
 
-    def _get_file(self, key: str, file: File) -> str:
+    def _get_file(self, key: str, file: IO) -> str:
         """Write data at key to file-like object file.
 
         Parameters
@@ -373,7 +364,7 @@ class KeyValueStore:
         """
         return key in self.keys()
 
-    def _open(self, key: str) -> File:
+    def _open(self, key: str) -> IO:
         """Open record at key.
 
         Parameters
@@ -406,7 +397,7 @@ class KeyValueStore:
         """
         return self._put_file(key, BytesIO(data))
 
-    def _put_file(self, key: str, file: File) -> str:
+    def _put_file(self, key: str, file: IO) -> str:
         """Store data from file-like object at key.
 
         Parameters

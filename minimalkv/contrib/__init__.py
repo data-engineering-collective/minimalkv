@@ -1,7 +1,7 @@
 import re
 from typing import Optional
 
-from minimalkv import VALID_NON_NUM
+from minimalkv.constants import VALID_NON_NUM
 
 VALID_NON_NUM_EXTENDED = VALID_NON_NUM + r"/ "
 VALID_KEY_REGEXP_EXTENDED = "^[%s0-9a-zA-Z]+$" % re.escape(VALID_NON_NUM_EXTENDED)

@@ -1,7 +1,7 @@
 from io import BytesIO
-from typing import Callable, Optional, Union
+from typing import IO, Callable, Optional, Union
 
-from minimalkv._typing import File
+from minimalkv.constants import FOREVER, NOT_SET
 
 
 class UrlMixin:
@@ -48,10 +48,6 @@ class UrlMixin:
 
         """
         raise NotImplementedError
-
-
-FOREVER = "forever"
-NOT_SET = "not_set"
 
 
 class TimeToLiveMixin:
@@ -164,7 +160,7 @@ class TimeToLiveMixin:
     def put_file(
         self,
         key: str,
-        file: Union[str, File],
+        file: Union[str, IO],
         ttl_secs: Optional[Union[float, int, str]] = None,
     ) -> str:
         """Store contents of file at key.
@@ -235,7 +231,7 @@ class TimeToLiveMixin:
         return self._put_file(key, BytesIO(data), ttl_secs)
 
     def _put_file(
-        self, key: str, file: File, ttl_secs: Optional[Union[str, float, int]] = None
+        self, key: str, file: IO, ttl_secs: Optional[Union[str, float, int]] = None
     ):
         """Store contents of file at key.
 

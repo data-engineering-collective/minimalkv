@@ -1,6 +1,6 @@
 import pytest
 
-from minimalkv._store_creation import create_store
+from minimalkv.storefact._store_creation import create_store
 
 
 def test_create_store_azure(mocker):
@@ -72,7 +72,7 @@ def test_create_store_azure_inconsistent_params():
 
 
 def test_create_store_hs3(mocker):
-    mock_hs3 = mocker.patch("minimalkv._boto._get_s3bucket")
+    mock_hs3 = mocker.patch("minimalkv.storefact._boto._get_s3bucket")
     create_store(
         "hs3",
         {
@@ -91,7 +91,7 @@ def test_create_store_hs3(mocker):
 
 
 def test_create_store_s3(mocker):
-    mock_s3 = mocker.patch("minimalkv._boto._get_s3bucket")
+    mock_s3 = mocker.patch("minimalkv.storefact._boto._get_s3bucket")
     create_store(
         "s3",
         {
@@ -121,7 +121,7 @@ def test_create_store_hfs(mocker):
 
 
 def test_create_store_fs(mocker):
-    mock_fs = mocker.patch("minimalkv._store_creation.FilesystemStore")
+    mock_fs = mocker.patch("minimalkv.storefact._store_creation.FilesystemStore")
     mock_makedirs = mocker.patch("os.makedirs")
     create_store(
         "fs",

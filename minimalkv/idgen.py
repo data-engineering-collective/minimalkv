@@ -18,9 +18,8 @@ import hashlib
 import os
 import tempfile
 import uuid
-from typing import Optional, Union
+from typing import IO, Optional, Union
 
-from minimalkv._typing import File
 from minimalkv.decorator import StoreDecorator
 
 
@@ -74,7 +73,7 @@ class HashDecorator(StoreDecorator):
 
         return self._dstore.put(key, data, *args, **kwargs)  # type: ignore
 
-    def put_file(self, key: Optional[str], file: Union[str, File], *args, **kwargs):
+    def put_file(self, key: Optional[str], file: Union[str, IO], *args, **kwargs):
         """Store contents of file at key.
 
         Store data from a file into key. ``file`` can be a string, which will be
@@ -201,7 +200,7 @@ class UUIDDecorator(StoreDecorator):
 
         return self._dstore.put(self._template.format(key), data, *args, **kwargs)  # type: ignore
 
-    def put_file(self, key: Optional[str], file: Union[str, File], *args, **kwargs):
+    def put_file(self, key: Optional[str], file: Union[str, IO], *args, **kwargs):
         """Store contents of file at key.
 
         Store data from a file into key. ``file`` can be a string, which will be
