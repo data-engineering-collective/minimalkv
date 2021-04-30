@@ -9,6 +9,7 @@ from minimalkv.key_value_store import KeyValueStore, UrlKeyValueStore
 from minimalkv.mixins import CopyMixin, TimeToLiveMixin, UrlMixin
 from minimalkv.storefact._store_creation import create_store
 from minimalkv.storefact._store_decoration import decorate_store
+from minimalkv.storefact._urls import url2dict
 from minimalkv.storefact.access import get_store, get_store_from_url
 
 try:
@@ -20,17 +21,18 @@ except Exception:  # pragma: no cover
 
 __all__ = [
     "CopyMixin",
+    "create_store",
+    "decorate_store",
     "FOREVER",
     "get_store_from_url",
     "get_store",
     "KeyValueStore",
     "NOT_SET",
     "TimeToLiveMixin",
+    "url2dict",
     "UrlKeyValueStore",
-    "create_store",
     "UrlMixin",
     "VALID_KEY_RE",
     "VALID_KEY_REGEXP",
-    "decorate_store",
     "VALID_NON_NUM",
 ]
