@@ -7,10 +7,10 @@ from minimalkv.key_value_store import KeyValueStore
 class CacheDecorator(StoreDecorator):
     """Write-through cache decorator.
 
-    Can combine two :class:`~minimalkv.KeyValueStore` instances into a single
-    caching :class:`~minimalkv.KeyValueStore`. On a data-read request, the cache
-    will be consulted first, if there is a cache miss or an error, data will be
-    read from the backing store. Any retrieved value will be stored in the
+    Can combine two :class:`~minimalkv.key_value_store.KeyValueStore` instances into a
+    single caching :class:`~minimalkv.key_value_store.KeyValueStore`. On a data-read
+    request, the cache will be consulted first, if there is a cache miss or an error,
+    data will be read from the backing store. Any retrieved value will be stored in the
     cache before being forward to the client.
 
     Write, key-iteration and delete requests will be passed on straight to the

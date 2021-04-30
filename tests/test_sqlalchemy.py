@@ -10,8 +10,8 @@ from sqlalchemy import MetaData, create_engine
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.pool import StaticPool
 
-from minimalkv.contrib import ExtendedKeyspaceMixin
 from minimalkv.db.sql import SQLAlchemyStore
+from minimalkv.mixins import ExtendedKeyspaceMixin
 
 DSNS = [
     (
