@@ -1,6 +1,25 @@
 Changelog
 *********
 
+1.3.0
+=====
+
+* Moved mixin classes ``UrlMixin`` and ``CopyMixin`` from ``minimalkv`` to
+  ``minimalkv.mixins``.
+* Moved mixin class ``ExtendedKeyspaceMixin`` from ``minimalkv.contrib`` to
+  ``minimalkv.mixins``.
+* Moved stores ``KeyValueStore`` and ``UrlKeyValueStore`` from ``minimalkv`` to
+  ``minimalkv.key_value_store``.
+* Moved functions ``get_store`` and ``get_store_from_url`` from ``minimalkv`` to
+  ``minimalkv.storefact.access``.
+* Moved constants ``FOREVER``, ``NOT_SET``, ``VALID_NON_NUM``, ``VALID_KEY_REGEXP`` and
+  ``VALID_KEY_RE`` from ``minimalkv`` to ``minimalkv.constants``.
+* Moved constants ``VALID_NON_NUM_EXTENDED``, ``VALID_KEY_REGEXP_EXTENDED``,
+  ``VALID_KEY_RE_EXTENDED`` from ``minimalkv.contrib`` to ``minimalkv.constants``.
+* All above changes are backwards compatible.
+* Moved private modules ``_boto``, ``_store_creation``, ``_store_decoration`` and
+  ``_url`` from ``minimalkv`` to ``minimalkv.storefact``.
+
 1.2.2
 =====
 
@@ -125,7 +144,7 @@ Changelog
   :class:`~minimalkv.decorator.URLEncodeKeysDecorator`
 * Added a Microsoft Azure Blob Storage backend:
   :class:`~minimalkv.net.azurestore.AzureBlockBlobStore`
-* Added ``minimalkv.mixins.ExtendedKeyspaceMixin`` which allows slashes and spaces in key names
+* Added ``minimalkv.contrib.ExtendedKeyspaceMixin`` which allows slashes and spaces in key names
   This mixin is experimental, unsupported and might not work with all backends.
 
 
