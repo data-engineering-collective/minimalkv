@@ -73,7 +73,7 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
                 )
         return container_client
 
-    def _delete(self, key):
+    def _delete(self, key: str) -> None:
         with map_azure_exceptions(key, error_codes_pass=("BlobNotFound",)):
             self.blob_container_client.delete_blob(key)
 
