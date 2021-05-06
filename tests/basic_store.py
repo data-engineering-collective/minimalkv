@@ -20,8 +20,8 @@ def is_emulated_gcstore_test(store):
 
 class BasicStore(object):
     def test_store(self, store, key, value):
-        key = store.put(key, value)
-        assert isinstance(key, str)
+        new_key = store.put(key, value)
+        assert key == new_key
 
     def test_unicode_store(self, store, key, unicode_value):
         with pytest.raises(IOError):
