@@ -33,7 +33,7 @@ jobs:
           docker-compose up -d
           while ! docker exec mysql mysqladmin status -h 127.0.0.1 -u minimalkv_test --password=minimalkv_test; \
             do sleep 3; done
-          pytest -n auto --dist loadfile -rs
+          pytest -n auto --dist loadfile -rs --cov=minimalkv --cov-report=xml
           python setup.py sdist
           python setup.py bdist_wheel
       - name: Publish package
@@ -42,6 +42,9 @@ jobs:
         with:
           user: __token__
           password: ${{ secrets.pypi_password }}
+      - uses: codecov/codecov-action@v1
+        with:
+          file: ./coverage.xml
 
   pre-commit-checks:
     name: "Pre-commit checks - Python 3.8"

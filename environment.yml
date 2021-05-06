@@ -9,6 +9,7 @@ dependencies:
   - pytest
   - pytest-mock
   - pytest-xdist
+  - pytest-cov
   - redis-py
   - psycopg2
   - six
