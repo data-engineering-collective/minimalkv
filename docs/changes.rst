@@ -11,7 +11,7 @@ Changelog
 * Moved stores ``KeyValueStore`` and ``UrlKeyValueStore`` from ``minimalkv`` to
   ``minimalkv._key_value_store``.
 * Moved functions ``get_store`` and ``get_store_from_url`` from ``minimalkv`` to
-  ``minimalkv.access``.
+  ``minimalkv._get_store``.
 * Moved constants ``FOREVER``, ``NOT_SET``, ``VALID_NON_NUM``, ``VALID_KEY_REGEXP`` and
   ``VALID_KEY_RE`` from ``minimalkv`` to ``minimalkv._constants``.
 * Moved constants ``VALID_NON_NUM_EXTENDED``, ``VALID_KEY_REGEXP_EXTENDED``,

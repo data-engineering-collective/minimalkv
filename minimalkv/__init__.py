@@ -5,12 +5,12 @@ from minimalkv._constants import (
     VALID_KEY_REGEXP,
     VALID_NON_NUM,
 )
+from minimalkv._get_store import get_store, get_store_from_url
 from minimalkv._key_value_store import KeyValueStore, UrlKeyValueStore
 from minimalkv._mixins import CopyMixin, TimeToLiveMixin, UrlMixin
 from minimalkv._store_creation import create_store
 from minimalkv._store_decoration import decorate_store
 from minimalkv._urls import url2dict
-from minimalkv.access import get_store, get_store_from_url
 
 try:
     import pkg_resources
