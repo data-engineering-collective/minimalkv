@@ -1,3 +1,7 @@
+from minimalkv._store_creation import create_store
+from minimalkv._store_decoration import decorate_store
+from minimalkv._urls import url2dict
+from minimalkv.access import get_store, get_store_from_url
 from minimalkv.constants import (
     FOREVER,
     NOT_SET,
@@ -7,10 +11,6 @@ from minimalkv.constants import (
 )
 from minimalkv.key_value_store import KeyValueStore, UrlKeyValueStore
 from minimalkv.mixins import CopyMixin, TimeToLiveMixin, UrlMixin
-from minimalkv.storefact._store_creation import create_store
-from minimalkv.storefact._store_decoration import decorate_store
-from minimalkv.storefact._urls import url2dict
-from minimalkv.storefact.access import get_store, get_store_from_url
 
 try:
     import pkg_resources
