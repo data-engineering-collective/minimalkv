@@ -1,8 +1,8 @@
 from io import BytesIO
 from typing import IO, Iterable, Iterator, List, Optional, Union
 
-from minimalkv.constants import VALID_KEY_RE
-from minimalkv.mixins import UrlMixin
+from minimalkv._constants import VALID_KEY_RE
+from minimalkv._mixins import UrlMixin
 
 # Only here to keep backwards-compatability
 key_type = str
@@ -13,7 +13,7 @@ class KeyValueStore:
     Class to access a key-value store.
 
     Supported keys are ascii-strings containing alphanumeric characters or symbols out
-    of ``minimalkv.constants.VALID_NON_NUM`` of length not greater than 250. Values
+    of ``minimalkv._constants.VALID_NON_NUM`` of length not greater than 250. Values
     (or records) are stored as raw bytes.
     """
 

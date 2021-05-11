@@ -4,8 +4,8 @@ import shutil
 import urllib.parse
 from typing import IO, Any, Callable, Iterator, List, Optional, Union, cast
 
-from minimalkv.key_value_store import KeyValueStore
-from minimalkv.mixins import CopyMixin, UrlMixin
+from minimalkv._key_value_store import KeyValueStore
+from minimalkv._mixins import CopyMixin, UrlMixin
 
 
 class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):

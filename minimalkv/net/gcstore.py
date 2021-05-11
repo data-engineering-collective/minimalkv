@@ -2,7 +2,7 @@ import io
 from contextlib import contextmanager
 from typing import IO, Iterator, Optional, Tuple, cast
 
-from minimalkv.key_value_store import KeyValueStore
+from minimalkv._key_value_store import KeyValueStore
 from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
 
 

@@ -1,7 +1,7 @@
 from io import BytesIO
 from typing import IO, Callable, Optional, Union
 
-from minimalkv.constants import FOREVER, NOT_SET, VALID_KEY_RE_EXTENDED
+from minimalkv._constants import FOREVER, NOT_SET, VALID_KEY_RE_EXTENDED
 
 
 class UrlMixin:
@@ -54,19 +54,19 @@ class TimeToLiveMixin:
     """Mixin to allow keys to expire after a certain amount of time.
 
     This mixin overrides some of the signatures of the api of
-    :class:`~minimalkv.key_value_store.KeyValueStore`, albeit in a backwards compatible
+    :class:`~minimalkv._key_value_store.KeyValueStore`, albeit in a backwards compatible
     manner.
 
     Any value given for a time-to-live parameter must be one of the following:
 
     * A positive ``int`` or ``float``, representing seconds,
-    * ``minimalkv.constants.FOREVER``, meaning no expiration
-    * ``minimalkv.constants.NOT_SET``, meaning that no TTL configuration will be
+    * ``minimalkv._constants.FOREVER``, meaning no expiration
+    * ``minimalkv._constants.NOT_SET``, meaning that no TTL configuration will be
       done at all or
     * ``None`` representing the default (see
       :class:`.TimeToLiveMixin`'s ``default_ttl_secs``).
 
-    .. note:: When deriving from :class:`~minimalkv.mixins.TimeToLiveMixin`, the same
+    .. note:: When deriving from :class:`~minimalkv._mixins.TimeToLiveMixin`, the same
        default implementations for ``_put``, ``_put_file`` and
        ``_put_filename`` are provided, except that they all take an additional
        ``ttl_secs`` argument. For more information on how to implement
@@ -93,9 +93,9 @@ class TimeToLiveMixin:
         Parameters
         ----------
         ttl_secs: numeric or string or None
-            Time to live. Numeric or one of ``minimalkv.constants.FOREVER`` or
-            ``minimalkv.constants.NOT_SET``. ``None`` will be replaced with
-            ``minimalkv.mixins.TimeToLiveMixin.default_ttl_secs``.
+            Time to live. Numeric or one of ``minimalkv._constants.FOREVER`` or
+            ``minimalkv._constants.NOT_SET``. ``None`` will be replaced with
+            ``minimalkv._mixins.TimeToLiveMixin.default_ttl_secs``.
 
         Raises
         ------
@@ -125,9 +125,9 @@ class TimeToLiveMixin:
         """Store bytestring data at key.
 
         If ``ttl_secs`` is a positive number, the key will expire after ``ttl_secs``.
-        Other possible values for ``ttl_secs`` are ``minimalkv.constants.FOREVER`` (no expiration)
-        and ``minimalkv.constants.NOT_SET`` (no TTL configuration). ``None`` will be replaced with
-        ``minimalkv.mixins.TimeToLiveMixin.default_ttl_secs``.
+        Other possible values for ``ttl_secs`` are ``minimalkv._constants.FOREVER`` (no expiration)
+        and ``minimalkv._constants.NOT_SET`` (no TTL configuration). ``None`` will be replaced with
+        ``minimalkv._mixins.TimeToLiveMixin.default_ttl_secs``.
 
         Parameters
         ----------
@@ -173,9 +173,9 @@ class TimeToLiveMixin:
         unnecessary copies. To prevent this, pass the opened file instead.
 
         If ``ttl_secs`` is a positive number, the key will expire after ``ttl_secs``.
-        Other possible values for ``ttl_secs`` are `minimalkv.constants.FOREVER` (no expiration)
-        and ``minimalkv.constants.NOT_SET`` (no TTL configuration). ``None`` will be replaced with
-        ``minimalkv.mixins.TimeToLiveMixin.default_ttl_secs``.
+        Other possible values for ``ttl_secs`` are `minimalkv._constants.FOREVER` (no expiration)
+        and ``minimalkv._constants.NOT_SET`` (no TTL configuration). ``None`` will be replaced with
+        ``minimalkv._mixins.TimeToLiveMixin.default_ttl_secs``.
 
         Parameters
         ----------
@@ -388,7 +388,7 @@ class ExtendedKeyspaceMixin:
     """A mixin to extend the keyspace to allow slashes and spaces in keynames.
 
     Attention: A single / is NOT allowed.
-    Use it by extending first from ` :class:`~minimalkv.mixins.ExtendedKeyspaceMixin`
+    Use it by extending first from ` :class:`~minimalkv._mixins.ExtendedKeyspaceMixin`
     and then by the desired store.
     Note: This Mixin is unsupported and might not work correctly with all backends.
 

@@ -4,7 +4,7 @@ import pytest
 from basic_store import BasicStore, TTLStore
 from conftest import ExtendedKeyspaceTests
 
-from minimalkv.mixins import ExtendedKeyspaceMixin
+from minimalkv._mixins import ExtendedKeyspaceMixin
 
 redis = pytest.importorskip("redis")
 

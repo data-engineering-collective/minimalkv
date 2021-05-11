@@ -2,7 +2,7 @@ kv-caches
 *********
 
 Caches speed up access to stores greatly, if used right. Usually, these require
-combining two :class:`~minimalkv.key_value_store.KeyValueStore` instances of the same or
+combining two :class:`~minimalkv._key_value_store.KeyValueStore` instances of the same or
 different kind. A simple example without error-handling is a store that uses a
 :class:`~minimalkv.memory.redisstore.RedisStore` in front of a
 :class:`~minimalkv.fs.FilesystemStore`:

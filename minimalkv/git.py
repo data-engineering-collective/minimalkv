@@ -7,7 +7,7 @@ from dulwich.objects import Blob, Commit, Tree
 from dulwich.repo import Repo
 
 from minimalkv import __version__
-from minimalkv.key_value_store import KeyValueStore
+from minimalkv._key_value_store import KeyValueStore
 
 
 def _on_tree(

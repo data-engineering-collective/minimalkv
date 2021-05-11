@@ -147,14 +147,14 @@ Table of contents
 The core API
 ============
 
-.. autoclass:: minimalkv.key_value_store.KeyValueStore
+.. autoclass:: minimalkv._key_value_store.KeyValueStore
    :members: __contains__, __iter__, delete, get, get_file, iter_keys, keys,
              open, put, put_file
 
 Some backends support an efficient copy operation, which is provided by a
 mixin class:
 
-.. autoclass:: minimalkv.mixins.CopyMixin
+.. autoclass:: minimalkv._mixins.CopyMixin
    :members: copy
 
 In addition to that, a mixin class is available for backends that provide a
@@ -163,7 +163,7 @@ method to support URL generation:
 .. autoclass:: minimalkv.mixin.UrlMixin
    :members: url_for
 
-.. autoclass:: minimalkv.key_value_store.UrlKeyValueStore
+.. autoclass:: minimalkv._key_value_store.UrlKeyValueStore
    :members:
 
 Some backends support setting a time-to-live on keys for automatic expiration,
@@ -175,16 +175,16 @@ this is represented by the :class:`~minimalkv.mixin.TimeToLiveMixin`:
 
    .. automethod:: minimalkv.mixin.TimeToLiveMixin.put_file
 
-   .. attribute:: default_ttl_secs = minimalkv.constants.NOT_SET
+   .. attribute:: default_ttl_secs = minimalkv._constants.NOT_SET
 
       Passing ``None`` for any time-to-live parameter will cause this value to
       be used.
 
    .. autoattribute:: minimalkv.mixin.TimeToLiveMixin.ttl_support
 
-.. autodata:: minimalkv.constants.VALID_KEY_REGEXP
+.. autodata:: minimalkv._constants.VALID_KEY_REGEXP
 
-.. autodata:: minimalkv.constants.VALID_KEY_RE
+.. autodata:: minimalkv._constants.VALID_KEY_RE
 
 .. _implement:
 
@@ -192,12 +192,12 @@ this is represented by the :class:`~minimalkv.mixin.TimeToLiveMixin`:
 Implementing a new backend
 ==========================
 
-Subclassing :class:`~minimalkv.key_value_store.KeyValueStore` is the fastest way to implement a
+Subclassing :class:`~minimalkv._key_value_store.KeyValueStore` is the fastest way to implement a
 new backend. It suffices to override the
-:func:`~minimalkv.key_value_store.KeyValueStore._delete`,
-:func:`~minimalkv.key_value_store.KeyValueStore.iter_keys`,
-:func:`~minimalkv.key_value_store.KeyValueStore._open` and
-:func:`~minimalkv.key_value_store.KeyValueStore._put_file` methods, as all the other methods
+:func:`~minimalkv._key_value_store.KeyValueStore._delete`,
+:func:`~minimalkv._key_value_store.KeyValueStore.iter_keys`,
+:func:`~minimalkv._key_value_store.KeyValueStore._open` and
+:func:`~minimalkv._key_value_store.KeyValueStore._put_file` methods, as all the other methods
 have default implementations that call these.
 
 After that, you can override any number of underscore-prefixed methods with
@@ -206,27 +206,27 @@ more specialized implementations to gain speed improvements.
 Default implementation
 ----------------------
 
-Classes derived from :class:`~minimalkv.key_value_store.KeyValueStore` inherit a number of
+Classes derived from :class:`~minimalkv._key_value_store.KeyValueStore` inherit a number of
 default implementations for the core API methods. Specifically, the
-:func:`~minimalkv.key_value_store.KeyValueStore.delete`,
-:func:`~minimalkv.key_value_store.KeyValueStore.get`,
-:func:`~minimalkv.key_value_store.KeyValueStore.get_file`,
-:func:`~minimalkv.key_value_store.KeyValueStore.keys`,
-:func:`~minimalkv.key_value_store.KeyValueStore.open`,
-:func:`~minimalkv.key_value_store.KeyValueStore.put`,
-:func:`~minimalkv.key_value_store.KeyValueStore.put_file`,
-methods will each call the :func:`~minimalkv.key_value_store.KeyValueStore._check_valid_key` method if a key has been provided and then call one of the following protected methods:
+:func:`~minimalkv._key_value_store.KeyValueStore.delete`,
+:func:`~minimalkv._key_value_store.KeyValueStore.get`,
+:func:`~minimalkv._key_value_store.KeyValueStore.get_file`,
+:func:`~minimalkv._key_value_store.KeyValueStore.keys`,
+:func:`~minimalkv._key_value_store.KeyValueStore.open`,
+:func:`~minimalkv._key_value_store.KeyValueStore.put`,
+:func:`~minimalkv._key_value_store.KeyValueStore.put_file`,
+methods will each call the :func:`~minimalkv._key_value_store.KeyValueStore._check_valid_key` method if a key has been provided and then call one of the following protected methods:
 
-.. automethod:: minimalkv.key_value_store.KeyValueStore._check_valid_key
-.. automethod:: minimalkv.key_value_store.KeyValueStore._delete
-.. automethod:: minimalkv.key_value_store.KeyValueStore._get
-.. automethod:: minimalkv.key_value_store.KeyValueStore._get_file
-.. automethod:: minimalkv.key_value_store.KeyValueStore._get_filename
-.. automethod:: minimalkv.key_value_store.KeyValueStore._has_key
-.. automethod:: minimalkv.key_value_store.KeyValueStore._open
-.. automethod:: minimalkv.key_value_store.KeyValueStore._put
-.. automethod:: minimalkv.key_value_store.KeyValueStore._put_file
-.. automethod:: minimalkv.key_value_store.KeyValueStore._put_filename
+.. automethod:: minimalkv._key_value_store.KeyValueStore._check_valid_key
+.. automethod:: minimalkv._key_value_store.KeyValueStore._delete
+.. automethod:: minimalkv._key_value_store.KeyValueStore._get
+.. automethod:: minimalkv._key_value_store.KeyValueStore._get_file
+.. automethod:: minimalkv._key_value_store.KeyValueStore._get_filename
+.. automethod:: minimalkv._key_value_store.KeyValueStore._has_key
+.. automethod:: minimalkv._key_value_store.KeyValueStore._open
+.. automethod:: minimalkv._key_value_store.KeyValueStore._put
+.. automethod:: minimalkv._key_value_store.KeyValueStore._put_file
+.. automethod:: minimalkv._key_value_store.KeyValueStore._put_filename
 
 
 Atomicity

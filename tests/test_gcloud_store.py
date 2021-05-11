@@ -15,7 +15,7 @@ from google.api_core.exceptions import NotFound
 from google.auth.credentials import AnonymousCredentials
 from google.cloud.exceptions import MethodNotAllowed
 
-from minimalkv.mixins import ExtendedKeyspaceMixin
+from minimalkv._mixins import ExtendedKeyspaceMixin
 from minimalkv.net.gcstore import GoogleCloudStore
 
 

@@ -4,8 +4,8 @@ from conftest import ExtendedKeyspaceTests
 from dulwich.repo import Repo
 from idgens import HashGen, UUIDGen
 
+from minimalkv._mixins import ExtendedKeyspaceMixin
 from minimalkv.git import GitCommitStore
-from minimalkv.mixins import ExtendedKeyspaceMixin
 
 
 class TestGitCommitStore(BasicStore, UUIDGen, HashGen):

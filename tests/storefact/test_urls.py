@@ -1,8 +1,8 @@
 import pytest
 
+from minimalkv._urls import url2dict
+from minimalkv.access import get_store_from_url
 from minimalkv.decorator import ReadOnlyDecorator
-from minimalkv.storefact._urls import url2dict
-from minimalkv.storefact.access import get_store_from_url
 
 good_urls = [
     (

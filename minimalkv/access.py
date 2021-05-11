@@ -1,8 +1,8 @@
 from functools import reduce
 from typing import Any
 
-from minimalkv.key_value_store import KeyValueStore
-from minimalkv.storefact._urls import url2dict
+from minimalkv._key_value_store import KeyValueStore
+from minimalkv._urls import url2dict
 
 
 def get_store_from_url(url: str) -> KeyValueStore:
@@ -118,8 +118,8 @@ def get_store(
         Key value store of type ``type`` as described in ``kwargs`` parameters.
 
     """
-    from minimalkv.storefact._store_creation import create_store
-    from minimalkv.storefact._store_decoration import decorate_store
+    from minimalkv._store_creation import create_store
+    from minimalkv._store_decoration import decorate_store
 
     # split off old-style wrappers, if any:
     parts = type.split("+")

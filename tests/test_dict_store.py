@@ -6,8 +6,8 @@ from conftest import ExtendedKeyspaceTests
 from idgens import HashGen, UUIDGen
 from test_hmac import HMACDec
 
+from minimalkv._mixins import ExtendedKeyspaceMixin
 from minimalkv.memory import DictStore
-from minimalkv.mixins import ExtendedKeyspaceMixin
 
 
 class TestDictStore(BasicStore, UUIDGen, HashGen, HMACDec):

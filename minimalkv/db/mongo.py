@@ -5,7 +5,7 @@ from typing import IO, Iterator
 
 from bson.binary import Binary
 
-from minimalkv.key_value_store import KeyValueStore
+from minimalkv._key_value_store import KeyValueStore
 
 
 class MongoStore(KeyValueStore):

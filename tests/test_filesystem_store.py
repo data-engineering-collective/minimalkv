@@ -13,8 +13,8 @@ from idgens import HashGen, UUIDGen
 from mock import Mock
 from url_store import UrlStore
 
+from minimalkv._mixins import ExtendedKeyspaceMixin
 from minimalkv.fs import FilesystemStore, WebFilesystemStore
-from minimalkv.mixins import ExtendedKeyspaceMixin
 
 
 class TestBaseFilesystemStore(BasicStore, UrlStore, UUIDGen, HashGen):
