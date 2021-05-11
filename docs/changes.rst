@@ -16,9 +16,7 @@ Changelog
   ``VALID_KEY_RE`` from ``minimalkv`` to ``minimalkv._constants``.
 * Moved constants ``VALID_NON_NUM_EXTENDED``, ``VALID_KEY_REGEXP_EXTENDED``,
   ``VALID_KEY_RE_EXTENDED`` from ``minimalkv.contrib`` to ``minimalkv._constants``.
-* All above changes are backwards compatible.
-* Moved private modules ``_boto``, ``_store_creation``, ``_store_decoration`` and
-  ``_url`` from ``minimalkv`` to ``minimalkv.storefact``.
+* All changes are backwards compatible.
 
 1.2.2
 =====
