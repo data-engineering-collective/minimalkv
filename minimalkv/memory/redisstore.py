@@ -2,11 +2,9 @@
 # -*- coding: utf-8 -*-
 import re
 from io import BytesIO
-from typing import Iterator, List, Optional, Union
+from typing import IO, Iterator, List, Optional, Union
 
 from redis import StrictRedis
-
-from minimalkv._typing import File
 
 from .. import FOREVER, NOT_SET, KeyValueStore, TimeToLiveMixin
 
@@ -65,11 +63,11 @@ class RedisStore(TimeToLiveMixin, KeyValueStore):
             raise KeyError(key)
         return val
 
-    def _get_file(self, key: str, file: File) -> str:
+    def _get_file(self, key: str, file: IO) -> str:
         file.write(self._get(key))
         return key
 
-    def _open(self, key: str) -> File:
+    def _open(self, key: str) -> IO:
         return BytesIO(self._get(key))
 
     def _put(
@@ -97,7 +95,7 @@ class RedisStore(TimeToLiveMixin, KeyValueStore):
         return key
 
     def _put_file(
-        self, key: str, file: File, ttl_secs: Optional[Union[str, int, float]] = None
+        self, key: str, file: IO, ttl_secs: Optional[Union[str, int, float]] = None
     ) -> str:
         self._put(key, file.read(), ttl_secs)
         return key

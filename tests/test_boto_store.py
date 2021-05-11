@@ -10,7 +10,7 @@ from bucket_manager import boto_bucket, boto_credentials
 from conftest import ExtendedKeyspaceTests
 from url_store import UrlStore
 
-from minimalkv.contrib import ExtendedKeyspaceMixin
+from minimalkv._mixins import ExtendedKeyspaceMixin
 from minimalkv.net.botostore import BotoStore
 
 

@@ -1,6 +1,6 @@
 import os
 
-from minimalkv.contrib import ExtendedKeyspaceMixin
+from minimalkv._mixins import ExtendedKeyspaceMixin
 from minimalkv.fs import FilesystemStore
 from minimalkv.memory import DictStore
 from minimalkv.memory.redisstore import RedisStore

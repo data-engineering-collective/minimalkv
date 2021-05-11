@@ -2,7 +2,7 @@
 import io
 from contextlib import contextmanager
 
-from minimalkv import KeyValueStore
+from minimalkv._key_value_store import KeyValueStore
 from minimalkv.net._azurestore_common import _byte_buffer_md5, _file_md5, _filename_md5
 from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
 

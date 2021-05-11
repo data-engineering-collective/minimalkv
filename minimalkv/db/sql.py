@@ -1,10 +1,9 @@
 from io import BytesIO
-from typing import Iterator
+from typing import IO, Iterator
 
 from sqlalchemy import Column, LargeBinary, String, Table, exists, select
 
 from minimalkv import CopyMixin, KeyValueStore
-from minimalkv._typing import File
 
 
 class SQLAlchemyStore(KeyValueStore, CopyMixin):  # noqa D
@@ -38,7 +37,7 @@ class SQLAlchemyStore(KeyValueStore, CopyMixin):  # noqa D
 
         return rv
 
-    def _open(self, key: str) -> File:
+    def _open(self, key: str) -> IO:
         return BytesIO(self._get(key))
 
     def _copy(self, source: str, dest: str):
@@ -77,7 +76,7 @@ class SQLAlchemyStore(KeyValueStore, CopyMixin):  # noqa D
         con.close()
         return key
 
-    def _put_file(self, key: str, file: File) -> str:
+    def _put_file(self, key: str, file: IO) -> str:
         return self._put(key, file.read())
 
     def iter_keys(self, prefix: str = "") -> Iterator[str]:  # noqa D

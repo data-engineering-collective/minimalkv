@@ -2,10 +2,10 @@ import os
 import os.path
 import shutil
 import urllib.parse
-from typing import Any, Callable, Iterator, List, Optional, Union, cast
+from typing import IO, Any, Callable, Iterator, List, Optional, Union, cast
 
-from minimalkv import CopyMixin, KeyValueStore, UrlMixin
-from minimalkv._typing import File
+from minimalkv._key_value_store import KeyValueStore
+from minimalkv._mixins import CopyMixin, UrlMixin
 
 
 class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
@@ -76,7 +76,7 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
     def _has_key(self, key: str) -> bool:
         return os.path.exists(self._build_filename(key))
 
-    def _open(self, key: str) -> File:
+    def _open(self, key: str) -> IO:
         try:
             f = open(self._build_filename(key), "rb")
             return f
@@ -109,7 +109,7 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
                 if not os.path.isdir(path):
                     raise e
 
-    def _put_file(self, key: str, file: File, *args, **kwargs) -> str:
+    def _put_file(self, key: str, file: IO, *args, **kwargs) -> str:
         bufsize = self.bufsize
 
         target = self._build_filename(key)

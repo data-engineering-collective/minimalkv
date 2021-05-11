@@ -1,17 +1,16 @@
-from typing import Union
+from typing import IO, Union
 
-from minimalkv import KeyValueStore
-from minimalkv._typing import File
+from minimalkv._key_value_store import KeyValueStore
 from minimalkv.decorator import StoreDecorator
 
 
 class CacheDecorator(StoreDecorator):
     """Write-through cache decorator.
 
-    Can combine two :class:`~minimalkv.KeyValueStore` instances into a single
-    caching :class:`~minimalkv.KeyValueStore`. On a data-read request, the cache
-    will be consulted first, if there is a cache miss or an error, data will be
-    read from the backing store. Any retrieved value will be stored in the
+    Can combine two :class:`~minimalkv._key_value_store.KeyValueStore` instances into a
+    single caching :class:`~minimalkv._key_value_store.KeyValueStore`. On a data-read
+    request, the cache will be consulted first, if there is a cache miss or an error,
+    data will be read from the backing store. Any retrieved value will be stored in the
     cache before being forward to the client.
 
     Write, key-iteration and delete requests will be passed on straight to the
@@ -82,7 +81,7 @@ class CacheDecorator(StoreDecorator):
             # cache error, ignore completely and return from backend
             return self._dstore.get(key)
 
-    def get_file(self, key: str, file: Union[str, File]) -> str:
+    def get_file(self, key: str, file: Union[str, IO]) -> str:
         """Write data at key to file.
 
         If a cache miss occurs, the value is retrieved, stored in the cache and
@@ -115,7 +114,7 @@ class CacheDecorator(StoreDecorator):
         # if an IOError occured, file pointer may be dirty - cannot proceed
         # safely
 
-    def open(self, key: str) -> File:
+    def open(self, key: str) -> IO:
         """Open record at key.
 
         If a cache miss occurs, the value is retrieved, stored in the cache,
@@ -206,7 +205,7 @@ class CacheDecorator(StoreDecorator):
         finally:
             self.cache.delete(key)
 
-    def put_file(self, key: str, file: Union[str, File]) -> str:
+    def put_file(self, key: str, file: Union[str, IO]) -> str:
         """Store contents of file at key.
 
         Will store the value in the backing store. Afterwards delete the (original)

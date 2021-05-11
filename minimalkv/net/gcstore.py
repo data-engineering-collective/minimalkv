@@ -1,9 +1,8 @@
 import io
 from contextlib import contextmanager
-from typing import Iterator, Optional, Tuple, cast
+from typing import IO, Iterator, Optional, Tuple, cast
 
-from minimalkv import KeyValueStore
-from minimalkv._typing import File
+from minimalkv._key_value_store import KeyValueStore
 from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
 
 
@@ -96,7 +95,7 @@ class GoogleCloudStore(KeyValueStore):
             blob_bytes = blob.download_as_bytes()
         return blob_bytes
 
-    def _get_file(self, key: str, file: File) -> str:
+    def _get_file(self, key: str, file: IO) -> str:
         blob = self._bucket.blob(key)
         with map_gcloud_exceptions(key):
             blob.download_to_file(file)
@@ -120,11 +119,11 @@ class GoogleCloudStore(KeyValueStore):
         """
         return (blob.name for blob in self._bucket.list_blobs(prefix=prefix))
 
-    def _open(self, key: str) -> File:
+    def _open(self, key: str) -> IO:
         blob = self._bucket.blob(key)
         if not blob.exists():
             raise KeyError
-        return IOInterface(blob)
+        return cast(IO, IOInterface(blob))
 
     def _put(self, key: str, data: bytes) -> str:
         blob = self._bucket.blob(key)
@@ -133,7 +132,7 @@ class GoogleCloudStore(KeyValueStore):
         blob.upload_from_string(data, content_type="application/octet-stream")
         return key
 
-    def _put_file(self, key: str, file: File) -> str:
+    def _put_file(self, key: str, file: IO) -> str:
         blob = self._bucket.blob(key)
         with map_gcloud_exceptions(key):
             if isinstance(file, io.BytesIO):

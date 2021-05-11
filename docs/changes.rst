@@ -1,6 +1,23 @@
 Changelog
 *********
 
+1.3.0
+=====
+
+* Moved mixin classes ``UrlMixin`` and ``CopyMixin`` from ``minimalkv`` to
+  ``minimalkv._mixins``.
+* Moved mixin class ``ExtendedKeyspaceMixin`` from ``minimalkv.contrib`` to
+  ``minimalkv._mixins``.
+* Moved stores ``KeyValueStore`` and ``UrlKeyValueStore`` from ``minimalkv`` to
+  ``minimalkv._key_value_store``.
+* Moved functions ``get_store`` and ``get_store_from_url`` from ``minimalkv`` to
+  ``minimalkv._get_store``.
+* Moved constants ``FOREVER``, ``NOT_SET``, ``VALID_NON_NUM``, ``VALID_KEY_REGEXP`` and
+  ``VALID_KEY_RE`` from ``minimalkv`` to ``minimalkv._constants``.
+* Moved constants ``VALID_NON_NUM_EXTENDED``, ``VALID_KEY_REGEXP_EXTENDED``,
+  ``VALID_KEY_RE_EXTENDED`` from ``minimalkv.contrib`` to ``minimalkv._constants``.
+* All changes are backwards compatible.
+
 1.2.2
 =====
 

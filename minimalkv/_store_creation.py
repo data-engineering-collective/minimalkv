@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any, Dict
 from minimalkv.fs import FilesystemStore
 
 if TYPE_CHECKING:
-    from minimalkv import KeyValueStore
+    from minimalkv._key_value_store import KeyValueStore
 
 
 def create_store(type: str, params: Dict[str, Any]) -> "KeyValueStore":
@@ -38,9 +38,8 @@ def _create_store_gcs(store_type, params):
 
     from google.oauth2.service_account import Credentials
 
+    from minimalkv._hstores import HGoogleCloudStore
     from minimalkv.net.gcstore import GoogleCloudStore
-
-    from ._hstores import HGoogleCloudStore
 
     if type(params["credentials"]) == bytes:
         account_info = json.loads(params["credentials"].decode())
@@ -56,9 +55,8 @@ def _create_store_gcs(store_type, params):
 
 def _create_store_azure(type, params):
     # TODO: Docstring with required params.
+    from minimalkv._hstores import HAzureBlockBlobStore
     from minimalkv.net.azurestore import AzureBlockBlobStore
-
-    from ._hstores import HAzureBlockBlobStore
 
     conn_string = params.get("connection_string", _build_azure_url(**params))
 
@@ -93,8 +91,9 @@ def _create_store_azure(type, params):
 
 def _create_store_hs3(type, params):
     # TODO: Docstring with required params.
+    from minimalkv._hstores import HBotoStore
+
     from ._boto import _get_s3bucket
-    from ._hstores import HBotoStore
 
     return HBotoStore(_get_s3bucket(**params))
 
@@ -112,7 +111,7 @@ def _create_store_hfs(type, params):
     # TODO: Docstring with required params.
     if params["create_if_missing"] and not os.path.exists(params["path"]):
         os.makedirs(params["path"])
-    from ._hstores import HFilesystemStore
+    from minimalkv._hstores import HFilesystemStore
 
     return HFilesystemStore(params["path"])
 
@@ -133,7 +132,7 @@ def _create_store_mem(type, params):
 
 def _create_store_hmem(type, params):
     # TODO: Docstring with required params.
-    from ._hstores import HDictStore
+    from minimalkv._hstores import HDictStore
 
     return HDictStore()
 

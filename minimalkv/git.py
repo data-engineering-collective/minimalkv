@@ -1,13 +1,13 @@
 import re
 import time
 from io import BytesIO
-from typing import Iterator, List, Optional, Union
+from typing import IO, Iterator, List, Optional, Union
 
 from dulwich.objects import Blob, Commit, Tree
 from dulwich.repo import Repo
 
-from minimalkv import KeyValueStore, __version__
-from minimalkv._typing import File
+from minimalkv import __version__
+from minimalkv._key_value_store import KeyValueStore
 
 
 def _on_tree(
@@ -196,10 +196,10 @@ class GitCommitStore(KeyValueStore):
                 if o.path.decode("ascii").startswith(prefix):
                     yield o.path.decode("ascii")
 
-    def _open(self, key: str) -> File:
+    def _open(self, key: str) -> IO:
         return BytesIO(self._get(key))
 
-    def _put_file(self, key: str, file: File) -> str:
+    def _put_file(self, key: str, file: IO) -> str:
         # FIXME: it may be worth to try to move large files directly into the
         #        store here
         return self._put(key, file.read())

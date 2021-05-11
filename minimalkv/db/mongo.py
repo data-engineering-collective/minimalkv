@@ -1,12 +1,11 @@
 import pickle
 import re
 from io import BytesIO
-from typing import Iterator
+from typing import IO, Iterator
 
 from bson.binary import Binary
 
-from minimalkv import KeyValueStore
-from minimalkv._typing import File
+from minimalkv._key_value_store import KeyValueStore
 
 
 class MongoStore(KeyValueStore):
@@ -39,7 +38,7 @@ class MongoStore(KeyValueStore):
         except StopIteration:
             raise KeyError(key)
 
-    def _open(self, key: str) -> File:
+    def _open(self, key: str) -> IO:
         return BytesIO(self._get(key))
 
     def _put(self, key: str, value: bytes) -> str:
@@ -48,7 +47,7 @@ class MongoStore(KeyValueStore):
         )
         return key
 
-    def _put_file(self, key: str, file: File) -> str:
+    def _put_file(self, key: str, file: IO) -> str:
         return self._put(key, file.read())
 
     def iter_keys(self, prefix: str = "") -> Iterator[str]:
