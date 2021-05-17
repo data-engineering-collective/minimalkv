@@ -1,6 +1,11 @@
 Changelog
 *********
 
+1.3.1
+=====
+
+* Fixed a bug requiring ``redis`` in :func:`~minimalkv._get_store.get_store_from_url`.
+
 1.3.0
 =====
 
@@ -53,7 +58,7 @@ Changelog
 0.14.1
 ======
 
-* Fix support for ``key in store`` for azure with ``azure-storage-blob`` 12
+* Fix support for ``key in store`` for azure with ``azure-storage-blob``.
 
 0.14.0
 ======
