@@ -2,11 +2,14 @@
 # -*- coding: utf-8 -*-
 import re
 from io import BytesIO
-from typing import IO, Iterator, List, Optional, Union
+from typing import IO, TYPE_CHECKING, Iterator, List, Optional, Union
 
-from redis import StrictRedis
+if TYPE_CHECKING:
+    from redis import StrictRedis
 
-from .. import FOREVER, NOT_SET, KeyValueStore, TimeToLiveMixin
+from minimalkv._constants import FOREVER, NOT_SET
+from minimalkv._key_value_store import KeyValueStore
+from minimalkv._mixins import TimeToLiveMixin
 
 
 class RedisStore(TimeToLiveMixin, KeyValueStore):
@@ -19,7 +22,7 @@ class RedisStore(TimeToLiveMixin, KeyValueStore):
 
     """
 
-    def __init__(self, redis: StrictRedis):
+    def __init__(self, redis: "StrictRedis"):
         self.redis = redis
 
     def _delete(self, key: str) -> int:
