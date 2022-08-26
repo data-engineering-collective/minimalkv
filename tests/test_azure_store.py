@@ -97,12 +97,12 @@ def test_azure_setgetstate():
     container = str(uuid())
     conn_string = get_azure_conn_string()
     store = AzureBlockBlobStore(conn_string=conn_string, container=container)
-    store.put(u"key1", b"value1")
+    store.put("key1", b"value1")
 
     buf = pickle.dumps(store, protocol=2)
     store = pickle.loads(buf)
 
-    assert store.get(u"key1") == b"value1"
+    assert store.get("key1") == b"value1"
     _delete_container(conn_string, container)
 
 
@@ -155,7 +155,7 @@ class TestAzureExceptionHandling(object):
         )
         with pytest.raises(IOError) as exc:
             store.keys()
-        assert u"The specified container does not exist." in str(exc.value)
+        assert "The specified container does not exist." in str(exc.value)
 
     def test_wrong_endpoint(self):
         container = str(uuid())
@@ -176,8 +176,8 @@ class TestAzureExceptionHandling(object):
             store.blob_container_client._config.retry_policy.total_retries = 0  # type: ignore
 
         with pytest.raises(IOError) as exc:
-            store.put(u"key", b"data")
-        assert u"connect" in str(exc.value)
+            store.put("key", b"data")
+        assert "connect" in str(exc.value)
 
     def test_wrong_credentials(self):
         container = str(uuid())
@@ -198,8 +198,8 @@ class TestAzureExceptionHandling(object):
             store.blob_container_client._config.retry_policy.total_retries = 0  # type: ignore
 
         with pytest.raises(IOError) as exc:
-            store.put(u"key", b"data")
-        assert u"Incorrect padding" in str(exc.value)
+            store.put("key", b"data")
+        assert "Incorrect padding" in str(exc.value)
 
 
 class TestChecksum(object):

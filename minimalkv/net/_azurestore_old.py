@@ -21,7 +21,7 @@ def map_azure_exceptions(key=None, exc_pass=()):
     except AzureMissingResourceHttpError as ex:
         if ex.__class__.__name__ not in exc_pass:
             s = str(ex)
-            if s.startswith(u"The specified container does not exist."):
+            if s.startswith("The specified container does not exist."):
                 raise IOError(s)
             raise KeyError(key)
     except AzureHttpError as ex:

@@ -6,7 +6,7 @@ from minimalkv.decorator import ReadOnlyDecorator
 
 good_urls = [
     (
-        u"azure://MYACCOUNT:dead%2Fbeef@1buc-ket1?param1=foo&param2=🍺&eat_more_🍎=1&create_if_missing=true",
+        "azure://MYACCOUNT:dead%2Fbeef@1buc-ket1?param1=foo&param2=🍺&eat_more_🍎=1&create_if_missing=true",
         dict(
             type="azure",
             account_name="MYACCOUNT",
@@ -16,7 +16,7 @@ good_urls = [
         ),
     ),
     (
-        u"azure://MYACCOUNT:deadbeef@1bucket1?param1=foo&param2=🍺&eat_more_🍎=1&create_if_missing=true",
+        "azure://MYACCOUNT:deadbeef@1bucket1?param1=foo&param2=🍺&eat_more_🍎=1&create_if_missing=true",
         dict(
             type="azure",
             account_name="MYACCOUNT",
@@ -26,7 +26,7 @@ good_urls = [
         ),
     ),
     (
-        u"azure://MYACCOUNT:deadbeef@1bucket1?param1=foo&param2=🍺&eat_more_🍎=&max_connections=5",
+        "azure://MYACCOUNT:deadbeef@1bucket1?param1=foo&param2=🍺&eat_more_🍎=&max_connections=5",
         dict(
             type="azure",
             account_name="MYACCOUNT",
@@ -36,7 +36,7 @@ good_urls = [
         ),
     ),
     (
-        u"azure://MYACCOUNT:deadbeef@1bucket1?param1=foo&param2=🍺&eat_more_🍎=&max_connections=5&max_block_size=4194304&&max_single_put_size=67108864",
+        "azure://MYACCOUNT:deadbeef@1bucket1?param1=foo&param2=🍺&eat_more_🍎=&max_connections=5&max_block_size=4194304&&max_single_put_size=67108864",
         dict(
             type="azure",
             account_name="MYACCOUNT",
@@ -47,26 +47,26 @@ good_urls = [
             max_single_put_size=["67108864"],
         ),
     ),
-    (u"fs://this/is/a/relative/path", dict(type="fs", path="this/is/a/relative/path")),
-    (u"fs:///an/absolute/path", dict(type=u"fs", path=u"/an/absolute/path")),
+    ("fs://this/is/a/relative/path", dict(type="fs", path="this/is/a/relative/path")),
+    ("fs:///an/absolute/path", dict(type="fs", path="/an/absolute/path")),
     (
-        u"s3://access_key:secret_key@endpoint:1234/bucketname",
+        "s3://access_key:secret_key@endpoint:1234/bucketname",
         dict(
-            type=u"s3",
-            host=u"endpoint:1234",
-            access_key=u"access_key",
-            secret_key=u"secret_key",
-            bucket=u"bucketname",
+            type="s3",
+            host="endpoint:1234",
+            access_key="access_key",
+            secret_key="secret_key",
+            bucket="bucketname",
         ),
     ),
-    (u"redis:///2", dict(type=u"redis", host=u"localhost", db=2)),
-    (u"memory://#wrap:readonly", {"type": u"memory", "wrap": u"readonly"}),
-    (u"memory://", dict(type=u"memory")),
+    ("redis:///2", dict(type="redis", host="localhost", db=2)),
+    ("memory://#wrap:readonly", {"type": "memory", "wrap": "readonly"}),
+    ("memory://", dict(type="memory")),
 ]
 
 bad_urls = [
     (
-        u"azure://MYACCOUNT:deadb/eef@1buc-ket1?param1=foo&param2=🍺&eat_more_🍎=1&create_if_missing=true",
+        "azure://MYACCOUNT:deadb/eef@1buc-ket1?param1=foo&param2=🍺&eat_more_🍎=1&create_if_missing=true",
         ValueError,
     ),
 ]
@@ -74,7 +74,7 @@ bad_urls = [
 
 def test_raise_on_invalid_store():
     with pytest.raises(ValueError):
-        url2dict(u"dummy://foo/bar")
+        url2dict("dummy://foo/bar")
 
 
 @pytest.mark.parametrize("url, expected", good_urls)
@@ -90,6 +90,6 @@ def test_bad_url2dict(url, raises):
 
 def test_roundtrip():
     assert isinstance(
-        get_store_from_url(u"memory://#wrap:readonly"),
+        get_store_from_url("memory://#wrap:readonly"),
         ReadOnlyDecorator,
     )

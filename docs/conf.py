@@ -34,8 +34,8 @@ source_suffix = ".rst"
 master_doc = "index"
 
 # General information about the project.
-project = u"minimalkv"
-copyright = u"2011-2021, The minimalkv contributors"
+project = "minimalkv"
+copyright = "2011-2021, The minimalkv contributors"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

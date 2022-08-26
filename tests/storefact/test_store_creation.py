@@ -76,17 +76,17 @@ def test_create_store_hs3(mocker):
     create_store(
         "hs3",
         {
-            "host": u"endpoint:1234",
-            "access_key": u"access_key",
-            "secret_key": u"secret_key",
-            "bucket": u"bucketname",
+            "host": "endpoint:1234",
+            "access_key": "access_key",
+            "secret_key": "secret_key",
+            "bucket": "bucketname",
         },
     )
     mock_hs3.assert_called_once_with(
-        host=u"endpoint:1234",
-        access_key=u"access_key",
-        secret_key=u"secret_key",
-        bucket=u"bucketname",
+        host="endpoint:1234",
+        access_key="access_key",
+        secret_key="secret_key",
+        bucket="bucketname",
     )
 
 
@@ -95,17 +95,17 @@ def test_create_store_s3(mocker):
     create_store(
         "s3",
         {
-            "host": u"endpoint:1234",
-            "access_key": u"access_key",
-            "secret_key": u"secret_key",
-            "bucket": u"bucketname",
+            "host": "endpoint:1234",
+            "access_key": "access_key",
+            "secret_key": "secret_key",
+            "bucket": "bucketname",
         },
     )
     mock_s3.assert_called_once_with(
-        host=u"endpoint:1234",
-        access_key=u"access_key",
-        secret_key=u"secret_key",
-        bucket=u"bucketname",
+        host="endpoint:1234",
+        access_key="access_key",
+        secret_key="secret_key",
+        bucket="bucketname",
     )
 
 
@@ -135,7 +135,7 @@ def test_create_store_mem(mocker):
     mock_mem = mocker.patch("minimalkv.memory.DictStore")
     create_store(
         "memory",
-        {"type": u"memory", "wrap": u"readonly"},
+        {"type": "memory", "wrap": "readonly"},
     )
     mock_mem.assert_called_once_with()
 
@@ -144,7 +144,7 @@ def test_create_store_hmem(mocker):
     mock_hmem = mocker.patch("minimalkv._hstores.HDictStore")
     create_store(
         "hmemory",
-        {"type": u"memory", "wrap": u"readonly"},
+        {"type": "memory", "wrap": "readonly"},
     )
     mock_hmem.assert_called_once_with()
 
@@ -153,7 +153,7 @@ def test_create_store_redis(mocker):
     mock_Strictredis = mocker.patch("redis.StrictRedis")
     create_store(
         "redis",
-        {"type": u"redis", "host": u"localhost", "db": 2},
+        {"type": "redis", "host": "localhost", "db": 2},
     )
     mock_Strictredis.assert_called_once_with(db=2, host="localhost", type="redis")
 

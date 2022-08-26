@@ -15,11 +15,11 @@ UUID_REGEXP = re.compile(
 class IDGen:
     @pytest.fixture(
         params=[
-            u"constant",
-            u"foo{}bar",
-            u"{}.jpeg",
-            u"prefix-{}.hello",
-            u"justprefix{}",
+            "constant",
+            "foo{}bar",
+            "{}.jpeg",
+            "prefix-{}.hello",
+            "justprefix{}",
         ]
     )
     def idgen_template(self, request):
