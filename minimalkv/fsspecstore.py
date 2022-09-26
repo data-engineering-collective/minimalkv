@@ -4,13 +4,26 @@ from minimalkv import KeyValueStore
 from shutil import copyfileobj
 
 
+# The complete path of the key is structured as follows:
+# /Users/simon/data/mykvstore/file1
+# <FS Location>    /<prefix>  <key>
+# If desired to be a directory, the prefix should end in a slash.
+
+# TODO: clean up keys before using fs
+
 class FSSpecStore(KeyValueStore):
     def __init__(self, fs: AbstractFileSystem, prefix=""):
         self.fs = fs
         self.prefix = prefix
 
     def iter_keys(self, prefix: str = "") -> Iterator[str]:
-        pass
+        # List files
+        fs_location = self.fs.info(path="")["name"]
+        files = self.fs.ls(f"{self.prefix}{prefix}")
+        return map(
+            lambda f: f.replace(f"{fs_location}/{self.prefix}", ""),
+            files
+        )
 
     def _delete(self, key: str):
         self.fs.delete(f"{self.prefix}{key}")
