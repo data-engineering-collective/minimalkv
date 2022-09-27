@@ -154,6 +154,11 @@ class TestAzureExceptionHandling(object):
             conn_string=conn_string, container=container, create_if_missing=False
         )
         with pytest.raises(IOError) as exc:
+            # TODO: we catch a FileNotFound error here,
+            # but we should make this a more descriptive error,
+            # e.g. by introducing a ContainerStore class (which extends FSSpecStore),
+            # which checks for the existence of the container
+            # before running any operations
             store.keys()
         assert "The specified container does not exist." in str(exc.value)
 

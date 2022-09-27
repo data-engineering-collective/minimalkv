@@ -6,7 +6,7 @@ from shutil import copyfileobj
 
 # The complete path of the key is structured as follows:
 # /Users/simon/data/mykvstore/file1
-# <FS Location>    /<prefix>  <key>
+# <prefix>                    <key>
 # If desired to be a directory, the prefix should end in a slash.
 
 # TODO: clean up keys before using fs
@@ -18,10 +18,9 @@ class FSSpecStore(KeyValueStore):
 
     def iter_keys(self, prefix: str = "") -> Iterator[str]:
         # List files
-        fs_location = self.fs.info(path="")["name"]
         files = self.fs.ls(f"{self.prefix}{prefix}")
         return map(
-            lambda f: f.replace(f"{fs_location}/{self.prefix}", ""),
+            lambda f: f.replace(f"{self.prefix}", ""),
             files
         )
 
