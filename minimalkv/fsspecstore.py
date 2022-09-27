@@ -12,9 +12,22 @@ from shutil import copyfileobj
 # TODO: clean up keys before using fs
 
 class FSSpecStore(KeyValueStore):
-    def __init__(self, fs: AbstractFileSystem, prefix=""):
+    def __init__(self, fs: AbstractFileSystem, prefix="", mkdir_prefix=True):
+        """
+
+        Parameters
+        ----------
+        fs
+        prefix
+        mkdir_prefix : Boolean
+            If True, the prefix will be created if it does not exist.
+            Analogous to the create_if_missing parameter in AzureBlockBlobStore.
+        """
         self.fs = fs
         self.prefix = prefix
+
+        if mkdir_prefix:
+            self.fs.mkdir(self.prefix)
 
     def iter_keys(self, prefix: str = "") -> Iterator[str]:
         # List files

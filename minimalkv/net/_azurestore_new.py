@@ -42,6 +42,8 @@ class AzureBlockBlobStore(FSSpecStore):  # noqa D
     ):
         self.conn_string = conn_string
         self.max_block_size = max_block_size
+        self.container = container
+        self.create_if_missing = create_if_missing
 
         # Create Azure Blob Storage Filesystem
         from adlfs import AzureBlobFileSystem
@@ -50,16 +52,11 @@ class AzureBlockBlobStore(FSSpecStore):  # noqa D
             # TODO blocksize is not really used in AzureBlobFileSystem
             blocksize=max_block_size,
         )
-        super().__init__(fs, prefix=f"/{container}/")
+        super().__init__(fs, prefix=f"{container}/", mkdir_prefix=create_if_missing)
 
-        # Will be used for building paths later
-        self.container = container
         # Cannot be specified via adlfs API
+        # Was only used for creating the container
         self.public = public
-        # Decides if the container should be created if it does not exist
-        # Only used in blob_container_client
-        # Can be implemented with makedir
-        self.create_if_missing = create_if_missing
         # max_connections is not used or exposed in adlfs
         self.max_connections = max_connections
         # Only used in blob_container_client
