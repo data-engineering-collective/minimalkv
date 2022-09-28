@@ -31,17 +31,28 @@ class FSSpecStore(KeyValueStore):
 
     def iter_keys(self, prefix: str = "") -> Iterator[str]:
         # List files
-        files = self.fs.ls(f"{self.prefix}{prefix}")
+        all_files_and_dirs = self.fs.find(f"{self.prefix}", prefix=prefix)
+
+        # When no matches are found, the Azure FileSystem returns the container,
+        # which is not desired.
+        if len(all_files_and_dirs) == 1 and all_files_and_dirs[0] in self.prefix:
+            return iter([])
         return map(
-            lambda f: f.replace(f"{self.prefix}", ""),
-            files
+            lambda k: k.replace(f"{self.prefix}", ""),
+            all_files_and_dirs
         )
 
     def _delete(self, key: str):
-        self.fs.delete(f"{self.prefix}{key}")
+        try:
+            self.fs.delete(f"{self.prefix}{key}")
+        except FileNotFoundError:
+            pass
 
     def _open(self, key: str) -> IO:
-        return self.fs.open(f"{self.prefix}{key}")
+        try:
+            return self.fs.open(f"{self.prefix}{key}")
+        except FileNotFoundError:
+            raise KeyError(key)
 
     def _put_file(self, key: str, file: IO) -> str:
         # fs.put_file only supports a path as a parameter, not a file
@@ -49,3 +60,6 @@ class FSSpecStore(KeyValueStore):
         with self.fs.open(f"{self.prefix}{key}", "wb") as f:
             copyfileobj(file, f)
             return key
+
+    def _has_key(self, key):
+        return self.fs.exists(f"{self.prefix}{key}")
