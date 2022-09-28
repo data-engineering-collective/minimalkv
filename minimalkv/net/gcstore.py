@@ -2,7 +2,7 @@ import io
 from contextlib import contextmanager
 from typing import IO, Iterator, Optional, Tuple, cast
 
-from minimalkv._key_value_store import KeyValueStore
+from minimalkv.fsspecstore import FSSpecStore
 from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
 
 
@@ -41,7 +41,7 @@ def map_gcloud_exceptions(
             raise IOError
 
 
-class GoogleCloudStore(KeyValueStore):
+class GoogleCloudStore(FSSpecStore):
     """A store using ``Google Cloud storage`` as a backend.
 
     See ``https://cloud.google.com/storage``.
@@ -55,6 +55,16 @@ class GoogleCloudStore(KeyValueStore):
         bucket_creation_location: str = "EUROPE-WEST3",
         project=None,
     ):
+        from gcsfs import GCSFileSystem
+        from gcsfs.core import DEFAULT_PROJECT
+        fs = GCSFileSystem(
+            project=project or DEFAULT_PROJECT,
+            token=credentials,
+            access="read_write",
+            default_location=bucket_creation_location,
+        )
+
+        super().__init__(fs, prefix=f"{bucket_name}/", mkdir_prefix=create_if_missing)
 
         self._credentials = credentials
         self.bucket_name = bucket_name
@@ -84,74 +94,74 @@ class GoogleCloudStore(KeyValueStore):
         else:
             return Client(credentials=self._credentials, project=self.project_name)
 
-    def _delete(self, key: str) -> str:
-        with map_gcloud_exceptions(key, error_codes_pass=("NotFound",)):
-            self._bucket.delete_blob(key)
-        return key
-
-    def _get(self, key: str) -> bytes:
-        blob = self._bucket.blob(key)
-        with map_gcloud_exceptions(key):
-            blob_bytes = blob.download_as_bytes()
-        return blob_bytes
-
-    def _get_file(self, key: str, file: IO) -> str:
-        blob = self._bucket.blob(key)
-        with map_gcloud_exceptions(key):
-            blob.download_to_file(file)
-        return key
-
-    def _has_key(self, key: str) -> bool:
-        return self._bucket.blob(key).exists()
-
-    def iter_keys(self, prefix: str = "") -> Iterator[str]:
-        """Iterate over all keys in the store starting with prefix.
-
-        Parameters
-        ----------
-        prefix : str, optional, default = ''
-            Only iterate over keys starting with prefix. Iterate over all keys if empty.
-
-        Raises
-        ------
-        IOError
-            If there was an error accessing the store.
-        """
-        return (blob.name for blob in self._bucket.list_blobs(prefix=prefix))
-
-    def _open(self, key: str) -> IO:
-        blob = self._bucket.blob(key)
-        if not blob.exists():
-            raise KeyError
-        return cast(IO, IOInterface(blob))
-
-    def _put(self, key: str, data: bytes) -> str:
-        blob = self._bucket.blob(key)
-        if type(data) != bytes:
-            raise IOError(f"data has to be of type 'bytes', not {type(data)}")
-        blob.upload_from_string(data, content_type="application/octet-stream")
-        return key
-
-    def _put_file(self, key: str, file: IO) -> str:
-        blob = self._bucket.blob(key)
-        with map_gcloud_exceptions(key):
-            if isinstance(file, io.BytesIO):
-                # not passing a size triggers a resumable upload to avoid trying to upload
-                # large files in a single request
-                # For BytesIO, getting the size is cheap, therefore we pass it
-                blob.upload_from_file(file_obj=file, size=file.getbuffer().nbytes)
-            else:
-                blob.upload_from_file(file_obj=file)
-        return key
-
-    # skips two items: bucket & client.
-    # These will be recreated after unpickling through the lazy_property decoorator
-    def __getstate__(self):  # noqa D
-        return {
-            key: value
-            for key, value in self.__dict__.items()
-            if not key.startswith(LAZY_PROPERTY_ATTR_PREFIX)
-        }
+    # def _delete(self, key: str) -> str:
+    #     with map_gcloud_exceptions(key, error_codes_pass=("NotFound",)):
+    #         self._bucket.delete_blob(key)
+    #     return key
+    #
+    # def _get(self, key: str) -> bytes:
+    #     blob = self._bucket.blob(key)
+    #     with map_gcloud_exceptions(key):
+    #         blob_bytes = blob.download_as_bytes()
+    #     return blob_bytes
+    #
+    # def _get_file(self, key: str, file: IO) -> str:
+    #     blob = self._bucket.blob(key)
+    #     with map_gcloud_exceptions(key):
+    #         blob.download_to_file(file)
+    #     return key
+    #
+    # def _has_key(self, key: str) -> bool:
+    #     return self._bucket.blob(key).exists()
+    #
+    # def iter_keys(self, prefix: str = "") -> Iterator[str]:
+    #     """Iterate over all keys in the store starting with prefix.
+    #
+    #     Parameters
+    #     ----------
+    #     prefix : str, optional, default = ''
+    #         Only iterate over keys starting with prefix. Iterate over all keys if empty.
+    #
+    #     Raises
+    #     ------
+    #     IOError
+    #         If there was an error accessing the store.
+    #     """
+    #     return (blob.name for blob in self._bucket.list_blobs(prefix=prefix))
+    #
+    # def _open(self, key: str) -> IO:
+    #     blob = self._bucket.blob(key)
+    #     if not blob.exists():
+    #         raise KeyError
+    #     return cast(IO, IOInterface(blob))
+    #
+    # def _put(self, key: str, data: bytes) -> str:
+    #     blob = self._bucket.blob(key)
+    #     if type(data) != bytes:
+    #         raise IOError(f"data has to be of type 'bytes', not {type(data)}")
+    #     blob.upload_from_string(data, content_type="application/octet-stream")
+    #     return key
+    #
+    # def _put_file(self, key: str, file: IO) -> str:
+    #     blob = self._bucket.blob(key)
+    #     with map_gcloud_exceptions(key):
+    #         if isinstance(file, io.BytesIO):
+    #             # not passing a size triggers a resumable upload to avoid trying to upload
+    #             # large files in a single request
+    #             # For BytesIO, getting the size is cheap, therefore we pass it
+    #             blob.upload_from_file(file_obj=file, size=file.getbuffer().nbytes)
+    #         else:
+    #             blob.upload_from_file(file_obj=file)
+    #     return key
+    #
+    # # skips two items: bucket & client.
+    # # These will be recreated after unpickling through the lazy_property decoorator
+    # def __getstate__(self):  # noqa D
+    #     return {
+    #         key: value
+    #         for key, value in self.__dict__.items()
+    #         if not key.startswith(LAZY_PROPERTY_ATTR_PREFIX)
+    #     }
 
 
 class IOInterface(io.BufferedIOBase):
