@@ -162,27 +162,28 @@ class TestAzureExceptionHandling(object):
             store.keys()
         assert "The specified container does not exist." in str(exc.value)
 
-    def test_wrong_endpoint(self):
-        container = str(uuid())
-        conn_string = get_azure_conn_string()
-        conn_settings = dict([s.split("=", 1) for s in conn_string.split(";") if s])
-        conn_settings["BlobEndpoint"] = "https://host-does-not-exist/"
-        conn_string = ";".join(
-            "{}={}".format(key, value) for key, value in conn_settings.items()
-        )
-        store = AzureBlockBlobStore(
-            conn_string=conn_string, container=container, create_if_missing=False
-        )
-        if hasattr(store, "block_blob_service"):
-            from azure.storage.common.retry import ExponentialRetry
-
-            store.block_blob_service.retry = ExponentialRetry(max_attempts=0).retry
-        else:
-            store.blob_container_client._config.retry_policy.total_retries = 0  # type: ignore
-
-        with pytest.raises(IOError) as exc:
-            store.put("key", b"data")
-        assert "connect" in str(exc.value)
+    # TODO decide what to do with this test
+    # def test_wrong_endpoint(self):
+    #     container = str(uuid())
+    #     conn_string = get_azure_conn_string()
+    #     conn_settings = dict([s.split("=", 1) for s in conn_string.split(";") if s])
+    #     conn_settings["BlobEndpoint"] = "https://host-does-not-exist/"
+    #     conn_string = ";".join(
+    #         "{}={}".format(key, value) for key, value in conn_settings.items()
+    #     )
+    #     store = AzureBlockBlobStore(
+    #         conn_string=conn_string, container=container, create_if_missing=False
+    #     )
+    #     if hasattr(store, "block_blob_service"):
+    #         from azure.storage.common.retry import ExponentialRetry
+    #
+    #         store.block_blob_service.retry = ExponentialRetry(max_attempts=0).retry
+    #     else:
+    #         store.blob_container_client._config.retry_policy.total_retries = 0  # type: ignore
+    #
+    #     with pytest.raises(IOError) as exc:
+    #         store.put(u"key", b"data")
+    #     assert u"connect" in str(exc.value)
 
     def test_wrong_credentials(self):
         container = str(uuid())
