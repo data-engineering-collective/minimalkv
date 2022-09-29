@@ -106,7 +106,7 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
         if isinstance(bucket, str):
             import boto3
 
-            s3_resource = boto3.resource("s3")
+            s3_resource = boto3.resource("s3", endpoint_url="http://127.0.0.1:9000")
             bucket = s3_resource.Bucket(bucket)
             if bucket not in s3_resource.buckets.all():
                 raise ValueError("invalid s3 bucket name")
@@ -201,10 +201,12 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
         else:
             is_public = _public_readable(grants)
         if self.url_valid_time and not is_public:
-            s3_client = boto3.client("s3")
+            s3_client = boto3.client("s3", endpoint_url=self.bucket.meta.client.meta.endpoint_url)
         else:
             s3_client = boto3.client(
-                "s3", config=botocore.client.Config(signature_version=botocore.UNSIGNED)
+                "s3",
+                config=botocore.client.Config(signature_version=botocore.UNSIGNED),
+                endpoint_url=self.bucket.meta.client.meta.endpoint_url
             )
         with map_boto3_exceptions(key=key):
             return s3_client.generate_presigned_url(
