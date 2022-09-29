@@ -30,7 +30,8 @@ def unicode_value(request):
     return request.param
 
 
-@pytest.fixture(params=[b"a_long_value" * 4 * 1024])
+# TODO make longer again
+@pytest.fixture(params=[b"a_long_value" * 4])
 def long_value(request):
     return request.param
 
