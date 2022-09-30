@@ -7,6 +7,7 @@ dependencies:
   - dulwich
   - mock
   - pytest
+# TODO remove
   - pytest-timeout
   - pytest-mock
   - pytest-xdist

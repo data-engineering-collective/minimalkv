@@ -27,7 +27,6 @@ class BasicStore(object):
         with pytest.raises(IOError):
             store.put(key, unicode_value)
 
-    @pytest.mark.timeout(10)
     def test_store_and_retrieve(self, store, key, value):
         store.put(key, value)
         assert store.get(key) == value
