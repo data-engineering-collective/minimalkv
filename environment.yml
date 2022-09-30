@@ -24,6 +24,6 @@ dependencies:
   - docker-compose
   - pymysql
   - pre-commit
-  - setuptools-scm
+  - setuptools-scm==6.4.2
   - uritools
   - sphinx
