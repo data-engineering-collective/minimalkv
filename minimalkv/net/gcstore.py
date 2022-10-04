@@ -2,6 +2,8 @@ import io
 from contextlib import contextmanager
 from typing import IO, Iterator, Optional, Tuple, cast
 
+from gcsfs.core import GCSFile
+
 from minimalkv.fsspecstore import FSSpecStore
 from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
 
@@ -57,9 +59,10 @@ class GoogleCloudStore(FSSpecStore):
     ):
         from gcsfs import GCSFileSystem
         from gcsfs.core import DEFAULT_PROJECT
+
         fs = GCSFileSystem(
-            project=project or DEFAULT_PROJECT,
-            token=credentials,
+            project=project or "nice-road-330220",
+            token="/Users/simon/code/minimalkv/nice-road-330220-167c4b1bbd12.json",
             access="read_write",
             default_location=bucket_creation_location,
         )
@@ -93,6 +96,21 @@ class GoogleCloudStore(FSSpecStore):
             return Client.from_service_account_json(self._credentials)
         else:
             return Client(credentials=self._credentials, project=self.project_name)
+
+    def _open(self, key: str) -> IO:
+        return GoogleCloudEntry(super()._open(key))
+
+
+class GoogleCloudEntry(io.BufferedIOBase):
+    def __init__(self, gcsfile: GCSFile):
+        self.gcsfile = gcsfile
+
+    def seek(self, loc, whence=0):
+        try:
+            return self.gcsfile.seek(loc, whence)
+        except ValueError:
+            # Map ValueError to IOError
+            raise IOError
 
     # def _delete(self, key: str) -> str:
     #     with map_gcloud_exceptions(key, error_codes_pass=("NotFound",)):
@@ -164,98 +182,98 @@ class GoogleCloudStore(FSSpecStore):
     #     }
 
 
-class IOInterface(io.BufferedIOBase):
-    """Class which provides a file-like interface to selectively read from a blob in the bucket."""
-
-    size: int
-    pos: int
-
-    def __init__(self, blob):
-        super(IOInterface, self).__init__()
-        self.blob = blob
-
-        if blob.size is None:
-            blob.reload()
-        self.size = cast(int, blob.size)
-        self.pos = 0
-
-    def tell(self) -> int:
-        """Return the current offset as int. Always >= 0."""
-        if self.closed:
-            raise ValueError("I/O operation on closed file")
-        return self.pos
-
-    def read(self, size: Optional[int] = -1) -> bytes:
-        """Return first ``size`` bytes of data.
-
-        If no size is given all data is returned.
-
-        Parameters
-        ----------
-        size : int, optional, default = -1
-            Number of bytes to be returned.
-
-        """
-        size = -1 if size is None else size
-        # TODO: What happens for size < 0?
-        if self.closed:
-            raise ValueError("I/O operation on closed file")
-        max_size = max(0, self.size - self.pos)
-        if size < 0 or size > max_size:
-            size = max_size
-        if size == 0:
-            return b""
-        blob_bytes = self.blob.download_as_bytes(
-            start=self.pos, end=self.pos + size - 1
-        )
-        self.pos += len(blob_bytes)
-        return blob_bytes
-
-    def seek(self, offset: int, whence: int = 0) -> int:
-        """
-        Move to a new offset either relative or absolute.
-
-        whence=0 is absolute, whence=1 is relative, whence=2 is relative to the end.
-
-        Any relative or absolute seek operation which would result in a
-        negative position is undefined and that case can be ignored
-        in the implementation.
-
-        Any seek operation which moves the position after the stream
-        should succeed. ``tell()`` should report that position and ``read()``
-        should return an empty bytes object.
-
-        Parameters
-        ----------
-        offset : int
-            TODO
-        whence : int, optional, default = 0
-            TODO
-
-        Returns
-        -------
-        pos : int
-            TODO
-
-        """
-        if self.closed:
-            raise ValueError("I/O operation on closed file")
-        if whence == 0:
-            if offset < 0:
-                raise IOError("seek would move position outside the file")
-            self.pos = offset
-        elif whence == 1:
-            if self.pos + offset < 0:
-                raise IOError("seek would move position outside the file")
-            self.pos += offset
-        elif whence == 2:
-            if self.size + offset < 0:
-                raise IOError("seek would move position outside the file")
-            self.pos = self.size + offset
-        return self.pos
-
-    def seekable(self) -> bool:  # noqa
-        return True
-
-    def readable(self) -> bool:  # noqa
-        return True
+# class IOInterface(io.BufferedIOBase):
+#     """Class which provides a file-like interface to selectively read from a blob in the bucket."""
+#
+#     size: int
+#     pos: int
+#
+#     def __init__(self, blob):
+#         super(IOInterface, self).__init__()
+#         self.blob = blob
+#
+#         if blob.size is None:
+#             blob.reload()
+#         self.size = cast(int, blob.size)
+#         self.pos = 0
+#
+#     def tell(self) -> int:
+#         """Return the current offset as int. Always >= 0."""
+#         if self.closed:
+#             raise ValueError("I/O operation on closed file")
+#         return self.pos
+#
+#     def read(self, size: Optional[int] = -1) -> bytes:
+#         """Return first ``size`` bytes of data.
+#
+#         If no size is given all data is returned.
+#
+#         Parameters
+#         ----------
+#         size : int, optional, default = -1
+#             Number of bytes to be returned.
+#
+#         """
+#         size = -1 if size is None else size
+#         # TODO: What happens for size < 0?
+#         if self.closed:
+#             raise ValueError("I/O operation on closed file")
+#         max_size = max(0, self.size - self.pos)
+#         if size < 0 or size > max_size:
+#             size = max_size
+#         if size == 0:
+#             return b""
+#         blob_bytes = self.blob.download_as_bytes(
+#             start=self.pos, end=self.pos + size - 1
+#         )
+#         self.pos += len(blob_bytes)
+#         return blob_bytes
+#
+#     def seek(self, offset: int, whence: int = 0) -> int:
+#         """
+#         Move to a new offset either relative or absolute.
+#
+#         whence=0 is absolute, whence=1 is relative, whence=2 is relative to the end.
+#
+#         Any relative or absolute seek operation which would result in a
+#         negative position is undefined and that case can be ignored
+#         in the implementation.
+#
+#         Any seek operation which moves the position after the stream
+#         should succeed. ``tell()`` should report that position and ``read()``
+#         should return an empty bytes object.
+#
+#         Parameters
+#         ----------
+#         offset : int
+#             TODO
+#         whence : int, optional, default = 0
+#             TODO
+#
+#         Returns
+#         -------
+#         pos : int
+#             TODO
+#
+#         """
+#         if self.closed:
+#             raise ValueError("I/O operation on closed file")
+#         if whence == 0:
+#             if offset < 0:
+#                 raise IOError("seek would move position outside the file")
+#             self.pos = offset
+#         elif whence == 1:
+#             if self.pos + offset < 0:
+#                 raise IOError("seek would move position outside the file")
+#             self.pos += offset
+#         elif whence == 2:
+#             if self.size + offset < 0:
+#                 raise IOError("seek would move position outside the file")
+#             self.pos = self.size + offset
+#         return self.pos
+#
+#     def seekable(self) -> bool:  # noqa
+#         return True
+#
+#     def readable(self) -> bool:  # noqa
+#         return True
