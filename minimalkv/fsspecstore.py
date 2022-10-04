@@ -18,6 +18,8 @@ class FSSpecStoreEntry(io.BufferedIOBase):
         self._file = file
 
     def seek(self, loc, whence=0):
+        if self.closed():
+            raise ValueError("I/O operation on closed file.")
         try:
             return self._file.seek(loc, whence)
         except ValueError:
@@ -25,6 +27,8 @@ class FSSpecStoreEntry(io.BufferedIOBase):
             raise IOError
 
     def tell(self):
+        if self.closed():
+            raise ValueError("I/O operation on closed file.")
         return self._file.tell()
 
     def read(self, size=-1):

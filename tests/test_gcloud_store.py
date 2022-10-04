@@ -84,6 +84,8 @@ def store(dirty_store):
     for blob in dirty_store._bucket.list_blobs():
         blob.delete()
 
+    dirty_store.fs.invalidate_cache()
+
     # Google Storage doesn't like getting hit with heavy CRUD on a newly
     # create bucket. Therefore we introduce an artificial timeout
     if not os.environ.get("STORAGE_EMULATOR_HOST", None):
@@ -147,6 +149,8 @@ class TestExtendedKeysGCStore(TestGoogleCloudStore, ExtendedKeyspaceTests):
     def store(self, dirty_store):
         for blob in dirty_store._bucket.list_blobs():
             blob.delete()
+        # Invalidate fsspec cache
+        dirty_store.fs.invalidate_cache()
         if not os.environ.get("STORAGE_EMULATOR_HOST", None):
             time.sleep(0.2)
         return dirty_store
