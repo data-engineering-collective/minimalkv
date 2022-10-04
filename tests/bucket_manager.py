@@ -51,7 +51,6 @@ def boto3_bucket(access_key, secret_key, host=None, bucket_name=None, **kwargs):
     name = bucket_name or "testrun-bucket-{}".format(uuid())
     if host == "127.0.0.1":
         host = "http://127.0.0.1:9000"
-    host = host or "http://127.0.0.1:9000"
     s3_client = boto3.client("s3", endpoint_url=host)
     s3_client.create_bucket(Bucket=name)
     s3_resource = boto3.resource("s3", endpoint_url=host)

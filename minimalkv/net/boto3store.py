@@ -106,7 +106,7 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
         if isinstance(bucket, str):
             import boto3
 
-            s3_resource = boto3.resource("s3", endpoint_url="http://127.0.0.1:9000")
+            s3_resource = boto3.resource("s3")
             bucket = s3_resource.Bucket(bucket)
             if bucket not in s3_resource.buckets.all():
                 raise ValueError("invalid s3 bucket name")
