@@ -1,8 +1,9 @@
-from typing import Iterator, IO
-from fsspec import AbstractFileSystem
-from minimalkv import KeyValueStore
 from shutil import copyfileobj
+from typing import IO, Iterator
 
+from fsspec import AbstractFileSystem
+
+from minimalkv import KeyValueStore
 
 # The complete path of the key is structured as follows:
 # /Users/simon/data/mykvstore/file1
@@ -10,6 +11,7 @@ from shutil import copyfileobj
 # If desired to be a directory, the prefix should end in a slash.
 
 # TODO: clean up keys before using fs
+
 
 class FSSpecStore(KeyValueStore):
     def __init__(self, fs: AbstractFileSystem, prefix="", mkdir_prefix=True):
@@ -37,14 +39,11 @@ class FSSpecStore(KeyValueStore):
         # which is not desired.
         if len(all_files_and_dirs) == 1 and all_files_and_dirs[0] in self.prefix:
             return iter([])
-        return map(
-            lambda k: k.replace(f"{self.prefix}", ""),
-            all_files_and_dirs
-        )
+        return map(lambda k: k.replace(f"{self.prefix}", ""), all_files_and_dirs)
 
     def _delete(self, key: str):
         try:
-            self.fs.delete(f"{self.prefix}{key}")
+            self.fs.rm_file(f"{self.prefix}{key}")
         except FileNotFoundError:
             pass
 
