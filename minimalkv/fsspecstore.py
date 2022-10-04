@@ -4,6 +4,7 @@ from typing import IO, Iterator
 
 from fsspec import AbstractFileSystem
 from fsspec.spec import AbstractBufferedFile
+from google.cloud.exceptions import NotFound
 
 from minimalkv import KeyValueStore
 
@@ -62,8 +63,15 @@ class FSSpecStore(KeyValueStore):
         self.fs = fs
         self.prefix = prefix
 
+        self._prefix_exists = True
         if mkdir_prefix:
             self.fs.mkdir(self.prefix)
+        else:
+            # Check if bucket exists
+            try:
+                self.fs.info(self.prefix)
+            except FileNotFoundError:
+                self._bucket_exists = False
 
     def iter_keys(self, prefix: str = "") -> Iterator[str]:
         # List files
@@ -82,6 +90,8 @@ class FSSpecStore(KeyValueStore):
             pass
 
     def _open(self, key: str) -> IO:
+        if not self._bucket_exists:
+            raise NotFound("Bucket does not exist.")
         try:
             return self.fs.open(f"{self.prefix}{key}")
         except FileNotFoundError:
