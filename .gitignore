@@ -105,6 +105,9 @@ Pipfile.lock
 # direnv
 .envrc
 
+# VS Code
+.vscode/
+
 # minimalkv
 store/
 exp.py
