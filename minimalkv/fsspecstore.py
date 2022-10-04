@@ -1,7 +1,9 @@
+import io
 from shutil import copyfileobj
 from typing import IO, Iterator
 
 from fsspec import AbstractFileSystem
+from fsspec.spec import AbstractBufferedFile
 
 from minimalkv import KeyValueStore
 
@@ -10,7 +12,35 @@ from minimalkv import KeyValueStore
 # <prefix>                    <key>
 # If desired to be a directory, the prefix should end in a slash.
 
-# TODO: clean up keys before using fs
+
+class FSSpecStoreEntry(io.BufferedIOBase):
+    def __init__(self, file: AbstractBufferedFile):
+        self._file = file
+
+    def seek(self, loc, whence=0):
+        try:
+            return self._file.seek(loc, whence)
+        except ValueError:
+            # Map ValueError to IOError
+            raise IOError
+
+    def tell(self):
+        return self._file.tell()
+
+    def read(self, size=-1):
+        return self._file.read(size)
+
+    def seekable(self):
+        return self._file.seekable()
+
+    def readable(self):
+        return self._file.readable()
+
+    def close(self) -> None:
+        self._file.close()
+
+    def closed(self) -> bool:
+        return self._file.closed
 
 
 class FSSpecStore(KeyValueStore):

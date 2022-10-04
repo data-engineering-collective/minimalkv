@@ -4,7 +4,7 @@ from typing import IO, Iterator, Optional, Tuple, cast
 
 from gcsfs.core import GCSFile
 
-from minimalkv.fsspecstore import FSSpecStore
+from minimalkv.fsspecstore import FSSpecStore, FSSpecStoreEntry
 from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
 
 
@@ -98,19 +98,7 @@ class GoogleCloudStore(FSSpecStore):
             return Client(credentials=self._credentials, project=self.project_name)
 
     def _open(self, key: str) -> IO:
-        return GoogleCloudEntry(super()._open(key))
-
-
-class GoogleCloudEntry(io.BufferedIOBase):
-    def __init__(self, gcsfile: GCSFile):
-        self.gcsfile = gcsfile
-
-    def seek(self, loc, whence=0):
-        try:
-            return self.gcsfile.seek(loc, whence)
-        except ValueError:
-            # Map ValueError to IOError
-            raise IOError
+        return FSSpecStoreEntry(super()._open(key))
 
     # def _delete(self, key: str) -> str:
     #     with map_gcloud_exceptions(key, error_codes_pass=("NotFound",)):
