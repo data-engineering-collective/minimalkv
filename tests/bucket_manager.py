@@ -49,9 +49,19 @@ def boto3_bucket(access_key, secret_key, host=None, bucket_name=None, **kwargs):
     import boto3
 
     name = bucket_name or "testrun-bucket-{}".format(uuid())
-    s3_client = boto3.client("s3", endpoint_url=host)
+    s3_client = boto3.client(
+        "s3",
+        endpoint_url=host,
+        aws_access_key_id=access_key,
+        aws_secret_access_key=secret_key,
+    )
     s3_client.create_bucket(Bucket=name)
-    s3_resource = boto3.resource("s3", endpoint_url=host)
+    s3_resource = boto3.resource(
+        "s3",
+        endpoint_url=host,
+        aws_access_key_id=access_key,
+        aws_secret_access_key=secret_key,
+    )
     bucket = s3_resource.Bucket(name)
 
     yield bucket
