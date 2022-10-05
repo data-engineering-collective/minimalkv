@@ -106,9 +106,9 @@ def test_gcstore_pickling(store):
     assert store.get("key1") == b"value1"
 
 
-def test_gcstore_pickling_attrs():
+def test_gcstore_pickling_attrs(gc_credentials):
     store = GoogleCloudStore(
-        credentials=AnonymousCredentials(),
+        credentials=gc_credentials,
         bucket_name="test_bucket",
         create_if_missing=False,
         bucket_creation_location="US-CENTRAL1",

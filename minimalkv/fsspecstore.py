@@ -70,7 +70,7 @@ class FSSpecStore(KeyValueStore):
             # Check if bucket exists
             try:
                 self.fs.info(self.prefix)
-            except FileNotFoundError:
+            except (FileNotFoundError, IOError):
                 self._prefix_exists = False
 
     def iter_keys(self, prefix: str = "") -> Iterator[str]:
