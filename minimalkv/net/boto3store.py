@@ -201,10 +201,14 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
         else:
             is_public = _public_readable(grants)
         if self.url_valid_time and not is_public:
-            s3_client = boto3.client("s3")
+            s3_client = boto3.client(
+                "s3", endpoint_url=self.bucket.meta.client.meta.endpoint_url
+            )
         else:
             s3_client = boto3.client(
-                "s3", config=botocore.client.Config(signature_version=botocore.UNSIGNED)
+                "s3",
+                config=botocore.client.Config(signature_version=botocore.UNSIGNED),
+                endpoint_url=self.bucket.meta.client.meta.endpoint_url,
             )
         with map_boto3_exceptions(key=key):
             return s3_client.generate_presigned_url(

@@ -39,7 +39,7 @@ class HashDecorator(StoreDecorator):
 
     """
 
-    def __init__(self, decorated_store, hashfunc=hashlib.sha1, template=u"{}"):
+    def __init__(self, decorated_store, hashfunc=hashlib.sha1, template="{}"):
 
         self.hashfunc = hashfunc
         self._template = template
@@ -135,7 +135,7 @@ class HashDecorator(StoreDecorator):
                         self._template.format(phash.hexdigest()),
                         tmpfile.name,
                         *args,
-                        **kwargs
+                        **kwargs,
                     )  # type: ignore
                 finally:
                     try:
@@ -169,7 +169,7 @@ class UUIDDecorator(StoreDecorator):
     # looked up using :func:`getattr` on the :mod:`uuid` module.
     uuidfunc = "uuid1"
 
-    def __init__(self, store, template=u"{}"):
+    def __init__(self, store, template="{}"):
         super(UUIDDecorator, self).__init__(store)
         self._template = template
 

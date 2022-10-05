@@ -36,7 +36,7 @@ class TestHMACFileReader(object):
 
     @pytest.fixture
     def chunk_sizes(self, value):
-        return [10 ** n for n in range(2, 8)]
+        return [10**n for n in range(2, 8)]
 
     def test_close(self, create_reader):
         reader = create_reader()
@@ -121,7 +121,7 @@ class HMACDec(object):
 
     def test_copy_raises_not_implemented(self, store):
         with pytest.raises(NotImplementedError):
-            HMACDecorator(b"secret", store).copy(u"src", u"dest")
+            HMACDecorator(b"secret", store).copy("src", "dest")
 
     def test_put_file_obj(self, key, value, hmacstore):
         hmacstore.put_file(key, BytesIO(value))

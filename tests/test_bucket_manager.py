@@ -11,7 +11,7 @@ def credentials(request):
     return request.param
 
 
-@pytest.yield_fixture()
+@pytest.fixture
 def bucket(credentials):
     with boto_bucket(**credentials) as bucket:
         yield bucket

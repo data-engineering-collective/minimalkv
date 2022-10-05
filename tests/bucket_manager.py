@@ -45,13 +45,42 @@ def boto_bucket(
 
 
 @contextmanager
-def boto3_bucket(access_key, secret_key, host, bucket_name=None, **kwargs):
+def boto3_bucket(
+    access_key,
+    secret_key,
+    host=None,
+    bucket_name=None,
+    port=None,
+    is_secure=None,
+    **kwargs,
+):
+    import os
+
     import boto3
 
+    # Set environment variables for boto3
+    os.environ["AWS_ACCESS_KEY_ID"] = access_key
+    os.environ["AWS_SECRET_ACCESS_KEY"] = secret_key
+    os.environ["AWS_DEFAULT_REGION"] = "us-east-1"
+
+    # Build endpoint host
+    endpoint_url = None
+    if host:
+        scheme = "https" if is_secure else "http"
+        endpoint_url = f"{scheme}://{host}"
+        if port:
+            endpoint_url += f":{port}"
+
     name = bucket_name or "testrun-bucket-{}".format(uuid())
-    s3_client = boto3.client("s3")
+    s3_client = boto3.client(
+        "s3",
+        endpoint_url=endpoint_url,
+    )
     s3_client.create_bucket(Bucket=name)
-    s3_resource = boto3.resource("s3")
+    s3_resource = boto3.resource(
+        "s3",
+        endpoint_url=endpoint_url,
+    )
     bucket = s3_resource.Bucket(name)
 
     yield bucket

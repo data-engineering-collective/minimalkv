@@ -153,7 +153,7 @@ def _build_azure_url(
     default_endpoints_protocol=None,
     blob_endpoint=None,
     use_sas=False,
-    **kwargs
+    **kwargs,
 ):
     # TODO: Docstring
     protocol = default_endpoints_protocol or "https"

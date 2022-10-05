@@ -19,7 +19,7 @@ class TestMongoDB(BasicStore):
     def db_name(self):
         return "_minimalkv_test_{}".format(uuid())
 
-    @pytest.yield_fixture
+    @pytest.fixture
     def store(self, db_name):
         try:
             conn = pymongo.MongoClient()

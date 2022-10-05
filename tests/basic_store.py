@@ -244,26 +244,26 @@ class BasicStore(object):
 
     def test_prefix_iterator(self, store, value):
         for k in [
-            u"X",
-            u"a1Xb1",
-            u"a1Xb1",
-            u"a2X",
-            u"a2Xb1",
-            u"a3",
-            u"a4Xb1Xc1",
-            u"a4Xb1Xc2",
-            u"a4Xb2Xc1",
-            u"a4Xb3",
+            "X",
+            "a1Xb1",
+            "a1Xb1",
+            "a2X",
+            "a2Xb1",
+            "a3",
+            "a4Xb1Xc1",
+            "a4Xb1Xc2",
+            "a4Xb2Xc1",
+            "a4Xb3",
         ]:
             store.put(k, value)
 
-        prefixes = sorted(store.iter_prefixes(u"X"))
-        assert prefixes == [u"X", u"a1X", u"a2X", u"a3", u"a4X"]
+        prefixes = sorted(store.iter_prefixes("X"))
+        assert prefixes == ["X", "a1X", "a2X", "a3", "a4X"]
 
-        prefixes = sorted(store.iter_prefixes(u"X", prefix=u"a4X"))
-        assert prefixes == [u"a4Xb1X", u"a4Xb2X", u"a4Xb3"]
+        prefixes = sorted(store.iter_prefixes("X", prefix="a4X"))
+        assert prefixes == ["a4Xb1X", "a4Xb2X", "a4Xb3"]
 
-        prefixes = sorted(store.iter_prefixes(u"X", prefix=u"foo"))
+        prefixes = sorted(store.iter_prefixes("X", prefix="foo"))
         assert prefixes == []
 
     def test_keys(self, store, key, key2, value, value2):

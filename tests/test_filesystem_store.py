@@ -56,7 +56,7 @@ class TestFilesystemStoreFileURI(TestBaseFilesystemStore):
             tmpfile.write(value)
             tmpfile.close()
 
-            key = store.put_file(u"testkey", tmpfile.name)
+            key = store.put_file("testkey", tmpfile.name)
             url = store.url_for(key)
 
             assert url.startswith("file://")
@@ -86,7 +86,7 @@ class TestFilesystemStoreUmask(TestBaseFilesystemStore):
     def test_file_permission_on_new_file_have_correct_value(self, store, perms, value):
         src = BytesIO(value)
 
-        key = store.put_file(u"test123", src)
+        key = store.put_file("test123", src)
 
         parts = urlparse(store.url_for(key))
         path = parts.path
@@ -166,41 +166,41 @@ class TestExtendedKeyspaceFilesystemStore(
 
     def test_prefix_iterator_ossep(self, store, value):
         for k in [
-            u"a1" + os.sep + u"b1",
-            u"a1" + os.sep + u"b1",
-            u"a2" + os.sep + u"b1",
-            u"a3",
-            u"a4" + os.sep + u"b1" + os.sep + u"c1",
-            u"a4" + os.sep + u"b1" + os.sep + u"c2",
-            u"a4" + os.sep + u"b2" + os.sep + u"c1",
-            u"a4" + os.sep + u"b3",
+            "a1" + os.sep + "b1",
+            "a1" + os.sep + "b1",
+            "a2" + os.sep + "b1",
+            "a3",
+            "a4" + os.sep + "b1" + os.sep + "c1",
+            "a4" + os.sep + "b1" + os.sep + "c2",
+            "a4" + os.sep + "b2" + os.sep + "c1",
+            "a4" + os.sep + "b3",
         ]:
             store.put(k, value)
 
         out = sorted(store.iter_prefixes(os.sep))
         assert out == [
-            u"a1" + os.sep,
-            u"a2" + os.sep,
-            u"a3",
-            u"a4" + os.sep,
+            "a1" + os.sep,
+            "a2" + os.sep,
+            "a3",
+            "a4" + os.sep,
         ]
 
         out = sorted(
             store.iter_prefixes(
                 os.sep,
-                prefix=u"a4" + os.sep,
+                prefix="a4" + os.sep,
             )
         )
         assert out == [
-            u"a4" + os.sep + "b1" + os.sep,
-            u"a4" + os.sep + "b2" + os.sep,
-            u"a4" + os.sep + "b3",
+            "a4" + os.sep + "b1" + os.sep,
+            "a4" + os.sep + "b2" + os.sep,
+            "a4" + os.sep + "b3",
         ]
 
         out = sorted(
             store.iter_prefixes(
                 os.sep,
-                prefix=u"foo" + os.sep,
+                prefix="foo" + os.sep,
             )
         )
         assert out == []
