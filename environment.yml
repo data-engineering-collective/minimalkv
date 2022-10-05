@@ -4,26 +4,31 @@ channels:
   - nodefaults
 dependencies:
   - python
+# Store SDKs
+  # Cloud
+  - azure-storage-blob
+  - boto
+  - boto3
+  - gcsfs
+  # DB
+  - redis-py
+  - psycopg2
+  - sqlalchemy
+  - pymongo
+  - pymysql
+  # Git
   - dulwich
+# Utils
+  - uritools
+  - six
+# Testing
   - mock
   - pytest
   - pytest-mock
   - pytest-xdist
   - pytest-cov
-  - redis-py
-  - psycopg2
-  - six
-  - sqlalchemy
-  # Remove??
-  - google-cloud-storage
-  - boto
-  - boto3
-  - pymongo
-  - docker-compose
-  - pymysql
+# Infrastructure
   - pre-commit
   - setuptools-scm
-  - uritools
   - sphinx
-  - adlfs
-  - gcsfs
+  - docker-compose
