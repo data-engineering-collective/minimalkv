@@ -58,7 +58,7 @@ class FSSpecStore(KeyValueStore):
         prefix
         mkdir_prefix : Boolean
             If True, the prefix will be created if it does not exist.
-            Analogous to the create_if_missing parameter in AzureBlockBlobStore.
+            Analogous to the create_if_missing parameter in AzureBlockBlobStore or GoogleCloudStore.
         """
         self.fs = fs
         self.prefix = prefix
@@ -75,17 +75,17 @@ class FSSpecStore(KeyValueStore):
 
     def iter_keys(self, prefix: str = "") -> Iterator[str]:
         # List files
-        all_files_and_dirs = self.fs.find(f"{self.prefix}", prefix=prefix)
+        all_files_and_dirs = self.fs.find(f"{self.prefix}", prefix=escape(prefix))
 
         # When no matches are found, the Azure FileSystem returns the container,
         # which is not desired.
         if len(all_files_and_dirs) == 1 and all_files_and_dirs[0] in self.prefix:
             return iter([])
-        return map(lambda k: k.replace(f"{self.prefix}", ""), all_files_and_dirs)
+        return map(lambda k: unescape(k.replace(f"{self.prefix}", "")), all_files_and_dirs)
 
     def _delete(self, key: str):
         try:
-            self.fs.rm_file(f"{self.prefix}{key}")
+            self.fs.rm_file(f"{self.prefix}{escape(key)}")
         except FileNotFoundError:
             pass
 
@@ -93,16 +93,29 @@ class FSSpecStore(KeyValueStore):
         if not self._prefix_exists:
             raise NotFound("Bucket does not exist.")
         try:
-            return self.fs.open(f"{self.prefix}{key}")
+            return self.fs.open(f"{self.prefix}{escape(key)}")
         except FileNotFoundError:
             raise KeyError(key)
 
     def _put_file(self, key: str, file: IO) -> str:
         # fs.put_file only supports a path as a parameter, not a file
         # Open file at key in writable mode
-        with self.fs.open(f"{self.prefix}{key}", "wb") as f:
+        with self.fs.open(f"{self.prefix}{escape(key)}", "wb") as f:
             copyfileobj(file, f)
             return key
 
     def _has_key(self, key):
-        return self.fs.exists(f"{self.prefix}{key}")
+        return self.fs.exists(f"{self.prefix}{escape(key)}")
+
+
+def escape(path: str) -> str:
+    # Escape key before downloading
+    from urllib.parse import quote
+    # Encode everything, including slashes
+    return quote(path, safe='')
+
+
+def unescape(path: str) -> str:
+    # Unescape key before downloading
+    from urllib.parse import unquote
+    return unquote(path)
