@@ -71,7 +71,7 @@ class FSSpecStore(KeyValueStore):
             try:
                 self.fs.info(self.prefix)
             except FileNotFoundError:
-                self._bucket_exists = False
+                self._prefix_exists = False
 
     def iter_keys(self, prefix: str = "") -> Iterator[str]:
         # List files
@@ -90,7 +90,7 @@ class FSSpecStore(KeyValueStore):
             pass
 
     def _open(self, key: str) -> IO:
-        if not self._bucket_exists:
+        if not self._prefix_exists:
             raise NotFound("Bucket does not exist.")
         try:
             return self.fs.open(f"{self.prefix}{key}")
