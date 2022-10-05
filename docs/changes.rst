@@ -1,6 +1,11 @@
 Changelog
 *********
 
+Current version
+===============
+
+* Drop support for Python 3.6 & 3.7
+
 1.3.1
 =====
 
