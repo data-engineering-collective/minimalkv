@@ -1,11 +1,9 @@
-import io
+import json
 from contextlib import contextmanager
-from typing import IO, Iterator, Optional, Tuple, cast
-
-from gcsfs.core import GCSFile
+from typing import IO, Optional, Tuple
 
 from minimalkv.fsspecstore import FSSpecStore, FSSpecStoreEntry
-from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
+from minimalkv.net._net_common import lazy_property
 
 
 @contextmanager
@@ -58,11 +56,15 @@ class GoogleCloudStore(FSSpecStore):
         project=None,
     ):
         from gcsfs import GCSFileSystem
-        from gcsfs.core import DEFAULT_PROJECT
+
+        if isinstance(credentials, str):
+            # Parse JSON from path to extract project name
+            credentialsdict = json.load(open(credentials))
+            project = project or credentialsdict["project_id"]
 
         fs = GCSFileSystem(
-            project=project or "nice-road-330220",
-            token="/Users/simon/code/minimalkv/nice-road-330220-167c4b1bbd12.json",
+            project=project,
+            token=credentials,
             access="read_write",
             default_location=bucket_creation_location,
         )
