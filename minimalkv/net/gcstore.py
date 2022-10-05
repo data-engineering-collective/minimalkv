@@ -1,6 +1,6 @@
 import json
 from contextlib import contextmanager
-from typing import IO, Optional, Tuple
+from typing import IO, Optional, Tuple, cast
 
 from minimalkv.fsspecstore import FSSpecStore, FSSpecStoreEntry
 from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
@@ -76,7 +76,7 @@ class GoogleCloudStore(FSSpecStore):
         )
 
     def _open(self, key: str) -> IO:
-        return FSSpecStoreEntry(super()._open(key))
+        return cast(IO, FSSpecStoreEntry(super()._open(key)))
 
     # These exist to allow the store to be pickled even though some properties don't support pickling.
     # We make pickling work by omitting the lazy properties from __getstate__
@@ -121,160 +121,3 @@ class GoogleCloudStore(FSSpecStore):
             for key, value in self.__dict__.items()
             if not key.startswith(LAZY_PROPERTY_ATTR_PREFIX)
         }
-
-    # def _delete(self, key: str) -> str:
-    #     with map_gcloud_exceptions(key, error_codes_pass=("NotFound",)):
-    #         self._bucket.delete_blob(key)
-    #     return key
-    #
-    # def _get(self, key: str) -> bytes:
-    #     blob = self._bucket.blob(key)
-    #     with map_gcloud_exceptions(key):
-    #         blob_bytes = blob.download_as_bytes()
-    #     return blob_bytes
-    #
-    # def _get_file(self, key: str, file: IO) -> str:
-    #     blob = self._bucket.blob(key)
-    #     with map_gcloud_exceptions(key):
-    #         blob.download_to_file(file)
-    #     return key
-    #
-    # def _has_key(self, key: str) -> bool:
-    #     return self._bucket.blob(key).exists()
-    #
-    # def iter_keys(self, prefix: str = "") -> Iterator[str]:
-    #     """Iterate over all keys in the store starting with prefix.
-    #
-    #     Parameters
-    #     ----------
-    #     prefix : str, optional, default = ''
-    #         Only iterate over keys starting with prefix. Iterate over all keys if empty.
-    #
-    #     Raises
-    #     ------
-    #     IOError
-    #         If there was an error accessing the store.
-    #     """
-    #     return (blob.name for blob in self._bucket.list_blobs(prefix=prefix))
-    #
-    # def _open(self, key: str) -> IO:
-    #     blob = self._bucket.blob(key)
-    #     if not blob.exists():
-    #         raise KeyError
-    #     return cast(IO, IOInterface(blob))
-    #
-    # def _put(self, key: str, data: bytes) -> str:
-    #     blob = self._bucket.blob(key)
-    #     if type(data) != bytes:
-    #         raise IOError(f"data has to be of type 'bytes', not {type(data)}")
-    #     blob.upload_from_string(data, content_type="application/octet-stream")
-    #     return key
-    #
-    # def _put_file(self, key: str, file: IO) -> str:
-    #     blob = self._bucket.blob(key)
-    #     with map_gcloud_exceptions(key):
-    #         if isinstance(file, io.BytesIO):
-    #             # not passing a size triggers a resumable upload to avoid trying to upload
-    #             # large files in a single request
-    #             # For BytesIO, getting the size is cheap, therefore we pass it
-    #             blob.upload_from_file(file_obj=file, size=file.getbuffer().nbytes)
-    #         else:
-    #             blob.upload_from_file(file_obj=file)
-    #     return key
-
-
-# class IOInterface(io.BufferedIOBase):
-#     """Class which provides a file-like interface to selectively read from a blob in the bucket."""
-#
-#     size: int
-#     pos: int
-#
-#     def __init__(self, blob):
-#         super(IOInterface, self).__init__()
-#         self.blob = blob
-#
-#         if blob.size is None:
-#             blob.reload()
-#         self.size = cast(int, blob.size)
-#         self.pos = 0
-#
-#     def tell(self) -> int:
-#         """Return the current offset as int. Always >= 0."""
-#         if self.closed:
-#             raise ValueError("I/O operation on closed file")
-#         return self.pos
-#
-#     def read(self, size: Optional[int] = -1) -> bytes:
-#         """Return first ``size`` bytes of data.
-#
-#         If no size is given all data is returned.
-#
-#         Parameters
-#         ----------
-#         size : int, optional, default = -1
-#             Number of bytes to be returned.
-#
-#         """
-#         size = -1 if size is None else size
-#         # TODO: What happens for size < 0?
-#         if self.closed:
-#             raise ValueError("I/O operation on closed file")
-#         max_size = max(0, self.size - self.pos)
-#         if size < 0 or size > max_size:
-#             size = max_size
-#         if size == 0:
-#             return b""
-#         blob_bytes = self.blob.download_as_bytes(
-#             start=self.pos, end=self.pos + size - 1
-#         )
-#         self.pos += len(blob_bytes)
-#         return blob_bytes
-#
-#     def seek(self, offset: int, whence: int = 0) -> int:
-#         """
-#         Move to a new offset either relative or absolute.
-#
-#         whence=0 is absolute, whence=1 is relative, whence=2 is relative to the end.
-#
-#         Any relative or absolute seek operation which would result in a
-#         negative position is undefined and that case can be ignored
-#         in the implementation.
-#
-#         Any seek operation which moves the position after the stream
-#         should succeed. ``tell()`` should report that position and ``read()``
-#         should return an empty bytes object.
-#
-#         Parameters
-#         ----------
-#         offset : int
-#             TODO
-#         whence : int, optional, default = 0
-#             TODO
-#
-#         Returns
-#         -------
-#         pos : int
-#             TODO
-#
-#         """
-#         if self.closed:
-#             raise ValueError("I/O operation on closed file")
-#         if whence == 0:
-#             if offset < 0:
-#                 raise IOError("seek would move position outside the file")
-#             self.pos = offset
-#         elif whence == 1:
-#             if self.pos + offset < 0:
-#                 raise IOError("seek would move position outside the file")
-#             self.pos += offset
-#         elif whence == 2:
-#             if self.size + offset < 0:
-#                 raise IOError("seek would move position outside the file")
-#             self.pos = self.size + offset
-#         return self.pos
-#
-#     def seekable(self) -> bool:  # noqa
-#         return True
-#
-#     def readable(self) -> bool:  # noqa
-#         return True
