@@ -2,11 +2,9 @@
 import io
 from contextlib import contextmanager
 
+from minimalkv._key_value_store import KeyValueStore
 from minimalkv.net._azurestore_common import _byte_buffer_md5, _file_md5
 from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
-from minimalkv.fsspecstore import FSSpecStore
-
-# TODO: Do we want to preserve picklability?
 
 
 @contextmanager
@@ -25,8 +23,7 @@ def map_azure_exceptions(key=None, error_codes_pass=()):
         raise IOError(str(ex))
 
 
-class AzureBlockBlobStore(FSSpecStore):  # noqa D
-    # TODO: Docstring
+class AzureBlockBlobStore(KeyValueStore):  # noqa D
     def __init__(
         self,
         conn_string=None,
@@ -37,32 +34,17 @@ class AzureBlockBlobStore(FSSpecStore):  # noqa D
         max_block_size=None,
         max_single_put_size=None,
         checksum=False,
-        # Unused; only exists for backward compatibility.
         socket_timeout=None,
     ):
+        # Note that socket_timeout is unused; it only exist for backward compatibility.
+        # TODO: Docstring
         self.conn_string = conn_string
-        self.max_block_size = max_block_size
         self.container = container
-        self.create_if_missing = create_if_missing
-
-        # Create Azure Blob Storage Filesystem
-        from adlfs import AzureBlobFileSystem
-        fs = AzureBlobFileSystem(
-            connection_string=conn_string,
-            # TODO blocksize is not really used in AzureBlobFileSystem
-            blocksize=max_block_size,
-        )
-        super().__init__(fs, prefix=f"{container}/", mkdir_prefix=create_if_missing)
-
-        # Cannot be specified via adlfs API
-        # Was only used for creating the container
         self.public = public
-        # max_connections is not used or exposed in adlfs
+        self.create_if_missing = create_if_missing
         self.max_connections = max_connections
-        # Only used in blob_container_client
+        self.max_block_size = max_block_size
         self.max_single_put_size = max_single_put_size
-        # Used as part of ContentSettings.
-        # ContentSettings can only be read via _details in adlfs??
         self.checksum = checksum
 
     # Using @lazy_property will (re-)create block_blob_service instance needed.
@@ -91,94 +73,94 @@ class AzureBlockBlobStore(FSSpecStore):  # noqa D
                 )
         return container_client
 
-    # def _delete(self, key: str) -> None:
-    #     with map_azure_exceptions(key, error_codes_pass=("BlobNotFound",)):
-    #         self.blob_container_client.delete_blob(key)
-    #
-    # def _get(self, key):
-    #     with map_azure_exceptions(key):
-    #         blob_client = self.blob_container_client.get_blob_client(key)
-    #         downloader = blob_client.download_blob(max_concurrency=self.max_connections)
-    #         return downloader.readall()
-    #
-    # def _has_key(self, key):
-    #     blob_client = self.blob_container_client.get_blob_client(key)
-    #     with map_azure_exceptions(key, ("BlobNotFound",)):
-    #         blob_client.get_blob_properties()
-    #         return True
-    #     return False
-    #
-    # def iter_keys(self, prefix=None):  # noqa D
-    #     with map_azure_exceptions():
-    #         blobs = self.blob_container_client.list_blobs(name_starts_with=prefix)
-    #
-    #     def gen_names():  # noqa D
-    #         with map_azure_exceptions():
-    #             for blob in blobs:
-    #                 yield blob.name
-    #
-    #     return gen_names()
-    #
-    # def iter_prefixes(self, delimiter, prefix=""):  # noqa D
-    #     return (
-    #         blob_prefix.name
-    #         for blob_prefix in self.blob_container_client.walk_blobs(
-    #             name_starts_with=prefix, delimiter=delimiter
-    #         )
-    #     )
-    #
-    # def _open(self, key):
-    #     with map_azure_exceptions(key):
-    #         blob_client = self.blob_container_client.get_blob_client(key)
-    #         return IOInterface(blob_client, self.max_connections)
-    #
-    # def _put(self, key, data):
-    #     from azure.storage.blob import ContentSettings
-    #
-    #     if self.checksum:
-    #         content_settings = ContentSettings(
-    #             content_md5=_byte_buffer_md5(data, b64encode=False)
-    #         )
-    #     else:
-    #         content_settings = ContentSettings()
-    #
-    #     with map_azure_exceptions(key):
-    #         blob_client = self.blob_container_client.get_blob_client(key)
-    #
-    #         blob_client.upload_blob(
-    #             data,
-    #             overwrite=True,
-    #             content_settings=content_settings,
-    #             max_concurrency=self.max_connections,
-    #         )
-    #     return key
-    #
-    # def _put_file(self, key, file):
-    #     from azure.storage.blob import ContentSettings
-    #
-    #     if self.checksum:
-    #         content_settings = ContentSettings(
-    #             content_md5=_file_md5(file, b64encode=False)
-    #         )
-    #     else:
-    #         content_settings = ContentSettings()
-    #
-    #     with map_azure_exceptions(key):
-    #         blob_client = self.blob_container_client.get_blob_client(key)
-    #
-    #         blob_client.upload_blob(
-    #             file,
-    #             overwrite=True,
-    #             content_settings=content_settings,
-    #             max_concurrency=self.max_connections,
-    #         )
-    #     return key
-    #
-    # def _get_file(self, key, file):
-    #     with map_azure_exceptions(key):
-    #         blob_client = self.blob_container_client.get_blob_client(key)
-    #         downloader = blob_client.download_blob(max_concurrency=self.max_connections)
-    #         downloader.readinto(file)
+    def _delete(self, key: str) -> None:
+        with map_azure_exceptions(key, error_codes_pass=("BlobNotFound",)):
+            self.blob_container_client.delete_blob(key)
+
+    def _get(self, key):
+        with map_azure_exceptions(key):
+            blob_client = self.blob_container_client.get_blob_client(key)
+            downloader = blob_client.download_blob(max_concurrency=self.max_connections)
+            return downloader.readall()
+
+    def _has_key(self, key):
+        blob_client = self.blob_container_client.get_blob_client(key)
+        with map_azure_exceptions(key, ("BlobNotFound",)):
+            blob_client.get_blob_properties()
+            return True
+        return False
+
+    def iter_keys(self, prefix=None):  # noqa D
+        with map_azure_exceptions():
+            blobs = self.blob_container_client.list_blobs(name_starts_with=prefix)
+
+        def gen_names():  # noqa D
+            with map_azure_exceptions():
+                for blob in blobs:
+                    yield blob.name
+
+        return gen_names()
+
+    def iter_prefixes(self, delimiter, prefix=""):  # noqa D
+        return (
+            blob_prefix.name
+            for blob_prefix in self.blob_container_client.walk_blobs(
+                name_starts_with=prefix, delimiter=delimiter
+            )
+        )
+
+    def _open(self, key):
+        with map_azure_exceptions(key):
+            blob_client = self.blob_container_client.get_blob_client(key)
+            return IOInterface(blob_client, self.max_connections)
+
+    def _put(self, key, data):
+        from azure.storage.blob import ContentSettings
+
+        if self.checksum:
+            content_settings = ContentSettings(
+                content_md5=_byte_buffer_md5(data, b64encode=False)
+            )
+        else:
+            content_settings = ContentSettings()
+
+        with map_azure_exceptions(key):
+            blob_client = self.blob_container_client.get_blob_client(key)
+
+            blob_client.upload_blob(
+                data,
+                overwrite=True,
+                content_settings=content_settings,
+                max_concurrency=self.max_connections,
+            )
+        return key
+
+    def _put_file(self, key, file):
+        from azure.storage.blob import ContentSettings
+
+        if self.checksum:
+            content_settings = ContentSettings(
+                content_md5=_file_md5(file, b64encode=False)
+            )
+        else:
+            content_settings = ContentSettings()
+
+        with map_azure_exceptions(key):
+            blob_client = self.blob_container_client.get_blob_client(key)
+
+            blob_client.upload_blob(
+                file,
+                overwrite=True,
+                content_settings=content_settings,
+                max_concurrency=self.max_connections,
+            )
+        return key
+
+    def _get_file(self, key, file):
+        with map_azure_exceptions(key):
+            blob_client = self.blob_container_client.get_blob_client(key)
+            downloader = blob_client.download_blob(max_concurrency=self.max_connections)
+            downloader.readinto(file)
 
     def __getstate__(self):  # noqa D
         # keep all of __dict__, except lazy properties:
