@@ -3,7 +3,7 @@ from contextlib import contextmanager
 from typing import IO, Optional, Tuple
 
 from minimalkv.fsspecstore import FSSpecStore, FSSpecStoreEntry
-from minimalkv.net._net_common import lazy_property
+from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
 
 
 @contextmanager
@@ -55,31 +55,34 @@ class GoogleCloudStore(FSSpecStore):
         bucket_creation_location: str = "EUROPE-WEST3",
         project=None,
     ):
-        from gcsfs import GCSFileSystem
-
         if isinstance(credentials, str):
             # Parse JSON from path to extract project name
-            credentialsdict = json.load(open(credentials))
-            project = project or credentialsdict["project_id"]
+            try:
+                with open(credentials) as f:
+                    credentials_dict = json.load(f)
+                    project = project or credentials_dict["project_id"]
+            except (FileNotFoundError, json.JSONDecodeError) as error:
+                print(error)
+                pass
 
-        fs = GCSFileSystem(
-            project=project,
-            token=credentials,
-            access="read_write",
-            default_location=bucket_creation_location,
-        )
-
-        super().__init__(fs, prefix=f"{bucket_name}/", mkdir_prefix=create_if_missing)
-
+        self.project_name = project
         self._credentials = credentials
         self.bucket_name = bucket_name
         self.create_if_missing = create_if_missing
         self.bucket_creation_location = bucket_creation_location
-        self.project_name = project
 
-    # this exists to allow the store to be pickled even though the underlying gc client
-    # doesn't support pickling. We make pickling work by omitting self.client from __getstate__
-    # and just (re)creating the client & bucket when they're used (again).
+        super().__init__(
+            self._fs, prefix=f"{bucket_name}/", mkdir_prefix=create_if_missing
+        )
+
+    def _open(self, key: str) -> IO:
+        return FSSpecStoreEntry(super()._open(key))
+
+    # These exist to allow the store to be pickled even though some properties don't support pickling.
+    # We make pickling work by omitting the lazy properties from __getstate__
+    # and just (re)creating them when they're used (again).
+    # `_bucket` and `_client` are used for testing only.
+    # All actual operations are performed using `_fs`.
     @lazy_property
     def _bucket(self):
         if self.create_if_missing and not self._client.lookup_bucket(self.bucket_name):
@@ -99,8 +102,25 @@ class GoogleCloudStore(FSSpecStore):
         else:
             return Client(credentials=self._credentials, project=self.project_name)
 
-    def _open(self, key: str) -> IO:
-        return FSSpecStoreEntry(super()._open(key))
+    @lazy_property
+    def _fs(self):
+        from gcsfs import GCSFileSystem
+
+        return GCSFileSystem(
+            project=self.project_name,
+            token=self._credentials,
+            access="read_write",
+            default_location=self.bucket_creation_location,
+        )
+
+    # Skips lazy properties.
+    # These will be recreated after unpickling through the lazy_property decorator
+    def __getstate__(self):  # noqa D
+        return {
+            key: value
+            for key, value in self.__dict__.items()
+            if not key.startswith(LAZY_PROPERTY_ATTR_PREFIX)
+        }
 
     # def _delete(self, key: str) -> str:
     #     with map_gcloud_exceptions(key, error_codes_pass=("NotFound",)):
@@ -161,15 +181,6 @@ class GoogleCloudStore(FSSpecStore):
     #         else:
     #             blob.upload_from_file(file_obj=file)
     #     return key
-    #
-    # # skips two items: bucket & client.
-    # # These will be recreated after unpickling through the lazy_property decoorator
-    # def __getstate__(self):  # noqa D
-    #     return {
-    #         key: value
-    #         for key, value in self.__dict__.items()
-    #         if not key.startswith(LAZY_PROPERTY_ATTR_PREFIX)
-    #     }
 
 
 # class IOInterface(io.BufferedIOBase):

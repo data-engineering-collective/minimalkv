@@ -108,7 +108,7 @@ def test_gcstore_pickling(store):
 
 def test_gcstore_pickling_attrs():
     store = GoogleCloudStore(
-        credentials="path_to_json",
+        credentials=AnonymousCredentials(),
         bucket_name="test_bucket",
         create_if_missing=False,
         bucket_creation_location="US-CENTRAL1",
