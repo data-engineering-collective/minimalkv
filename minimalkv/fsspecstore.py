@@ -7,6 +7,8 @@ from fsspec.spec import AbstractBufferedFile
 from google.cloud.exceptions import NotFound
 
 from minimalkv import KeyValueStore
+from minimalkv.net._net_common import lazy_property
+
 
 # The complete path of the key is structured as follows:
 # /Users/simon/data/mykvstore/file1
@@ -63,15 +65,17 @@ class FSSpecStore(KeyValueStore):
         self.fs = fs
         self.prefix = prefix
 
-        self._prefix_exists = True
         if mkdir_prefix:
             self.fs.mkdir(self.prefix)
-        else:
-            # Check if bucket exists
-            try:
-                self.fs.info(self.prefix)
-            except (FileNotFoundError, IOError):
-                self._prefix_exists = False
+
+    @lazy_property
+    def _prefix_exists(self):
+        # Check if prefix exists
+        try:
+            self.fs.info(self.prefix)
+        except (FileNotFoundError, IOError):
+            return False
+        return True
 
     def iter_keys(self, prefix: str = "") -> Iterator[str]:
         # List files
