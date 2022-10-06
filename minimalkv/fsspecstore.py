@@ -28,7 +28,7 @@ class FSSpecStoreEntry(io.BufferedIOBase):
         """
         self._file = file
 
-    def seek(self, loc, whence=0):
+    def seek(self, loc: int, whence: int = 0) -> int:
         """
         Set current file location.
 
@@ -66,10 +66,12 @@ class FSSpecStoreEntry(io.BufferedIOBase):
         """
         return self._file.read(size)
 
-    def seekable(self):  # noqa
+    def seekable(self) -> bool:
+        """Whether the file is seekable."""
         return self._file.seekable()
 
-    def readable(self):  # noqa
+    def readable(self) -> bool:
+        """Whether the file is readable."""
         return self._file.readable()
 
     def close(self) -> None:
@@ -84,7 +86,7 @@ class FSSpecStoreEntry(io.BufferedIOBase):
 class FSSpecStore(KeyValueStore):
     """A KeyValueStore that uses an fsspec AbstractFileSystem to store the key-value pairs."""
 
-    def __init__(self, prefix="", mkdir_prefix=True):
+    def __init__(self, prefix: str = "", mkdir_prefix: bool = True):
         """
         Initialize an FSSpecStore.
 
@@ -102,7 +104,7 @@ class FSSpecStore(KeyValueStore):
         self.mkdir_prefix = mkdir_prefix
 
     @lazy_property
-    def _prefix_exists(self):
+    def _prefix_exists(self) -> bool:
         # Check if prefix exists.
         # Used by inheriting classes to check if e.g. a bucket exists.
         try:
@@ -131,7 +133,7 @@ class FSSpecStore(KeyValueStore):
             lambda k: unescape(k.replace(f"{self.prefix}", "")), all_files_and_dirs
         )
 
-    def _delete(self, key: str):
+    def _delete(self, key: str) -> None:
         try:
             self._fs.rm_file(f"{self.prefix}{escape(key)}")
         except FileNotFoundError:
@@ -147,10 +149,10 @@ class FSSpecStore(KeyValueStore):
         self._fs.pipe_file(f"{self.prefix}{escape(key)}", file.read())
         return key
 
-    def _has_key(self, key):
+    def _has_key(self, key: str) -> bool:
         return self._fs.exists(f"{self.prefix}{escape(key)}")
 
-    def _create_filesystem(self):
+    def _create_filesystem(self) -> AbstractFileSystem:
         # To be implemented by inheriting classes.
         raise NotImplementedError
 
@@ -164,7 +166,7 @@ class FSSpecStore(KeyValueStore):
 
     # Skips lazy properties.
     # These will be recreated after unpickling through the lazy_property decorator
-    def __getstate__(self):  # noqa D
+    def __getstate__(self) -> dict:  # noqa D
         return {
             key: value
             for key, value in self.__dict__.items()
