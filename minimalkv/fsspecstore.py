@@ -1,12 +1,16 @@
 import io
+from functools import partial
 from typing import IO, Iterator, Optional
-from urllib.parse import quote, unquote
+from urllib.parse import quote as _quote
+from urllib.parse import unquote
 
 from fsspec import AbstractFileSystem
 from fsspec.spec import AbstractBufferedFile
 
 from minimalkv import KeyValueStore
 from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
+
+quote = partial(_quote, safe="")
 
 # The complete path of the key is structured as follows:
 # /Users/simon/data/mykvstore/file1
@@ -127,30 +131,30 @@ class FSSpecStore(KeyValueStore):
             If there was an error accessing the store.
         """
         # List files
-        all_files_and_dirs = self._fs.find(f"{self.prefix}", prefix=escape(prefix))
+        all_files_and_dirs = self._fs.find(f"{self.prefix}", prefix=quote(prefix))
 
         return map(
-            lambda k: unescape(k.replace(f"{self.prefix}", "")), all_files_and_dirs
+            lambda k: unquote(k.replace(f"{self.prefix}", "")), all_files_and_dirs
         )
 
     def _delete(self, key: str) -> None:
         try:
-            self._fs.rm_file(f"{self.prefix}{escape(key)}")
+            self._fs.rm_file(f"{self.prefix}{quote(key)}")
         except FileNotFoundError:
             pass
 
     def _open(self, key: str) -> IO:
         try:
-            return self._fs.open(f"{self.prefix}{escape(key)}")
+            return self._fs.open(f"{self.prefix}{quote(key)}")
         except FileNotFoundError:
             raise KeyError(key)
 
     def _put_file(self, key: str, file: IO) -> str:
-        self._fs.pipe_file(f"{self.prefix}{escape(key)}", file.read())
+        self._fs.pipe_file(f"{self.prefix}{quote(key)}", file.read())
         return key
 
     def _has_key(self, key: str) -> bool:
-        return self._fs.exists(f"{self.prefix}{escape(key)}")
+        return self._fs.exists(f"{self.prefix}{quote(key)}")
 
     def _create_filesystem(self) -> AbstractFileSystem:
         # To be implemented by inheriting classes.
@@ -172,40 +176,3 @@ class FSSpecStore(KeyValueStore):
             for key, value in self.__dict__.items()
             if not key.startswith(LAZY_PROPERTY_ATTR_PREFIX)
         }
-
-
-def escape(path: str) -> str:
-    """
-    URL-escape a path.
-
-    Every character not allowed within a URL segment is escaped, including slashes.
-    This is necessary because gcsfs does not escape the path properly.
-
-    Parameters
-    ----------
-    path: str
-        The path to escape.
-
-    Returns
-    -------
-    str
-        The escaped path.
-    """
-    return quote(path, safe="")
-
-
-def unescape(path: str) -> str:
-    """
-    URL-unescape a path. Every character not allowed within a URL segment is unescaped, including slashes.
-
-    Parameters
-    ----------
-    path: str
-        The path to unescape.
-
-    Returns
-    -------
-    str
-        The unescaped path.
-    """
-    return unquote(path)
