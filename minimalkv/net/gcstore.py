@@ -4,7 +4,6 @@ from typing import IO, cast
 from google.cloud.exceptions import NotFound
 
 from minimalkv.fsspecstore import FSSpecStore, FSSpecStoreEntry
-from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
 
 
 class GoogleCloudStore(FSSpecStore):
@@ -38,18 +37,9 @@ class GoogleCloudStore(FSSpecStore):
         self.bucket_creation_location = bucket_creation_location
         self.project_name = project
 
-        super().__init__(
-            self._fs, prefix=f"{bucket_name}/", mkdir_prefix=create_if_missing
-        )
+        super().__init__(prefix=f"{bucket_name}/", mkdir_prefix=create_if_missing)
 
-    def _open(self, key: str) -> IO:
-        if not self._prefix_exists:
-            raise NotFound(f"Could not find bucket: {self.bucket_name}")
-        return cast(IO, FSSpecStoreEntry(super()._open(key)))
-
-    # The file system is stored as a lazy property and not pickled.
-    @lazy_property
-    def _fs(self):
+    def _create_filesystem(self):
         from gcsfs import GCSFileSystem
 
         return GCSFileSystem(
@@ -59,11 +49,7 @@ class GoogleCloudStore(FSSpecStore):
             default_location=self.bucket_creation_location,
         )
 
-    # Skips lazy properties.
-    # These will be recreated after unpickling through the lazy_property decorator
-    def __getstate__(self):  # noqa D
-        return {
-            key: value
-            for key, value in self.__dict__.items()
-            if not key.startswith(LAZY_PROPERTY_ATTR_PREFIX)
-        }
+    def _open(self, key: str) -> IO:
+        if not self._prefix_exists:
+            raise NotFound(f"Could not find bucket: {self.bucket_name}")
+        return cast(IO, FSSpecStoreEntry(super()._open(key)))

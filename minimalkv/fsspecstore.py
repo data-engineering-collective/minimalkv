@@ -6,7 +6,7 @@ from fsspec import AbstractFileSystem
 from fsspec.spec import AbstractBufferedFile
 
 from minimalkv import KeyValueStore
-from minimalkv.net._net_common import lazy_property
+from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
 
 # The complete path of the key is structured as follows:
 # /Users/simon/data/mykvstore/file1
@@ -84,32 +84,29 @@ class FSSpecStoreEntry(io.BufferedIOBase):
 class FSSpecStore(KeyValueStore):
     """A KeyValueStore that uses an fsspec AbstractFileSystem to store the key-value pairs."""
 
-    def __init__(self, fs: AbstractFileSystem, prefix="", mkdir_prefix=True):
+    def __init__(self, prefix="", mkdir_prefix=True):
         """
         Initialize an FSSpecStore.
 
+        The underlying fsspec FileSystem is created when the store is used for the first time.
+
         Parameters
         ----------
-        fs: AbstractFileSystem
-            The fsspec filesystem to use.
         prefix: str, optional
             The prefix to use on the FSSpecStore when storing keys.
         mkdir_prefix : Boolean
             If True, the prefix will be created if it does not exist.
             Analogous to the create_if_missing parameter in AzureBlockBlobStore or GoogleCloudStore.
         """
-        self.fs = fs
         self.prefix = prefix
-
-        if mkdir_prefix:
-            self.fs.mkdir(self.prefix)
+        self.mkdir_prefix = mkdir_prefix
 
     @lazy_property
     def _prefix_exists(self):
         # Check if prefix exists.
         # Used by inheriting classes to check if e.g. a bucket exists.
         try:
-            self.fs.info(self.prefix)
+            self._fs.info(self.prefix)
         except (FileNotFoundError, IOError):
             return False
         return True
@@ -128,7 +125,7 @@ class FSSpecStore(KeyValueStore):
             If there was an error accessing the store.
         """
         # List files
-        all_files_and_dirs = self.fs.find(f"{self.prefix}", prefix=escape(prefix))
+        all_files_and_dirs = self._fs.find(f"{self.prefix}", prefix=escape(prefix))
 
         return map(
             lambda k: unescape(k.replace(f"{self.prefix}", "")), all_files_and_dirs
@@ -136,22 +133,43 @@ class FSSpecStore(KeyValueStore):
 
     def _delete(self, key: str):
         try:
-            self.fs.rm_file(f"{self.prefix}{escape(key)}")
+            self._fs.rm_file(f"{self.prefix}{escape(key)}")
         except FileNotFoundError:
             pass
 
     def _open(self, key: str) -> IO:
         try:
-            return self.fs.open(f"{self.prefix}{escape(key)}")
+            return self._fs.open(f"{self.prefix}{escape(key)}")
         except FileNotFoundError:
             raise KeyError(key)
 
     def _put_file(self, key: str, file: IO) -> str:
-        self.fs.pipe_file(f"{self.prefix}{escape(key)}", file.read())
+        self._fs.pipe_file(f"{self.prefix}{escape(key)}", file.read())
         return key
 
     def _has_key(self, key):
-        return self.fs.exists(f"{self.prefix}{escape(key)}")
+        return self._fs.exists(f"{self.prefix}{escape(key)}")
+
+    def _create_filesystem(self):
+        # To be implemented by inheriting classes.
+        raise NotImplementedError
+
+    @lazy_property
+    def _fs(self) -> AbstractFileSystem:
+        fs = self._create_filesystem()
+
+        if self.mkdir_prefix:
+            fs.mkdir(self.prefix)
+        return fs
+
+    # Skips lazy properties.
+    # These will be recreated after unpickling through the lazy_property decorator
+    def __getstate__(self):  # noqa D
+        return {
+            key: value
+            for key, value in self.__dict__.items()
+            if not key.startswith(LAZY_PROPERTY_ATTR_PREFIX)
+        }
 
 
 def escape(path: str) -> str:

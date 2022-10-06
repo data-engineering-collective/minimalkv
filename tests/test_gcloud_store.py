@@ -120,7 +120,7 @@ def store(dirty_store):
     for blob in get_bucket_from_store(dirty_store).list_blobs():
         blob.delete()
 
-    dirty_store.fs.invalidate_cache()
+    dirty_store._fs.invalidate_cache()
 
     # Google Storage doesn't like getting hit with heavy CRUD on a newly
     # create bucket. Therefore we introduce an artificial timeout
@@ -142,9 +142,9 @@ def test_gcstore_pickling(store):
     assert store.get("key1") == b"value1"
 
 
-def test_gcstore_pickling_attrs(gc_credentials):
+def test_gcstore_pickling_attrs():
     store = GoogleCloudStore(
-        credentials=gc_credentials,
+        credentials="path_to_json",
         bucket_name="test_bucket",
         create_if_missing=False,
         bucket_creation_location="US-CENTRAL1",
@@ -186,7 +186,7 @@ class TestExtendedKeysGCStore(TestGoogleCloudStore, ExtendedKeyspaceTests):
         for blob in get_bucket_from_store(dirty_store).list_blobs():
             blob.delete()
         # Invalidate fsspec cache
-        dirty_store.fs.invalidate_cache()
+        dirty_store._fs.invalidate_cache()
         if not os.environ.get("STORAGE_EMULATOR_HOST", None):
             time.sleep(0.2)
         return dirty_store
