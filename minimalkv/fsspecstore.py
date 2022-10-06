@@ -1,10 +1,9 @@
 import io
-from shutil import copyfileobj
 from typing import IO, Iterator, Optional
+from urllib.parse import quote, unquote
 
 from fsspec import AbstractFileSystem
 from fsspec.spec import AbstractBufferedFile
-from google.cloud.exceptions import NotFound
 
 from minimalkv import KeyValueStore
 from minimalkv.net._net_common import lazy_property
@@ -107,7 +106,8 @@ class FSSpecStore(KeyValueStore):
 
     @lazy_property
     def _prefix_exists(self):
-        # Check if prefix exists
+        # Check if prefix exists.
+        # Used by inheriting classes to check if e.g. a bucket exists.
         try:
             self.fs.info(self.prefix)
         except (FileNotFoundError, IOError):
@@ -130,10 +130,6 @@ class FSSpecStore(KeyValueStore):
         # List files
         all_files_and_dirs = self.fs.find(f"{self.prefix}", prefix=escape(prefix))
 
-        # When no matches are found, the Azure FileSystem returns the container,
-        # which is not desired.
-        if len(all_files_and_dirs) == 1 and all_files_and_dirs[0] in self.prefix:
-            return iter([])
         return map(
             lambda k: unescape(k.replace(f"{self.prefix}", "")), all_files_and_dirs
         )
@@ -145,19 +141,14 @@ class FSSpecStore(KeyValueStore):
             pass
 
     def _open(self, key: str) -> IO:
-        if not self._prefix_exists:
-            raise NotFound("Bucket does not exist.")
         try:
             return self.fs.open(f"{self.prefix}{escape(key)}")
         except FileNotFoundError:
             raise KeyError(key)
 
     def _put_file(self, key: str, file: IO) -> str:
-        # fs.put_file only supports a path as a parameter, not a file
-        # Open file at key in writable mode
-        with self.fs.open(f"{self.prefix}{escape(key)}", "wb") as f:
-            copyfileobj(file, f)
-            return key
+        self.fs.pipe_file(f"{self.prefix}{escape(key)}", file.read())
+        return key
 
     def _has_key(self, key):
         return self.fs.exists(f"{self.prefix}{escape(key)}")
@@ -180,10 +171,6 @@ def escape(path: str) -> str:
     str
         The escaped path.
     """
-    # Escape key before downloading
-    from urllib.parse import quote
-
-    # Encode everything, including slashes
     return quote(path, safe="")
 
 
@@ -201,7 +188,4 @@ def unescape(path: str) -> str:
     str
         The unescaped path.
     """
-    # Unescape key before downloading
-    from urllib.parse import unquote
-
     return unquote(path)

@@ -2,6 +2,8 @@ import json
 from contextlib import contextmanager
 from typing import IO, Optional, Tuple, cast
 
+from google.cloud.exceptions import NotFound
+
 from minimalkv.fsspecstore import FSSpecStore, FSSpecStoreEntry
 from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
 
@@ -62,20 +64,23 @@ class GoogleCloudStore(FSSpecStore):
                     credentials_dict = json.load(f)
                     project = project or credentials_dict["project_id"]
             except (FileNotFoundError, json.JSONDecodeError) as error:
-                print(error)
-                pass
+                print(
+                    f"Could not get the project name from the credentials file: {error}"
+                )
 
-        self.project_name = project
         self._credentials = credentials
         self.bucket_name = bucket_name
         self.create_if_missing = create_if_missing
         self.bucket_creation_location = bucket_creation_location
+        self.project_name = project
 
         super().__init__(
             self._fs, prefix=f"{bucket_name}/", mkdir_prefix=create_if_missing
         )
 
     def _open(self, key: str) -> IO:
+        if not self._prefix_exists:
+            raise NotFound(f"Could not find bucket: {self.bucket_name}")
         return cast(IO, FSSpecStoreEntry(super()._open(key)))
 
     # These exist to allow the store to be pickled even though some properties don't support pickling.
