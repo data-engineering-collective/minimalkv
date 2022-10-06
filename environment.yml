@@ -14,6 +14,7 @@ dependencies:
   - psycopg2
   - six
   - sqlalchemy
+  - azure-storage-blob
   - boto
   - boto3
   - pymongo
@@ -23,5 +24,4 @@ dependencies:
   - setuptools-scm
   - uritools
   - sphinx
-  - adlfs
   - gcsfs
