@@ -1,3 +1,4 @@
+import json
 from typing import IO, cast
 
 from gcsfs import GCSFileSystem
@@ -20,6 +21,18 @@ class GoogleCloudStore(FSSpecStore):
         bucket_creation_location: str = "EUROPE-WEST3",
         project=None,
     ):
+        if isinstance(credentials, str):
+            # Parse JSON from path to extract project name
+            # The project name is required to create new buckets
+            try:
+                with open(credentials) as f:
+                    credentials_dict = json.load(f)
+                    project = project or credentials_dict["project_id"]
+            except (FileNotFoundError, json.JSONDecodeError) as error:
+                print(
+                    f"Could not get the project name from the credentials file: {error}"
+                )
+
         self._credentials = credentials
         self.bucket_name = bucket_name
         self.create_if_missing = create_if_missing
