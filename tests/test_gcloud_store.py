@@ -1,7 +1,5 @@
 import pytest
 
-from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX
-
 storage = pytest.importorskip("google.cloud.storage")
 
 import os
@@ -68,10 +66,6 @@ def try_delete_bucket(bucket):
 
 
 def get_bucket_from_store(gcstore: GoogleCloudStore) -> Bucket:
-    cached_bucket = getattr(gcstore, f"{LAZY_PROPERTY_ATTR_PREFIX}bucket", None)
-    if cached_bucket:
-        return cached_bucket
-
     client = get_client_from_store(gcstore)
     if gcstore.create_if_missing and not client.lookup_bucket(gcstore.bucket_name):
         bucket = client.create_bucket(
@@ -82,21 +76,15 @@ def get_bucket_from_store(gcstore: GoogleCloudStore) -> Bucket:
         # will raise an error if bucket not found
         bucket = client.get_bucket(gcstore.bucket_name)
 
-    setattr(gcstore, f"{LAZY_PROPERTY_ATTR_PREFIX}bucket", bucket)
     return bucket
 
 
 def get_client_from_store(gcstore: GoogleCloudStore) -> Client:
-    cached_client = getattr(gcstore, f"{LAZY_PROPERTY_ATTR_PREFIX}client", None)
-    if cached_client:
-        return cached_client
-
     if type(gcstore._credentials) == str:
         client = Client.from_service_account_json(gcstore._credentials)
     else:
         client = Client(credentials=gcstore._credentials, project=gcstore.project_name)
 
-    setattr(gcstore, f"{LAZY_PROPERTY_ATTR_PREFIX}client", client)
     return client
 
 

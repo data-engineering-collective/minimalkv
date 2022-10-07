@@ -51,7 +51,7 @@ class FSSpecStoreEntry(io.BufferedIOBase):
             # Map ValueError to IOError
             raise IOError
 
-    def tell(self):
+    def tell(self) -> int:
         """Return the current offset as int. Always >= 0."""
         if self.closed():
             raise ValueError("I/O operation on closed file.")
@@ -164,7 +164,7 @@ class FSSpecStore(KeyValueStore):
     def _fs(self) -> AbstractFileSystem:
         fs = self._create_filesystem()
 
-        if self.mkdir_prefix:
+        if self.mkdir_prefix and not fs.exists(self.prefix):
             fs.mkdir(self.prefix)
         return fs
 
