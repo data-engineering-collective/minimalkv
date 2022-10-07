@@ -5,6 +5,8 @@ Current version
 ===============
 
 * Drop support for Python 3.6 & 3.7
+* Reimplement GoogleCloudStore using ``gcsfs`` and ``fsspec``.
+  This is a drop-in replacement for the old implementation.
 
 1.3.1
 =====
