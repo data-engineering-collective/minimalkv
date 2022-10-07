@@ -1,4 +1,5 @@
 import json
+import warnings
 from typing import IO, cast
 
 from gcsfs import GCSFileSystem
@@ -28,9 +29,16 @@ class GoogleCloudStore(FSSpecStore):
                 with open(credentials) as f:
                     credentials_dict = json.load(f)
                     project = project or credentials_dict["project_id"]
-            except (FileNotFoundError, json.JSONDecodeError) as error:
-                print(
-                    f"Could not get the project name from the credentials file: {error}"
+            except (FileNotFoundError, json.JSONDecodeError, KeyError) as error:
+                warnings.warn(
+                    f"""
+                    Could not get the project name from the credentials file.
+                    You set create_if_missing to {create_if_missing}.
+                    You will not be able to create a new bucket for this store.
+
+                    This was caused by the following error:
+                    {error}
+                    """
                 )
 
         self._credentials = credentials
