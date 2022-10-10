@@ -7,6 +7,7 @@ import pytest
 from minimalkv._get_store import get_store_from_url
 from minimalkv._store_creation import create_store
 from minimalkv._urls import url2dict
+from minimalkv.net.gcstore import GoogleCloudStore
 
 storage = pytest.importorskip("google.cloud.storage")
 from google.auth.credentials import AnonymousCredentials
@@ -97,7 +98,8 @@ def test_json_decode():
 def test_complete():
     url, expected = ACTUAL_URL
     store = get_store_from_url(url)
+    assert isinstance(store, GoogleCloudStore)
     assert store.bucket_name == expected["bucket_name"]  # type: ignore
-    assert store._client.project == "central-splice-296415"  # type: ignore
+    assert store.project_name == "central-splice-296415"  # type: ignore
     with pytest.raises(RefreshError):
         store.get("somekey")

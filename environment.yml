@@ -14,7 +14,6 @@ dependencies:
   - psycopg2
   - six
   - sqlalchemy
-  - google-cloud-storage
   - azure-storage-blob
   - boto
   - boto3
@@ -25,3 +24,4 @@ dependencies:
   - setuptools-scm
   - uritools
   - sphinx
+  - gcsfs

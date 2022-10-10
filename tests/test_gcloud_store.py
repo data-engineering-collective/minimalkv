@@ -14,6 +14,7 @@ from conftest import ExtendedKeyspaceTests
 from google.api_core.exceptions import NotFound
 from google.auth.credentials import AnonymousCredentials
 from google.cloud.exceptions import MethodNotAllowed
+from google.cloud.storage import Bucket, Client
 
 from minimalkv._mixins import ExtendedKeyspaceMixin
 from minimalkv.net.gcstore import GoogleCloudStore
@@ -64,6 +65,29 @@ def try_delete_bucket(bucket):
         assert err.message.endswith("unknown error")
 
 
+def get_bucket_from_store(gcstore: GoogleCloudStore) -> Bucket:
+    client = get_client_from_store(gcstore)
+    if gcstore.create_if_missing and not client.lookup_bucket(gcstore.bucket_name):
+        bucket = client.create_bucket(
+            bucket_or_name=gcstore.bucket_name,
+            location=gcstore.bucket_creation_location,
+        )
+    else:
+        # will raise an error if bucket not found
+        bucket = client.get_bucket(gcstore.bucket_name)
+
+    return bucket
+
+
+def get_client_from_store(gcstore: GoogleCloudStore) -> Client:
+    if type(gcstore._credentials) == str:
+        client = Client.from_service_account_json(gcstore._credentials)
+    else:
+        client = Client(credentials=gcstore._credentials, project=gcstore.project_name)
+
+    return client
+
+
 @pytest.fixture(scope="module")
 def dirty_store(gc_credentials):
     uuid = str(uuid4())
@@ -76,13 +100,15 @@ def dirty_store(gc_credentials):
         credentials=gc_credentials, bucket_name=uuid, project=project_name
     )
     yield store
-    try_delete_bucket(store._bucket)
+    try_delete_bucket(get_bucket_from_store(store))
 
 
 @pytest.fixture(scope="function")
 def store(dirty_store):
-    for blob in dirty_store._bucket.list_blobs():
+    for blob in get_bucket_from_store(dirty_store).list_blobs():
         blob.delete()
+
+    dirty_store._fs.invalidate_cache()
 
     # Google Storage doesn't like getting hit with heavy CRUD on a newly
     # create bucket. Therefore we introduce an artificial timeout
@@ -141,12 +167,14 @@ class TestExtendedKeysGCStore(TestGoogleCloudStore, ExtendedKeyspaceTests):
             credentials=gc_credentials, bucket_name=uuid, project=project_name
         )
         yield store
-        try_delete_bucket(store._bucket)
+        try_delete_bucket(get_bucket_from_store(store))
 
     @pytest.fixture(scope="function")
     def store(self, dirty_store):
-        for blob in dirty_store._bucket.list_blobs():
+        for blob in get_bucket_from_store(dirty_store).list_blobs():
             blob.delete()
+        # Invalidate fsspec cache
+        dirty_store._fs.invalidate_cache()
         if not os.environ.get("STORAGE_EMULATOR_HOST", None):
             time.sleep(0.2)
         return dirty_store
