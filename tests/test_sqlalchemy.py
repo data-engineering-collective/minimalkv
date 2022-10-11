@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf8
 
 import pytest
 
@@ -37,7 +36,7 @@ class TestSQLAlchemyStore(BasicStore):
         try:
             engine.connect()
         except OperationalError:
-            pytest.skip("could not connect to database {}".format(dsn))
+            pytest.skip(f"could not connect to database {dsn}")
         return engine
 
     @pytest.fixture

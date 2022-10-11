@@ -8,7 +8,7 @@ import pytest
 from minimalkv.crypt import HMACDecorator, VerificationException, _HMACFileReader
 
 
-class TestHMACFileReader(object):
+class TestHMACFileReader:
     @pytest.fixture
     def bad_datas(self, value):
         val = value * 3
@@ -107,7 +107,7 @@ class TestHMACFileReader(object):
 # test the "real" HMACMixin: core functionality and checks
 # this only works with dicts, as we access the internal structures to
 # manipulate values
-class HMACDec(object):
+class HMACDec:
     @pytest.fixture
     def hmacstore(self, secret_key, store):
         return HMACDecorator(secret_key, store)
@@ -142,7 +142,7 @@ class HMACDec(object):
     def test_get_file_non_writable_target(self, key, value, hmacstore):
         hmacstore.put(key, value)
         path = "/tmp/this/file/does/not/exist"
-        with pytest.raises(IOError, match="Error opening {} for writing".format(path)):
+        with pytest.raises(IOError, match=f"Error opening {path} for writing"):
             hmacstore.get_file(key, path)
 
     def test_get_file_fails_on_manipulation(self, hmacstore, key, value):

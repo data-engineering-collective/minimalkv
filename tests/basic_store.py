@@ -18,7 +18,7 @@ def is_emulated_gcstore_test(store):
     )
 
 
-class BasicStore(object):
+class BasicStore:
     def test_store(self, store, key, value):
         new_key = store.put(key, value)
         assert key == new_key
@@ -336,7 +336,7 @@ class BasicStore(object):
         a_lot = 20
 
         for i in range(a_lot):
-            key = key + "_{}".format(i)
+            key = key + f"_{i}"
             store.put(key, value)
 
 
@@ -344,7 +344,7 @@ class BasicStore(object):
 TTL_MARGIN = 1
 
 
-class TTLStore(object):
+class TTLStore:
     @pytest.fixture
     def ustore(self, store):
         return UUIDDecorator(store)
@@ -423,7 +423,7 @@ class TTLStore(object):
         dstore.put(key, value, ttl_secs=10)
 
 
-class OpenSeekTellStore(object):
+class OpenSeekTellStore:
     def test_open_seek_and_tell_empty_value(self, store, key):
         value = b""
         store.put(key, value)

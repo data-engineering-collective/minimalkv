@@ -34,7 +34,7 @@ def boto_bucket(
             access_key, secret_key, host=host, port=port, is_secure=is_secure
         )
 
-    name = bucket_name or "testrun-bucket-{}".format(uuid())
+    name = bucket_name or f"testrun-bucket-{uuid()}"
     bucket = conn.create_bucket(name)
 
     yield bucket
@@ -71,7 +71,7 @@ def boto3_bucket(
         if port:
             endpoint_url += f":{port}"
 
-    name = bucket_name or "testrun-bucket-{}".format(uuid())
+    name = bucket_name or f"testrun-bucket-{uuid()}"
     s3_client = boto3.client(
         "s3",
         endpoint_url=endpoint_url,
@@ -112,7 +112,7 @@ def load_boto_credentials():
         }
     )
     if not parser.read(cfg_fn):
-        pytest.skip("file {} not found".format(cfg_fn))
+        pytest.skip(f"file {cfg_fn} not found")
 
     for section in parser.sections():
         yield {

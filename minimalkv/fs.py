@@ -35,7 +35,7 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
     bufsize: int
 
     def __init__(self, root: str, perm: Optional[int] = None):
-        super(FilesystemStore, self).__init__()
+        super().__init__()
         self.root = str(root)
         self.perm = perm
         self.bufsize = 1024 * 1024  # 1m
@@ -80,7 +80,7 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
         try:
             f = open(self._build_filename(key), "rb")
             return f
-        except IOError as e:
+        except OSError as e:
             if 2 == e.errno:
                 raise KeyError(key)
             else:
@@ -95,7 +95,7 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
             shutil.copy(source_file_name, dest_file_name)
             self._fix_permissions(dest_file_name)
             return dest
-        except IOError as e:
+        except OSError as e:
             if 2 == e.errno:
                 raise KeyError(source)
             else:
@@ -189,7 +189,7 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
 
         """
         if delimiter != os.sep:
-            return super(FilesystemStore, self).iter_prefixes(
+            return super().iter_prefixes(
                 delimiter,
                 prefix,
             )
@@ -266,7 +266,7 @@ class WebFilesystemStore(FilesystemStore):
     def __init__(
         self, root, url_prefix: Union[Callable[[Any, str], str], str], **kwargs
     ):
-        super(WebFilesystemStore, self).__init__(root, **kwargs)
+        super().__init__(root, **kwargs)
 
         self.url_prefix = url_prefix
 

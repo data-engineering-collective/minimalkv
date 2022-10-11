@@ -24,12 +24,12 @@ def get_azure_conn_string():
     )
     result = parser.read(cfg_fn)
     if not result:
-        pytest.skip("file {} not found".format(cfg_fn))
+        pytest.skip(f"file {cfg_fn} not found")
 
     for section in parser.sections():
         account_name = parser.get(section, "account_name")
         if not account_name:
-            pytest.skip("no 'account_name' found in file {}".format(cfg_fn))
+            pytest.skip(f"no 'account_name' found in file {cfg_fn}")
 
         account_key = parser.get(section, "account_key")
         protocol = parser.get(section, "protocol")
@@ -38,7 +38,7 @@ def get_azure_conn_string():
             protocol, account_name, account_key
         )
         if endpoint:
-            conn_string += ";BlobEndpoint={}".format(endpoint)
+            conn_string += f";BlobEndpoint={endpoint}"
         return conn_string
 
 
@@ -146,7 +146,7 @@ def test_azure_special_args():
         assert cfg.max_block_size == MBS
 
 
-class TestAzureExceptionHandling(object):
+class TestAzureExceptionHandling:
     def test_missing_container(self):
         container = str(uuid())
         conn_string = get_azure_conn_string()
@@ -162,9 +162,7 @@ class TestAzureExceptionHandling(object):
         conn_string = get_azure_conn_string()
         conn_settings = dict([s.split("=", 1) for s in conn_string.split(";") if s])
         conn_settings["BlobEndpoint"] = "https://host-does-not-exist/"
-        conn_string = ";".join(
-            "{}={}".format(key, value) for key, value in conn_settings.items()
-        )
+        conn_string = ";".join(f"{key}={value}" for key, value in conn_settings.items())
         store = AzureBlockBlobStore(
             conn_string=conn_string, container=container, create_if_missing=False
         )
@@ -202,7 +200,7 @@ class TestAzureExceptionHandling(object):
         assert "Incorrect padding" in str(exc.value)
 
 
-class TestChecksum(object):
+class TestChecksum:
     CONTENT = b"\1\2\3\4"
     EXPECTED_CHECKSUM = "CNbAWiFRKnmh3+udKo8mLw=="
     KEY = "testkey"

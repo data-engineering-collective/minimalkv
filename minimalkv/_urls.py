@@ -94,7 +94,7 @@ def extract_params(scheme, host, port, path, query, userinfo):  # noqa D
     if scheme in ("s3", "hs3"):
         access_key, secret_key = _parse_userinfo(userinfo)
         params = {
-            "host": "{}:{}".format(host, port) if port else host,
+            "host": f"{host}:{port}" if port else host,
             "access_key": access_key,
             "secret_key": secret_key,
             "bucket": path[1:],
@@ -119,7 +119,7 @@ def extract_params(scheme, host, port, path, query, userinfo):  # noqa D
             params["max_single_put_size"] = query.pop("max_single_put_size")
         return params
 
-    raise ValueError('Unknown storage type "{}"'.format(scheme))
+    raise ValueError(f'Unknown storage type "{scheme}"')
 
 
 def _parse_userinfo(userinfo: str) -> List[str]:

@@ -1,4 +1,4 @@
-import mock
+from unittest import mock
 
 optional_dependencies = ["redis", "dulwich", "sqlalchemy", "google", "azure", "boto"]
 

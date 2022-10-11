@@ -155,7 +155,7 @@ class TimeToLiveMixin:
         """
         self._check_valid_key(key)
         if not isinstance(data, bytes):
-            raise IOError("Provided data is not of type bytes")
+            raise OSError("Provided data is not of type bytes")
         return self._put(key, data, self._valid_ttl(ttl_secs))
 
     def put_file(
@@ -277,7 +277,7 @@ class TimeToLiveMixin:
             return self._put_file(key, source, self._valid_ttl(ttl_secs))
 
 
-class CopyMixin(object):
+class CopyMixin:
     """Mixin to expose a copy operation supported by the backend."""
 
     _check_valid_key: Callable

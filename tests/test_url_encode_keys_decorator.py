@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf8
 
 import pytest
 from basic_store import BasicStore

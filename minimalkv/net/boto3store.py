@@ -32,7 +32,7 @@ def map_boto3_exceptions(key=None, exc_pass=()):
         code = ex.response["Error"]["Code"]
         if code == "404" or code == "NoSuchKey":
             raise KeyError(key)
-        raise IOError(str(ex))
+        raise OSError(str(ex))
 
 
 class Boto3SimpleKeyFile(io.RawIOBase):  # noqa D
@@ -44,7 +44,7 @@ class Boto3SimpleKeyFile(io.RawIOBase):  # noqa D
         self.position = 0
 
     def __repr__(self):  # noqa D
-        return "<{} s3_object={!r} >".format(type(self).__name__, self.s3_object)
+        return f"<{type(self).__name__} s3_object={self.s3_object!r} >"
 
     @property
     def size(self):  # noqa D
