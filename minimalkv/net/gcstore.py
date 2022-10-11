@@ -53,7 +53,7 @@ class GoogleCloudStore(FSSpecStore):
 
         super().__init__(prefix=f"{bucket_name}/", mkdir_prefix=create_if_missing)
 
-    def _create_filesystem(self) -> GCSFileSystem:
+    def _create_filesystem(self) -> "GCSFileSystem":
         if not has_gcsfs:
             raise ImportError("Cannot find optional dependency gcsfs.")
 
