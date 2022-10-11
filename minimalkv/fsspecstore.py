@@ -1,8 +1,5 @@
 import io
-from functools import partial
 from typing import IO, Iterator, Optional
-from urllib.parse import quote as _quote
-from urllib.parse import unquote
 
 from fsspec import AbstractFileSystem
 from fsspec.spec import AbstractBufferedFile
@@ -10,27 +7,15 @@ from fsspec.spec import AbstractBufferedFile
 from minimalkv import KeyValueStore
 from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
 
-quote = partial(_quote, safe="")
-
 # The complete path of the key is structured as follows:
 # /Users/simon/data/mykvstore/file1
 # <prefix>                    <key>
 # If desired to be a directory, the prefix should end in a slash.
 
 
-# Create decorator which prints function name before running the function
-def print_function_name(func):
-    def wrapper(*args, **kwargs):
-        print(f"Running {func.__name__}")
-        return func(*args, **kwargs)
-
-    return wrapper
-
-
 class FSSpecStoreEntry(io.BufferedIOBase):
     """A file-like object for reading from an entry in an FSSpecStore."""
 
-    @print_function_name
     def __init__(self, file: AbstractBufferedFile):
         """
         Initialize an FSSpecStoreEntry.
@@ -42,7 +27,6 @@ class FSSpecStoreEntry(io.BufferedIOBase):
         """
         self._file = file
 
-    @print_function_name
     def seek(self, loc: int, whence: int = 0) -> int:
         """
         Set current file location.
@@ -62,14 +46,12 @@ class FSSpecStoreEntry(io.BufferedIOBase):
             # Map ValueError to IOError
             raise OSError
 
-    @print_function_name
     def tell(self) -> int:
         """Return the current offset as int. Always >= 0."""
         if self.closed():
             raise ValueError("I/O operation on closed file.")
         return self._file.tell()
 
-    @print_function_name
     def read(self, size: Optional[int] = -1) -> bytes:
         """Return first ``size`` bytes of data.
 
@@ -83,22 +65,18 @@ class FSSpecStoreEntry(io.BufferedIOBase):
         """
         return self._file.read(size)
 
-    @print_function_name
     def seekable(self) -> bool:
         """Whether the file is seekable."""
         return self._file.seekable()
 
-    @print_function_name
     def readable(self) -> bool:
         """Whether the file is readable."""
         return self._file.readable()
 
-    @print_function_name
     def close(self) -> None:
         """Close the file."""
         self._file.close()
 
-    @print_function_name
     def closed(self) -> bool:
         """Whether the file is closed."""
         return self._file.closed
@@ -151,33 +129,28 @@ class FSSpecStore(KeyValueStore):
             If there was an error accessing the store.
         """
         # List files
-        all_files_and_dirs = self._fs.find(f"{self.prefix}", prefix=quote(prefix))
+        all_files_and_dirs = self._fs.find(f"{self.prefix}", prefix=prefix)
 
-        return map(
-            lambda k: unquote(k.replace(f"{self.prefix}", "")), all_files_and_dirs
-        )
+        return map(lambda k: k.replace(f"{self.prefix}", ""), all_files_and_dirs)
 
     def _delete(self, key: str) -> None:
         try:
-            self._fs.rm_file(f"{self.prefix}{quote(key)}")
+            self._fs.rm_file(f"{self.prefix}{key}")
         except FileNotFoundError:
             pass
 
     def _open(self, key: str) -> IO:
         try:
-            return self._fs.open(f"{self.prefix}{quote(key)}")
+            return self._fs.open(f"{self.prefix}{key}")
         except FileNotFoundError:
             raise KeyError(key)
 
-    def _get_file(self, key: str, file: IO) -> None:
-        file.write(self._fs.cat_file(f"{self.prefix}{quote(key)}"))
-
     def _put_file(self, key: str, file: IO) -> str:
-        self._fs.pipe_file(f"{self.prefix}{quote(key)}", file.read())
+        self._fs.pipe_file(f"{self.prefix}{key}", file.read())
         return key
 
     def _has_key(self, key: str) -> bool:
-        return self._fs.exists(f"{self.prefix}{quote(key)}")
+        return self._fs.exists(f"{self.prefix}{key}")
 
     def _create_filesystem(self) -> AbstractFileSystem:
         # To be implemented by inheriting classes.
