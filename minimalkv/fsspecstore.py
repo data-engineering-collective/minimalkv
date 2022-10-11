@@ -18,9 +18,19 @@ quote = partial(_quote, safe="")
 # If desired to be a directory, the prefix should end in a slash.
 
 
+# Create decorator which prints function name before running the function
+def print_function_name(func):
+    def wrapper(*args, **kwargs):
+        print(f"Running {func.__name__}")
+        return func(*args, **kwargs)
+
+    return wrapper
+
+
 class FSSpecStoreEntry(io.BufferedIOBase):
     """A file-like object for reading from an entry in an FSSpecStore."""
 
+    @print_function_name
     def __init__(self, file: AbstractBufferedFile):
         """
         Initialize an FSSpecStoreEntry.
@@ -32,6 +42,7 @@ class FSSpecStoreEntry(io.BufferedIOBase):
         """
         self._file = file
 
+    @print_function_name
     def seek(self, loc: int, whence: int = 0) -> int:
         """
         Set current file location.
@@ -51,12 +62,14 @@ class FSSpecStoreEntry(io.BufferedIOBase):
             # Map ValueError to IOError
             raise OSError
 
+    @print_function_name
     def tell(self) -> int:
         """Return the current offset as int. Always >= 0."""
         if self.closed():
             raise ValueError("I/O operation on closed file.")
         return self._file.tell()
 
+    @print_function_name
     def read(self, size: Optional[int] = -1) -> bytes:
         """Return first ``size`` bytes of data.
 
@@ -70,18 +83,22 @@ class FSSpecStoreEntry(io.BufferedIOBase):
         """
         return self._file.read(size)
 
+    @print_function_name
     def seekable(self) -> bool:
         """Whether the file is seekable."""
         return self._file.seekable()
 
+    @print_function_name
     def readable(self) -> bool:
         """Whether the file is readable."""
         return self._file.readable()
 
+    @print_function_name
     def close(self) -> None:
         """Close the file."""
         self._file.close()
 
+    @print_function_name
     def closed(self) -> bool:
         """Whether the file is closed."""
         return self._file.closed
@@ -109,12 +126,15 @@ class FSSpecStore(KeyValueStore):
 
     @lazy_property
     def _prefix_exists(self) -> bool:
+        from google.auth.exceptions import RefreshError
+
         # Check if prefix exists.
         # Used by inheriting classes to check if e.g. a bucket exists.
         try:
             self._fs.info(self.prefix)
-        except (FileNotFoundError, OSError):
-            return False
+        except (FileNotFoundError, OSError, RefreshError) as error:
+            print(error)
+            return True
         return True
 
     def iter_keys(self, prefix: str = "") -> Iterator[str]:
