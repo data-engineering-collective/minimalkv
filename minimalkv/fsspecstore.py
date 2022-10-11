@@ -1,5 +1,5 @@
 import io
-from typing import IO, Iterator, Optional
+from typing import IO, Iterator, Optional, Union
 
 from fsspec import AbstractFileSystem
 from fsspec.spec import AbstractBufferedFile
@@ -103,16 +103,17 @@ class FSSpecStore(KeyValueStore):
         self.mkdir_prefix = mkdir_prefix
 
     @lazy_property
-    def _prefix_exists(self) -> bool:
+    def _prefix_exists(self) -> Union[None, bool]:
         from google.auth.exceptions import RefreshError
 
         # Check if prefix exists.
         # Used by inheriting classes to check if e.g. a bucket exists.
         try:
             self._fs.exists(self.prefix)
-        except (FileNotFoundError, OSError, RefreshError) as error:
-            print(error)
-            return True
+        except FileNotFoundError:
+            return False
+        except (OSError, RefreshError):
+            return None
         return True
 
     def iter_keys(self, prefix: str = "") -> Iterator[str]:
