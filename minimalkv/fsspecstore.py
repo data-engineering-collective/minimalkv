@@ -131,7 +131,7 @@ class FSSpecStore(KeyValueStore):
         # Check if prefix exists.
         # Used by inheriting classes to check if e.g. a bucket exists.
         try:
-            self._fs.info(self.prefix)
+            self._fs.exists(self.prefix)
         except (FileNotFoundError, OSError, RefreshError) as error:
             print(error)
             return True
@@ -168,6 +168,9 @@ class FSSpecStore(KeyValueStore):
             return self._fs.open(f"{self.prefix}{quote(key)}")
         except FileNotFoundError:
             raise KeyError(key)
+
+    def _get_file(self, key: str, file: IO) -> None:
+        file.write(self._fs.cat_file(f"{self.prefix}{quote(key)}"))
 
     def _put_file(self, key: str, file: IO) -> str:
         self._fs.pipe_file(f"{self.prefix}{quote(key)}", file.read())
