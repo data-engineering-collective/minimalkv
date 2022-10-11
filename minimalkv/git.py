@@ -51,6 +51,7 @@ def _on_tree(
         name = components[0]
 
         if mode is not None:
+            assert obj is not None
             tree[name] = mode, obj.id
             return [tree]
         if name in tree:

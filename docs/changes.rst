@@ -1,6 +1,11 @@
 Changelog
 *********
 
+1.4.2
+=====
+
+* Declare packages as ``py.typed``.
+
 1.4.1
 =====
 
