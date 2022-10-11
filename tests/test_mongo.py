@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf8
 
 from uuid import uuid4 as uuid
 
@@ -17,7 +16,7 @@ from minimalkv.db.mongo import MongoStore
 class TestMongoDB(BasicStore):
     @pytest.fixture
     def db_name(self):
-        return "_minimalkv_test_{}".format(uuid())
+        return f"_minimalkv_test_{uuid()}"
 
     @pytest.fixture
     def store(self, db_name):

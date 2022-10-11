@@ -43,7 +43,7 @@ class HashDecorator(StoreDecorator):
 
         self.hashfunc = hashfunc
         self._template = template
-        super(HashDecorator, self).__init__(decorated_store)
+        super().__init__(decorated_store)
 
     def put(self, key: Optional[str], data: bytes, *args, **kwargs):
         """Store bytestring data at key.
@@ -170,7 +170,7 @@ class UUIDDecorator(StoreDecorator):
     uuidfunc = "uuid1"
 
     def __init__(self, store, template="{}"):
-        super(UUIDDecorator, self).__init__(store)
+        super().__init__(store)
         self._template = template
 
     def put(self, key: Optional[str], data: bytes, *args, **kwargs) -> str:

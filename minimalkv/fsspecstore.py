@@ -49,7 +49,7 @@ class FSSpecStoreEntry(io.BufferedIOBase):
             return self._file.seek(loc, whence)
         except ValueError:
             # Map ValueError to IOError
-            raise IOError
+            raise OSError
 
     def tell(self) -> int:
         """Return the current offset as int. Always >= 0."""
@@ -113,7 +113,7 @@ class FSSpecStore(KeyValueStore):
         # Used by inheriting classes to check if e.g. a bucket exists.
         try:
             self._fs.info(self.prefix)
-        except (FileNotFoundError, IOError):
+        except (FileNotFoundError, OSError):
             return False
         return True
 

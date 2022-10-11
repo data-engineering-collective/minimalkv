@@ -1,5 +1,3 @@
-# coding=utf8
-
 try:
     from azure.storage.blob import BlockBlobService  # noqa: F401
 

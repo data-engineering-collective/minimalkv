@@ -29,7 +29,7 @@ class CacheDecorator(StoreDecorator):
     """
 
     def __init__(self, cache: KeyValueStore, store: KeyValueStore):
-        super(CacheDecorator, self).__init__(store)
+        super().__init__(store)
         self.cache = cache
 
     def delete(self, key: str) -> None:
@@ -77,7 +77,7 @@ class CacheDecorator(StoreDecorator):
             # store in cache and return
             self.cache.put(key, data)
             return data
-        except IOError:
+        except OSError:
             # cache error, ignore completely and return from backend
             return self._dstore.get(key)
 
@@ -145,7 +145,7 @@ class CacheDecorator(StoreDecorator):
             self.cache.put_file(key, fp)
 
             return self.cache.open(key)
-        except IOError:
+        except OSError:
             # cache error, ignore completely and return from backend
             return self._dstore.open(key)
 

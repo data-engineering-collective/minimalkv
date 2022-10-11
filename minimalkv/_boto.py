@@ -27,5 +27,5 @@ def _get_s3bucket(
             if create_if_missing:
                 return s3con.create_bucket(bucket)
             else:
-                raise IOError("Bucket {} does not exist".format(bucket))
+                raise OSError(f"Bucket {bucket} does not exist")
         raise

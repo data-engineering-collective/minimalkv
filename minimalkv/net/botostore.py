@@ -14,10 +14,10 @@ def map_boto_exceptions(key=None, exc_pass=()):
     except StorageResponseError as e:
         if e.code == "NoSuchKey":
             raise KeyError(key)
-        raise IOError(str(e))
+        raise OSError(str(e))
     except (BotoClientError, BotoServerError) as e:
         if e.__class__.__name__ not in exc_pass:
-            raise IOError(str(e))
+            raise OSError(str(e))
 
 
 class BotoStore(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
@@ -91,7 +91,7 @@ class BotoStore(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
             self.bucket.delete_key(self.prefix + key)
         except StorageResponseError as e:
             if e.code != "NoSuchKey":
-                raise IOError(str(e))
+                raise OSError(str(e))
 
     def _get(self, key: str) -> bytes:
         k = self.__new_key(key)

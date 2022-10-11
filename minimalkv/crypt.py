@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf8
 
 import hashlib
 import hmac
@@ -9,7 +8,7 @@ import tempfile
 from minimalkv.decorator import StoreDecorator
 
 
-class _HMACFileReader(object):
+class _HMACFileReader:
     def __init__(self, hm, source):
         self.hm = hm
         self.source = source
@@ -90,7 +89,7 @@ class HMACDecorator(StoreDecorator):
     """
 
     def __init__(self, secret_key, decorated_store, hashfunc=hashlib.sha256):
-        super(HMACDecorator, self).__init__(decorated_store)
+        super().__init__(decorated_store)
 
         self.__hashfunc = hashfunc
         self.__secret_key = bytes(secret_key)
@@ -128,8 +127,8 @@ class HMACDecorator(StoreDecorator):
         if isinstance(file, str):
             try:
                 f = open(file, "wb")
-            except (OSError, IOError) as e:
-                raise IOError("Error opening {} for writing: {!r}".format(file, e))
+            except OSError as e:
+                raise OSError(f"Error opening {file} for writing: {e!r}")
 
             # file is open, now we call ourself again with a proper file
             try:

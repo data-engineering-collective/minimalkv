@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import re
 from io import BytesIO
 from typing import IO, TYPE_CHECKING, Iterator, List, Optional, Union

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf8
 
 import pytest
 
@@ -7,7 +6,7 @@ from minimalkv.decorator import ReadOnlyDecorator
 from minimalkv.memory import DictStore
 
 
-class TestReadOnlyDecorator(object):
+class TestReadOnlyDecorator:
     def test_readonly(self):
         store0 = DictStore()
         store0.put("file1", b"content")

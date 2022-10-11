@@ -1,9 +1,7 @@
-# coding: utf8
-
 import pytest
 
 
-class UrlStore(object):
+class UrlStore:
     def test_url_for_for_generates_url_for(self, store, key, value):
         store.put(key, value)
         assert store.url_for(key)

@@ -22,14 +22,14 @@ def map_azure_exceptions(key=None, exc_pass=()):
         if ex.__class__.__name__ not in exc_pass:
             s = str(ex)
             if s.startswith("The specified container does not exist."):
-                raise IOError(s)
+                raise OSError(s)
             raise KeyError(key)
     except AzureHttpError as ex:
         if ex.__class__.__name__ not in exc_pass:
-            raise IOError(str(ex))
+            raise OSError(str(ex))
     except AzureException as ex:
         if ex.__class__.__name__ not in exc_pass:
-            raise IOError(str(ex))
+            raise OSError(str(ex))
 
 
 class AzureBlockBlobStore(KeyValueStore):  # noqa D
@@ -210,7 +210,7 @@ class IOInterface(io.BufferedIOBase):
     """File-like interface to selectively read from a blob in the blob store."""
 
     def __init__(self, block_blob_service, container_name, key, max_connections):
-        super(IOInterface, self).__init__()
+        super().__init__()
         self.block_blob_service = block_blob_service
         self.container_name = container_name
         self.key = key
@@ -269,15 +269,15 @@ class IOInterface(io.BufferedIOBase):
             raise ValueError("I/O operation on closed file")
         if whence == 0:
             if offset < 0:
-                raise IOError("seek would move position outside the file")
+                raise OSError("seek would move position outside the file")
             self.pos = offset
         elif whence == 1:
             if self.pos + offset < 0:
-                raise IOError("seek would move position outside the file")
+                raise OSError("seek would move position outside the file")
             self.pos += offset
         elif whence == 2:
             if self.size + offset < 0:
-                raise IOError("seek would move position outside the file")
+                raise OSError("seek would move position outside the file")
             self.pos = self.size + offset
         return self.pos
 

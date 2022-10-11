@@ -20,7 +20,7 @@ def map_azure_exceptions(key=None, error_codes_pass=()):
             return
         if error_code == "BlobNotFound":
             raise KeyError(key)
-        raise IOError(str(ex))
+        raise OSError(str(ex))
 
 
 class AzureBlockBlobStore(KeyValueStore):  # noqa D
@@ -175,7 +175,7 @@ class IOInterface(io.BufferedIOBase):
     """Class which provides a file-like interface to selectively read from a blob in the blob store."""
 
     def __init__(self, blob_client, max_connections):
-        super(IOInterface, self).__init__()
+        super().__init__()
         self.blob_client = blob_client
         self.max_connections = max_connections
 
@@ -228,15 +228,15 @@ class IOInterface(io.BufferedIOBase):
             raise ValueError("I/O operation on closed file")
         if whence == 0:
             if offset < 0:
-                raise IOError("seek would move position outside the file")
+                raise OSError("seek would move position outside the file")
             self.pos = offset
         elif whence == 1:
             if self.pos + offset < 0:
-                raise IOError("seek would move position outside the file")
+                raise OSError("seek would move position outside the file")
             self.pos += offset
         elif whence == 2:
             if self.size + offset < 0:
-                raise IOError("seek would move position outside the file")
+                raise OSError("seek would move position outside the file")
             self.pos = self.size + offset
         return self.pos
 

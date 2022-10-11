@@ -131,7 +131,7 @@ class PrefixDecorator(KeyTransformingDecorator):
     """
 
     def __init__(self, prefix: str, store: KeyValueStore):
-        super(PrefixDecorator, self).__init__(store)
+        super().__init__(store)
         self.prefix = prefix
 
     def _filter(self, key: str) -> bool:
@@ -183,6 +183,6 @@ class ReadOnlyDecorator(StoreDecorator):
 
     def __getattr__(self, attr):  # noqa D
         if attr in ("get", "iter_keys", "keys", "open", "get_file"):
-            return super(ReadOnlyDecorator, self).__getattr__(attr)
+            return super().__getattr__(attr)
         else:
             raise AttributeError
