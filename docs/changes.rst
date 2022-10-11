@@ -1,6 +1,11 @@
 Changelog
 *********
 
+1.4.1
+=====
+
+* We now lazily import ``gcsfs``.
+
 1.4.0
 ======
 

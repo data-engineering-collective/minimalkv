@@ -2,10 +2,14 @@ import json
 import warnings
 from typing import IO, cast
 
-from gcsfs import GCSFileSystem
-from google.cloud.exceptions import NotFound
-
 from minimalkv.fsspecstore import FSSpecStore, FSSpecStoreEntry
+
+try:
+    from gcsfs import GCSFileSystem
+
+    has_gcsfs = True
+except ImportError:
+    has_gcsfs = False
 
 
 class GoogleCloudStore(FSSpecStore):
@@ -49,7 +53,10 @@ class GoogleCloudStore(FSSpecStore):
 
         super().__init__(prefix=f"{bucket_name}/", mkdir_prefix=create_if_missing)
 
-    def _create_filesystem(self) -> GCSFileSystem:
+    def _create_filesystem(self) -> "GCSFileSystem":
+        if not has_gcsfs:
+            raise ImportError("Cannot find optional dependency gcsfs.")
+
         return GCSFileSystem(
             project=self.project_name,
             token=self._credentials,
@@ -58,6 +65,8 @@ class GoogleCloudStore(FSSpecStore):
         )
 
     def _open(self, key: str) -> IO:
+        from google.cloud.exceptions import NotFound
+
         if not self._prefix_exists:
             raise NotFound(f"Could not find bucket: {self.bucket_name}")
         return cast(IO, FSSpecStoreEntry(super()._open(key)))
