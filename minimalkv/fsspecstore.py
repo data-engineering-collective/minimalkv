@@ -4,8 +4,13 @@ from typing import IO, Iterator, Optional, Union
 from urllib.parse import quote as _quote
 from urllib.parse import unquote
 
-from fsspec import AbstractFileSystem
-from fsspec.spec import AbstractBufferedFile
+try:
+    from fsspec import AbstractFileSystem
+    from fsspec.spec import AbstractBufferedFile
+
+    has_fsspec = True
+except ImportError:
+    has_fsspec = False
 
 from minimalkv import KeyValueStore
 from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
@@ -21,7 +26,7 @@ quote = partial(_quote, safe="")
 class FSSpecStoreEntry(io.BufferedIOBase):
     """A file-like object for reading from an entry in an FSSpecStore."""
 
-    def __init__(self, file: AbstractBufferedFile):
+    def __init__(self, file: "AbstractBufferedFile"):
         """
         Initialize an FSSpecStoreEntry.
 
@@ -160,12 +165,12 @@ class FSSpecStore(KeyValueStore):
     def _has_key(self, key: str) -> bool:
         return self._fs.exists(f"{self.prefix}{quote(key)}")
 
-    def _create_filesystem(self) -> AbstractFileSystem:
+    def _create_filesystem(self) -> "AbstractFileSystem":
         # To be implemented by inheriting classes.
         raise NotImplementedError
 
     @lazy_property
-    def _fs(self) -> AbstractFileSystem:
+    def _fs(self) -> "AbstractFileSystem":
         fs = self._create_filesystem()
 
         if self.mkdir_prefix and not fs.exists(self.prefix):
