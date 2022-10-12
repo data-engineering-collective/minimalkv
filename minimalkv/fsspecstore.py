@@ -153,6 +153,14 @@ class FSSpecStore(KeyValueStore):
         except FileNotFoundError:
             raise KeyError(key)
 
+    # Required to prevent error when credentials are not sufficient for listing objects
+    def _get_file(self, key: str, file: IO) -> str:
+        try:
+            file.write(self._fs.cat_file(f"{self.prefix}{quote(key)}"))
+            return key
+        except FileNotFoundError:
+            raise KeyError(key)
+
     def _put_file(self, key: str, file: IO) -> str:
         self._fs.pipe_file(f"{self.prefix}{quote(key)}", file.read())
         return key
