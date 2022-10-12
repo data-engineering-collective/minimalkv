@@ -30,6 +30,7 @@ class FSSpecStoreEntry(io.BufferedIOBase):
         file: AbstractBufferedFile
             The fsspec file object to wrap.
         """
+        super().__init__()
         self._file = file
 
     def seek(self, loc: int, whence: int = 0) -> int:
@@ -43,7 +44,7 @@ class FSSpecStoreEntry(io.BufferedIOBase):
         whence: {0, 1, 2}
             from start of file, current location or end of file, respectively.
         """
-        if self.closed():
+        if self.closed:
             raise ValueError("I/O operation on closed file.")
         try:
             return self._file.seek(loc, whence)
@@ -53,7 +54,7 @@ class FSSpecStoreEntry(io.BufferedIOBase):
 
     def tell(self) -> int:
         """Return the current offset as int. Always >= 0."""
-        if self.closed():
+        if self.closed:
             raise ValueError("I/O operation on closed file.")
         return self._file.tell()
 
@@ -68,6 +69,8 @@ class FSSpecStoreEntry(io.BufferedIOBase):
             Number of bytes to be returned.
 
         """
+        if self.closed:
+            raise ValueError("I/O operation on closed file")
         return self._file.read(size)
 
     def seekable(self) -> bool:
@@ -77,14 +80,6 @@ class FSSpecStoreEntry(io.BufferedIOBase):
     def readable(self) -> bool:
         """Whether the file is readable."""
         return self._file.readable()
-
-    def close(self) -> None:
-        """Close the file."""
-        self._file.close()
-
-    def closed(self) -> bool:
-        """Whether the file is closed."""
-        return self._file.closed
 
 
 class FSSpecStore(KeyValueStore):

@@ -1,5 +1,4 @@
 import pytest
-from pyarrow.parquet import ParquetFile
 
 storage = pytest.importorskip("google.cloud.storage")
 
@@ -120,16 +119,6 @@ def store(dirty_store):
 
 class TestGoogleCloudStore(OpenSeekTellStore, BasicStore):
     pass
-
-
-def test_parquet_file(store):
-    with open("tests/test.parquet", "rb") as f:
-        store.put_file("test.parquet", f)
-    # Open parquet file
-    f = store.open("test.parquet")
-    p = ParquetFile(f)
-    assert p.metadata.num_columns == 18
-    # Read metadata from parquet file
 
 
 def test_gcstore_pickling(store):
