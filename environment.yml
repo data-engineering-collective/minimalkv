@@ -26,5 +26,3 @@ dependencies:
   - sphinx  
   - sqlalchemy
   - uritools
-
-
