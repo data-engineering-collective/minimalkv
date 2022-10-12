@@ -70,3 +70,10 @@ class GoogleCloudStore(FSSpecStore):
         if self._prefix_exists is False:
             raise NotFound(f"Could not find bucket: {self.bucket_name}")
         return cast(IO, FSSpecStoreEntry(super()._open(key)))
+
+    def _get_file(self, key: str, file: IO) -> str:
+        from google.cloud.exceptions import NotFound
+
+        if self._prefix_exists is False:
+            raise NotFound(f"Could not find bucket: {self.bucket_name}")
+        return super()._get_file(key, file)

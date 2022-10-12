@@ -109,12 +109,9 @@ class FSSpecStore(KeyValueStore):
         # Check if prefix exists.
         # Used by inheriting classes to check if e.g. a bucket exists.
         try:
-            self._fs.exists(self.prefix)
-        except FileNotFoundError:
-            return False
+            return self._fs.exists(self.prefix)
         except (OSError, RefreshError):
             return None
-        return True
 
     def iter_keys(self, prefix: str = "") -> Iterator[str]:
         """Iterate over all keys in the store starting with prefix.

@@ -343,6 +343,11 @@ class BasicStore:
     # We should expand this to include more tests interfacing with other
     # FileSystem APIs like ParquetFile.
     def test_parquet_file(self, store):
+        # Skip if were using a SQLAlchemyStore
+        from minimalkv.db.sql import SQLAlchemyStore
+
+        if isinstance(store, SQLAlchemyStore):
+            pytest.skip("SQLAlchemyStore doesn't support ParquetFile yet")
         with open("tests/test.parquet", "rb") as f:
             store.put_file("test.parquet", f)
         # Open parquet file
