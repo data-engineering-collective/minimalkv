@@ -1,16 +1,12 @@
 import io
 from functools import partial
-from typing import IO, Iterator, Optional, Union
+from typing import IO, TYPE_CHECKING, Iterator, Optional, Union
 from urllib.parse import quote as _quote
 from urllib.parse import unquote
 
-try:
+if TYPE_CHECKING:
     from fsspec import AbstractFileSystem
     from fsspec.spec import AbstractBufferedFile
-
-    has_fsspec = True
-except ImportError:
-    has_fsspec = False
 
 from minimalkv import KeyValueStore
 from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
