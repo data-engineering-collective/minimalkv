@@ -11,6 +11,7 @@ dependencies:
   - fsspec
   - gcsfs
   - mock
+  - pip
   - pre-commit
   - psycopg2
   - pyarrow
