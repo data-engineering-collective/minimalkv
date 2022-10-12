@@ -1,11 +1,16 @@
 import io
+from functools import partial
 from typing import IO, Iterator, Optional, Union
+from urllib.parse import quote as _quote
+from urllib.parse import unquote
 
 from fsspec import AbstractFileSystem
 from fsspec.spec import AbstractBufferedFile
 
 from minimalkv import KeyValueStore
 from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
+
+quote = partial(_quote, safe="")
 
 # The complete path of the key is structured as follows:
 # /Users/simon/data/mykvstore/file1
@@ -130,28 +135,30 @@ class FSSpecStore(KeyValueStore):
             If there was an error accessing the store.
         """
         # List files
-        all_files_and_dirs = self._fs.find(f"{self.prefix}", prefix=prefix)
+        all_files_and_dirs = self._fs.find(f"{self.prefix}", prefix=quote(prefix))
 
-        return map(lambda k: k.replace(f"{self.prefix}", ""), all_files_and_dirs)
+        return map(
+            lambda k: unquote(k.replace(f"{self.prefix}", "")), all_files_and_dirs
+        )
 
     def _delete(self, key: str) -> None:
         try:
-            self._fs.rm_file(f"{self.prefix}{key}")
+            self._fs.rm_file(f"{self.prefix}{quote(key)}")
         except FileNotFoundError:
             pass
 
     def _open(self, key: str) -> IO:
         try:
-            return self._fs.open(f"{self.prefix}{key}")
+            return self._fs.open(f"{self.prefix}{quote(key)}")
         except FileNotFoundError:
             raise KeyError(key)
 
     def _put_file(self, key: str, file: IO) -> str:
-        self._fs.pipe_file(f"{self.prefix}{key}", file.read())
+        self._fs.pipe_file(f"{self.prefix}{quote(key)}", file.read())
         return key
 
     def _has_key(self, key: str) -> bool:
-        return self._fs.exists(f"{self.prefix}{key}")
+        return self._fs.exists(f"{self.prefix}{quote(key)}")
 
     def _create_filesystem(self) -> AbstractFileSystem:
         # To be implemented by inheriting classes.
