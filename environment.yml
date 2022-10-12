@@ -3,25 +3,26 @@ channels:
   - conda-forge
   - nodefaults
 dependencies:
-  - python
-  - dulwich
-  - mock
-  - pytest
-  - pytest-mock
-  - pytest-xdist
-  - pytest-cov
-  - redis-py
-  - psycopg2
-  - six
-  - sqlalchemy
   - azure-storage-blob
   - boto
   - boto3
-  - pymongo
   - docker-compose
-  - pymysql
-  - pre-commit
-  - setuptools-scm
-  - uritools
-  - sphinx
+  - dulwich
+  - fsspec
   - gcsfs
+  - mock
+  - pre-commit
+  - psycopg2
+  - pymongo
+  - pymysql
+  - pytest
+  - pytest-cov
+  - pytest-mock
+  - pytest-xdist  
+  - python
+  - redis-py
+  - setuptools-scm
+  - six
+  - sphinx  
+  - sqlalchemy
+  - uritools
