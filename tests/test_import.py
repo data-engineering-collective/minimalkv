@@ -1,6 +1,14 @@
 from unittest import mock
 
-optional_dependencies = ["redis", "dulwich", "sqlalchemy", "google", "azure", "boto"]
+optional_dependencies = [
+    "azure",
+    "boto",
+    "dulwich",
+    "gcsfs",
+    "google",
+    "redis",
+    "sqlalchemy",
+]
 
 orig_import = __import__
 
