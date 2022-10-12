@@ -4,6 +4,7 @@ optional_dependencies = [
     "azure",
     "boto",
     "dulwich",
+    "fsspec",
     "gcsfs",
     "google",
     "redis",
