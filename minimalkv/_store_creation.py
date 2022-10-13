@@ -43,7 +43,10 @@ def _create_store_gcs(store_type, params):
 
     if type(params["credentials"]) == bytes:
         account_info = json.loads(params["credentials"].decode())
-        params["credentials"] = Credentials.from_service_account_info(account_info)
+        params["credentials"] = Credentials.from_service_account_info(
+            account_info,
+            scopes=["https://www.googleapis.com/auth/devstorage.read_write"],
+        )
         params["project"] = account_info["project_id"]
 
     return (

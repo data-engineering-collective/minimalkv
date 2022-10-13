@@ -4,6 +4,7 @@ import time
 from io import BytesIO
 
 import pytest
+from pyarrow.parquet import ParquetFile
 
 from minimalkv import CopyMixin
 from minimalkv.crypt import HMACDecorator
@@ -338,6 +339,22 @@ class BasicStore:
         for i in range(a_lot):
             key = key + f"_{i}"
             store.put(key, value)
+
+    # We should expand this to include more tests interfacing with other
+    # FileSystem APIs like ParquetFile.
+    def test_parquet_file(self, store):
+        # Skip if were using a SQLAlchemyStore
+        from minimalkv.db.sql import SQLAlchemyStore
+
+        if isinstance(store, SQLAlchemyStore):
+            pytest.skip("SQLAlchemyStore doesn't support ParquetFile yet")
+        with open("tests/test.parquet", "rb") as f:
+            store.put_file("test.parquet", f)
+        # Open parquet file
+        f = store.open("test.parquet")
+        p = ParquetFile(f)
+        assert p.metadata.num_columns == 13
+        # Read metadata from parquet file
 
 
 # small extra time added to account for variance

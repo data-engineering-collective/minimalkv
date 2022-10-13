@@ -1,11 +1,12 @@
 import io
 from functools import partial
-from typing import IO, Iterator, Optional
+from typing import IO, TYPE_CHECKING, Iterator, Optional, Union
 from urllib.parse import quote as _quote
 from urllib.parse import unquote
 
-from fsspec import AbstractFileSystem
-from fsspec.spec import AbstractBufferedFile
+if TYPE_CHECKING:
+    from fsspec import AbstractFileSystem
+    from fsspec.spec import AbstractBufferedFile
 
 from minimalkv import KeyValueStore
 from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
@@ -21,7 +22,7 @@ quote = partial(_quote, safe="")
 class FSSpecStoreEntry(io.BufferedIOBase):
     """A file-like object for reading from an entry in an FSSpecStore."""
 
-    def __init__(self, file: AbstractBufferedFile):
+    def __init__(self, file: "AbstractBufferedFile"):
         """
         Initialize an FSSpecStoreEntry.
 
@@ -30,6 +31,7 @@ class FSSpecStoreEntry(io.BufferedIOBase):
         file: AbstractBufferedFile
             The fsspec file object to wrap.
         """
+        super().__init__()
         self._file = file
 
     def seek(self, loc: int, whence: int = 0) -> int:
@@ -43,7 +45,7 @@ class FSSpecStoreEntry(io.BufferedIOBase):
         whence: {0, 1, 2}
             from start of file, current location or end of file, respectively.
         """
-        if self.closed():
+        if self.closed:
             raise ValueError("I/O operation on closed file.")
         try:
             return self._file.seek(loc, whence)
@@ -53,7 +55,7 @@ class FSSpecStoreEntry(io.BufferedIOBase):
 
     def tell(self) -> int:
         """Return the current offset as int. Always >= 0."""
-        if self.closed():
+        if self.closed:
             raise ValueError("I/O operation on closed file.")
         return self._file.tell()
 
@@ -68,6 +70,8 @@ class FSSpecStoreEntry(io.BufferedIOBase):
             Number of bytes to be returned.
 
         """
+        if self.closed:
+            raise ValueError("I/O operation on closed file")
         return self._file.read(size)
 
     def seekable(self) -> bool:
@@ -77,14 +81,6 @@ class FSSpecStoreEntry(io.BufferedIOBase):
     def readable(self) -> bool:
         """Whether the file is readable."""
         return self._file.readable()
-
-    def close(self) -> None:
-        """Close the file."""
-        self._file.close()
-
-    def closed(self) -> bool:
-        """Whether the file is closed."""
-        return self._file.closed
 
 
 class FSSpecStore(KeyValueStore):
@@ -108,14 +104,15 @@ class FSSpecStore(KeyValueStore):
         self.mkdir_prefix = mkdir_prefix
 
     @lazy_property
-    def _prefix_exists(self) -> bool:
+    def _prefix_exists(self) -> Union[None, bool]:
+        from google.auth.exceptions import RefreshError
+
         # Check if prefix exists.
         # Used by inheriting classes to check if e.g. a bucket exists.
         try:
-            self._fs.info(self.prefix)
-        except (FileNotFoundError, OSError):
-            return False
-        return True
+            return self._fs.exists(self.prefix)
+        except (OSError, RefreshError):
+            return None
 
     def iter_keys(self, prefix: str = "") -> Iterator[str]:
         """Iterate over all keys in the store starting with prefix.
@@ -149,6 +146,14 @@ class FSSpecStore(KeyValueStore):
         except FileNotFoundError:
             raise KeyError(key)
 
+    # Required to prevent error when credentials are not sufficient for listing objects
+    def _get_file(self, key: str, file: IO) -> str:
+        try:
+            file.write(self._fs.cat_file(f"{self.prefix}{quote(key)}"))
+            return key
+        except FileNotFoundError:
+            raise KeyError(key)
+
     def _put_file(self, key: str, file: IO) -> str:
         self._fs.pipe_file(f"{self.prefix}{quote(key)}", file.read())
         return key
@@ -156,12 +161,12 @@ class FSSpecStore(KeyValueStore):
     def _has_key(self, key: str) -> bool:
         return self._fs.exists(f"{self.prefix}{quote(key)}")
 
-    def _create_filesystem(self) -> AbstractFileSystem:
+    def _create_filesystem(self) -> "AbstractFileSystem":
         # To be implemented by inheriting classes.
         raise NotImplementedError
 
     @lazy_property
-    def _fs(self) -> AbstractFileSystem:
+    def _fs(self) -> "AbstractFileSystem":
         fs = self._create_filesystem()
 
         if self.mkdir_prefix and not fs.exists(self.prefix):
