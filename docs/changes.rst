@@ -1,6 +1,13 @@
 Changelog
 *********
 
+1.4.3
+=====
+
+* Bug fixes for Google Cloud Storage:
+  * Request correct OAuth scope when creating credentials from URL
+  * Conform to ``BufferedIOBase`` class by calling ``super()``
+
 1.4.2
 =====
 
