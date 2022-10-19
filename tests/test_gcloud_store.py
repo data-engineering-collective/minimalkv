@@ -44,10 +44,27 @@ def gc_credentials():
     else:
         # if no endpoint was defined we're running against actual GC and need credentials
         credentials = credentials_path
+
     yield credentials
     # unset the env var
     if emulator_endpoint:
         del os.environ["STORAGE_EMULATOR_HOST"]
+
+
+@pytest.fixture
+def monkeypatch_quote(monkeypatch):
+    # Monkey-patch Quoter
+    # See `fsspecstore.py` for how this is done outside testing
+    from urllib.parse import quote as _quote
+    from urllib.parse import unquote
+
+    def quote(s):
+        return _quote(s, safe="")
+
+    from minimalkv.fsspecstore import Quoter
+
+    monkeypatch.setattr(Quoter, "quote", quote)
+    monkeypatch.setattr(Quoter, "unquote", unquote)
 
 
 def try_delete_bucket(bucket):
@@ -104,7 +121,7 @@ def dirty_store(gc_credentials):
 
 
 @pytest.fixture(scope="function")
-def store(dirty_store):
+def store(dirty_store, monkeypatch_quote):
     for blob in get_bucket_from_store(dirty_store).list_blobs():
         blob.delete()
 
@@ -114,6 +131,7 @@ def store(dirty_store):
     # create bucket. Therefore we introduce an artificial timeout
     if not os.environ.get("STORAGE_EMULATOR_HOST", None):
         time.sleep(0.3)
+
     return dirty_store
 
 
@@ -170,7 +188,7 @@ class TestExtendedKeysGCStore(TestGoogleCloudStore, ExtendedKeyspaceTests):
         try_delete_bucket(get_bucket_from_store(store))
 
     @pytest.fixture(scope="function")
-    def store(self, dirty_store):
+    def store(self, dirty_store, monkeypatch_quote):
         for blob in get_bucket_from_store(dirty_store).list_blobs():
             blob.delete()
         # Invalidate fsspec cache
