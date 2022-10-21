@@ -51,22 +51,6 @@ def gc_credentials():
         del os.environ["STORAGE_EMULATOR_HOST"]
 
 
-@pytest.fixture
-def monkeypatch_quote(monkeypatch):
-    # Monkey-patch Quoter
-    # See `fsspecstore.py` for how this is done outside testing
-    from urllib.parse import quote as _quote
-    from urllib.parse import unquote
-
-    def quote(s):
-        return _quote(s, safe="")
-
-    from minimalkv.fsspecstore import Quoter
-
-    monkeypatch.setattr(Quoter, "quote", quote)
-    monkeypatch.setattr(Quoter, "unquote", unquote)
-
-
 def try_delete_bucket(bucket):
     # normally here we should delete the bucket
     # however the emulator (fake-gcs-server) doesn't currently support bucket deletion.
@@ -121,7 +105,7 @@ def dirty_store(gc_credentials):
 
 
 @pytest.fixture(scope="function")
-def store(dirty_store, monkeypatch_quote):
+def store(dirty_store):
     for blob in get_bucket_from_store(dirty_store).list_blobs():
         blob.delete()
 
@@ -188,7 +172,7 @@ class TestExtendedKeysGCStore(TestGoogleCloudStore, ExtendedKeyspaceTests):
         try_delete_bucket(get_bucket_from_store(store))
 
     @pytest.fixture(scope="function")
-    def store(self, dirty_store, monkeypatch_quote):
+    def store(self, dirty_store):
         for blob in get_bucket_from_store(dirty_store).list_blobs():
             blob.delete()
         # Invalidate fsspec cache

@@ -78,29 +78,6 @@ class FSSpecStoreEntry(io.BufferedIOBase):
         return self._file.readable()
 
 
-class Quoter:
-    """
-    XXX.
-
-    To support filenames including e.g. `#`, we need to monkeypatch quote methods in here for pytest.
-    To be able to access keys which include e.g. '/' without double escaping, we do nothing here and let gcsfs
-    do the quoting until this PR is released:
-    https://github.com/fsspec/gcsfs/pull/502
-
-    Also see `test_gcloud_store.py` for monkeypatching.
-    """
-
-    @staticmethod
-    def quote(s):
-        """Do nothing here."""
-        return s
-
-    @staticmethod
-    def unquote(s):
-        """Do nothing here."""
-        return s
-
-
 class FSSpecStore(KeyValueStore):
     """A KeyValueStore that uses an fsspec AbstractFileSystem to store the key-value pairs."""
 
@@ -146,41 +123,39 @@ class FSSpecStore(KeyValueStore):
             If there was an error accessing the store.
         """
         # List files
-        all_files_and_dirs = self._fs.find(
-            f"{self.prefix}", prefix=Quoter.quote(prefix)
-        )
+        all_files_and_dirs = self._fs.find(f"{self.prefix}", prefix=prefix)
 
         return map(
-            lambda k: Quoter.unquote(k.replace(f"{self.prefix}", "")),
+            lambda k: k.replace(f"{self.prefix}", ""),
             all_files_and_dirs,
         )
 
     def _delete(self, key: str) -> None:
         try:
-            self._fs.rm_file(f"{self.prefix}{Quoter.quote(key)}")
+            self._fs.rm_file(f"{self.prefix}{key}")
         except FileNotFoundError:
             pass
 
     def _open(self, key: str) -> IO:
         try:
-            return self._fs.open(f"{self.prefix}{Quoter.quote(key)}")
+            return self._fs.open(f"{self.prefix}{key}")
         except FileNotFoundError:
             raise KeyError(key)
 
     # Required to prevent error when credentials are not sufficient for listing objects
     def _get_file(self, key: str, file: IO) -> str:
         try:
-            file.write(self._fs.cat_file(f"{self.prefix}{Quoter.quote(key)}"))
+            file.write(self._fs.cat_file(f"{self.prefix}{key}"))
             return key
         except FileNotFoundError:
             raise KeyError(key)
 
     def _put_file(self, key: str, file: IO) -> str:
-        self._fs.pipe_file(f"{self.prefix}{Quoter.quote(key)}", file.read())
+        self._fs.pipe_file(f"{self.prefix}{key}", file.read())
         return key
 
     def _has_key(self, key: str) -> bool:
-        return self._fs.exists(f"{self.prefix}{Quoter.quote(key)}")
+        return self._fs.exists(f"{self.prefix}{key}")
 
     def _create_filesystem(self) -> "AbstractFileSystem":
         # To be implemented by inheriting classes.
