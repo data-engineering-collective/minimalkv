@@ -9,7 +9,7 @@ dependencies:
   - docker-compose
   - dulwich
   - fsspec
-  - gcsfs
+  - gcsfs>=2022.10.0
   - mock
   - pip
   - pre-commit
