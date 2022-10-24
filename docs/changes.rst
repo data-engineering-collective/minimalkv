@@ -1,8 +1,8 @@
 Changelog
 *********
 
-Current version
-===============
+1.4.4
+=====
 
 * Keys are not quoted for ``FSSpecStore``s anymore.
   * Thus, e.g. GCS objects whose names include special characters like ``/`` or ``#`` can now be accessed.
