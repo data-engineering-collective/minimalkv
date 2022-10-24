@@ -15,6 +15,7 @@ dependencies:
   - pre-commit
   - psycopg2
   - pyarrow
+  - python-build
   - pymongo
   - pymysql
   - pytest
