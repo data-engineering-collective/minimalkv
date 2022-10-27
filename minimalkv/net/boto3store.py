@@ -1,9 +1,16 @@
 import io
 from contextlib import contextmanager
-from shutil import copyfileobj
 from typing import List
 
-from minimalkv import CopyMixin, KeyValueStore, UrlMixin
+from minimalkv import CopyMixin, UrlMixin
+from minimalkv.fsspecstore import FSSpecStore
+
+try:
+    from s3fs import S3FileSystem
+
+    has_s3fs = True
+except ImportError:
+    has_s3fs = False
 
 
 def _public_readable(grants: List) -> bool:  # TODO: What kind of list
@@ -93,7 +100,7 @@ class Boto3SimpleKeyFile(io.RawIOBase):  # noqa D
         return True
 
 
-class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
+class Boto3Store(FSSpecStore, UrlMixin, CopyMixin):  # noqa D
     def __init__(
         self,
         bucket,
@@ -110,6 +117,7 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
             bucket = s3_resource.Bucket(bucket)
             if bucket not in s3_resource.buckets.all():
                 raise ValueError("invalid s3 bucket name")
+
         self.bucket = bucket
         self.prefix = prefix.strip().lstrip("/")
         self.url_valid_time = url_valid_time
@@ -117,76 +125,82 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
         self.public = public
         self.metadata = metadata or {}
 
+        super().__init__(prefix=f"{bucket.name}/{prefix}")
+
+    def _create_filesystem(self) -> "S3FileSystem":
+        return S3FileSystem()
+
     def __new_object(self, name):
         return self.bucket.Object(self.prefix + name)
 
-    def iter_keys(self, prefix=""):  # noqa D
-        with map_boto3_exceptions():
-            prefix_len = len(self.prefix)
-            return map(
-                lambda k: k.key[prefix_len:],
-                self.bucket.objects.filter(Prefix=self.prefix + prefix),
-            )
-
-    def _delete(self, key):
-        self.bucket.Object(self.prefix + key).delete()
-
-    def _get(self, key):
-        obj = self.__new_object(key)
-        with map_boto3_exceptions(key=key):
-            obj = obj.get()
-            return obj["Body"].read()
-
-    def _get_file(self, key, file):
-        obj = self.__new_object(key)
-        with map_boto3_exceptions(key=key):
-            obj = obj.get()
-            return copyfileobj(obj["Body"], file)
-
-    def _get_filename(self, key, filename):
-        obj = self.__new_object(key)
-        with map_boto3_exceptions(key=key):
-            obj = obj.get()
-            with open(filename, "wb") as file:
-                return copyfileobj(obj["Body"], file)
-
-    def _open(self, key):
-        obj = self.__new_object(key)
-        with map_boto3_exceptions(key=key):
-            obj.load()
-            return Boto3SimpleKeyFile(obj)
-
-    def _copy(self, source, dest):
-        obj = self.__new_object(dest)
-        parameters = {
-            "CopySource": self.bucket.name + "/" + self.prefix + source,
-            "Metadata": self.metadata,
-        }
-        if self.public:
-            parameters["ACL"] = "public-read"
-        if self.reduced_redundancy:
-            parameters["StorageClass"] = "REDUCED_REDUNDANCY"
-        with map_boto3_exceptions(key=source):
-            self.__new_object(source).load()
-            obj.copy_from(**parameters)
-
-    def _put(self, key, data):
-        obj = self.__new_object(key)
-        parameters = {"Body": data, "Metadata": self.metadata}
-        if self.public:
-            parameters["ACL"] = "public-read"
-        if self.reduced_redundancy:
-            parameters["StorageClass"] = "REDUCED_REDUNDANCY"
-        with map_boto3_exceptions(key=key):
-            obj.put(**parameters)
-        return key
-
-    def _put_file(self, key, file):
-        return self._put(key, file)
-
-    def _put_filename(self, key, filename):
-        with open(filename, "rb") as file:
-            return self._put(key, file)
+    #
+    # def iter_keys(self, prefix=""):  # noqa D
+    #     with map_boto3_exceptions():
+    #         prefix_len = len(self.prefix)
+    #         return map(
+    #             lambda k: k.key[prefix_len:],
+    #             self.bucket.objects.filter(Prefix=self.prefix + prefix),
+    #         )
+    #
+    # def _delete(self, key):
+    #     self.bucket.Object(self.prefix + key).delete()
+    #
+    # def _get(self, key):
+    #     obj = self.__new_object(key)
+    #     with map_boto3_exceptions(key=key):
+    #         obj = obj.get()
+    #         return obj["Body"].read()
+    #
+    # def _get_file(self, key, file):
+    #     obj = self.__new_object(key)
+    #     with map_boto3_exceptions(key=key):
+    #         obj = obj.get()
+    #         return copyfileobj(obj["Body"], file)
+    #
+    # def _get_filename(self, key, filename):
+    #     obj = self.__new_object(key)
+    #     with map_boto3_exceptions(key=key):
+    #         obj = obj.get()
+    #         with open(filename, "wb") as file:
+    #             return copyfileobj(obj["Body"], file)
+    #
+    # def _open(self, key):
+    #     obj = self.__new_object(key)
+    #     with map_boto3_exceptions(key=key):
+    #         obj.load()
+    #         return Boto3SimpleKeyFile(obj)
+    #
+    # def _copy(self, source, dest):
+    #     obj = self.__new_object(dest)
+    #     parameters = {
+    #         "CopySource": self.bucket.name + "/" + self.prefix + source,
+    #         "Metadata": self.metadata,
+    #     }
+    #     if self.public:
+    #         parameters["ACL"] = "public-read"
+    #     if self.reduced_redundancy:
+    #         parameters["StorageClass"] = "REDUCED_REDUNDANCY"
+    #     with map_boto3_exceptions(key=source):
+    #         self.__new_object(source).load()
+    #         obj.copy_from(**parameters)
+    #
+    # def _put(self, key, data):
+    #     obj = self.__new_object(key)
+    #     parameters = {"Body": data, "Metadata": self.metadata}
+    #     if self.public:
+    #         parameters["ACL"] = "public-read"
+    #     if self.reduced_redundancy:
+    #         parameters["StorageClass"] = "REDUCED_REDUNDANCY"
+    #     with map_boto3_exceptions(key=key):
+    #         obj.put(**parameters)
+    #     return key
+    #
+    # def _put_file(self, key, file):
+    #     return self._put(key, file)
+    #
+    # def _put_filename(self, key, filename):
+    #     with open(filename, "rb") as file:
+    #         return self._put(key, file)
 
     def _url_for(self, key):
         import boto3

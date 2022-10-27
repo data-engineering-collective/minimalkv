@@ -10,6 +10,7 @@ dependencies:
   - dulwich
   - fsspec
   - gcsfs>=2022.10.0
+  - s3fs
   - mock
   - pip
   - pre-commit
