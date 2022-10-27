@@ -5,7 +5,7 @@ if TYPE_CHECKING:
     from fsspec import AbstractFileSystem
     from fsspec.spec import AbstractBufferedFile
 
-from minimalkv import KeyValueStore
+from minimalkv import CopyMixin, KeyValueStore
 from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
 
 # The complete path of the key is structured as follows:
@@ -78,7 +78,7 @@ class FSSpecStoreEntry(io.BufferedIOBase):
         return self._file.readable()
 
 
-class FSSpecStore(KeyValueStore):
+class FSSpecStore(KeyValueStore, CopyMixin):
     """A KeyValueStore that uses an fsspec AbstractFileSystem to store the key-value pairs."""
 
     def __init__(self, prefix: str = "", mkdir_prefix: bool = True):
@@ -95,7 +95,7 @@ class FSSpecStore(KeyValueStore):
             If True, the prefix will be created if it does not exist.
             Analogous to the create_if_missing parameter in AzureBlockBlobStore or GoogleCloudStore.
         """
-        self.prefix = prefix
+        self._prefix = prefix
         self.mkdir_prefix = mkdir_prefix
 
     @lazy_property
@@ -105,7 +105,7 @@ class FSSpecStore(KeyValueStore):
         # Check if prefix exists.
         # Used by inheriting classes to check if e.g. a bucket exists.
         try:
-            return self._fs.exists(self.prefix)
+            return self._fs.exists(self._prefix)
         except (OSError, RefreshError):
             return None
 
@@ -122,40 +122,58 @@ class FSSpecStore(KeyValueStore):
         IOError
             If there was an error accessing the store.
         """
-        # List files
-        all_files_and_dirs = self._fs.find(f"{self.prefix}", prefix=prefix)
+        # `find` only lists files below a directory, so we have to split
+        # the two prefixes accordingly.
+        full_prefix = f"{self._prefix}{prefix}"
+        # Find last slash in full prefix
+        last_slash = full_prefix.rfind("/")
+        if last_slash == -1:
+            # No slash in full prefix
+            dir_prefix = ""
+            file_prefix = full_prefix
+        else:
+            dir_prefix = full_prefix[: last_slash + 1]
+            file_prefix = full_prefix[last_slash + 1 :]
+        all_files_and_dirs = self._fs.find(dir_prefix, prefix=file_prefix)
 
         return map(
-            lambda k: k.replace(f"{self.prefix}", ""),
+            lambda k: k.replace(f"{self._prefix}", ""),
             all_files_and_dirs,
         )
 
     def _delete(self, key: str) -> None:
         try:
-            self._fs.rm_file(f"{self.prefix}{key}")
+            self._fs.rm_file(f"{self._prefix}{key}")
         except FileNotFoundError:
             pass
 
     def _open(self, key: str) -> IO:
         try:
-            return self._fs.open(f"{self.prefix}{key}")
+            return self._fs.open(f"{self._prefix}{key}")
         except FileNotFoundError:
             raise KeyError(key)
 
     # Required to prevent error when credentials are not sufficient for listing objects
     def _get_file(self, key: str, file: IO) -> str:
         try:
-            file.write(self._fs.cat_file(f"{self.prefix}{key}"))
+            file.write(self._fs.cat_file(f"{self._prefix}{key}"))
             return key
         except FileNotFoundError:
             raise KeyError(key)
 
     def _put_file(self, key: str, file: IO) -> str:
-        self._fs.pipe_file(f"{self.prefix}{key}", file.read())
+        self._fs.pipe_file(f"{self._prefix}{key}", file.read())
         return key
 
     def _has_key(self, key: str) -> bool:
-        return self._fs.exists(f"{self.prefix}{key}")
+        return self._fs.exists(f"{self._prefix}{key}")
+
+    def _copy(self, key: str, new_key: str) -> str:
+        try:
+            self._fs.cp_file(f"{self._prefix}{key}", f"{self._prefix}{new_key}")
+        except FileNotFoundError:
+            raise KeyError(key)
+        return new_key
 
     def _create_filesystem(self) -> "AbstractFileSystem":
         # To be implemented by inheriting classes.
@@ -165,8 +183,8 @@ class FSSpecStore(KeyValueStore):
     def _fs(self) -> "AbstractFileSystem":
         fs = self._create_filesystem()
 
-        if self.mkdir_prefix and not fs.exists(self.prefix):
-            fs.mkdir(self.prefix)
+        if self.mkdir_prefix and not fs.exists(self._prefix):
+            fs.mkdir(self._prefix)
         return fs
 
     # Skips lazy properties.

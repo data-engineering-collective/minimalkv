@@ -125,10 +125,15 @@ class Boto3Store(FSSpecStore, UrlMixin, CopyMixin):  # noqa D
         self.public = public
         self.metadata = metadata or {}
 
-        super().__init__(prefix=f"{bucket.name}/{prefix}")
+        super().__init__(prefix=f"{bucket.name}/{self.prefix}")
 
     def _create_filesystem(self) -> "S3FileSystem":
-        return S3FileSystem()
+        return S3FileSystem(
+            anon=False,
+            client_kwargs={
+                "endpoint_url": "http://127.0.0.1:9000",
+            },
+        )
 
     def __new_object(self, name):
         return self.bucket.Object(self.prefix + name)
