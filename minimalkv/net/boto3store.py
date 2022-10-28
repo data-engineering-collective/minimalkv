@@ -125,7 +125,10 @@ class Boto3Store(FSSpecStore, UrlMixin, CopyMixin):  # noqa D
         self.public = public
         self.metadata = metadata or {}
 
-        super().__init__(prefix=f"{bucket.name}/{self.prefix}")
+        put_kwargs = {
+            "StorageClass": "REDUCED_REDUNDANCY" if reduced_redundancy else "STANDARD",
+        }
+        super().__init__(prefix=f"{bucket.name}/{self.prefix}", put_kwargs=put_kwargs)
 
     def _create_filesystem(self) -> "S3FileSystem":
         return S3FileSystem(

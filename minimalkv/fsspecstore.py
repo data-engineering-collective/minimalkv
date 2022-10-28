@@ -81,7 +81,9 @@ class FSSpecStoreEntry(io.BufferedIOBase):
 class FSSpecStore(KeyValueStore, CopyMixin):
     """A KeyValueStore that uses an fsspec AbstractFileSystem to store the key-value pairs."""
 
-    def __init__(self, prefix: str = "", mkdir_prefix: bool = True):
+    def __init__(
+        self, prefix: str = "", mkdir_prefix: bool = True, put_kwargs: dict = {}
+    ):
         """
         Initialize an FSSpecStore.
 
@@ -97,6 +99,7 @@ class FSSpecStore(KeyValueStore, CopyMixin):
         """
         self._prefix = prefix
         self.mkdir_prefix = mkdir_prefix
+        self._put_kwargs = put_kwargs
 
     @lazy_property
     def _prefix_exists(self) -> Union[None, bool]:
@@ -162,7 +165,7 @@ class FSSpecStore(KeyValueStore, CopyMixin):
             raise KeyError(key)
 
     def _put_file(self, key: str, file: IO) -> str:
-        self._fs.pipe_file(f"{self._prefix}{key}", file.read())
+        self._fs.pipe_file(f"{self._prefix}{key}", file.read(), **self._put_kwargs)
         return key
 
     def _has_key(self, key: str) -> bool:
