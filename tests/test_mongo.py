@@ -24,7 +24,8 @@ class TestMongoDB(BasicStore):
             conn = pymongo.MongoClient()
         except pymongo.errors.ConnectionFailure:
             pytest.skip("could not connect to mongodb")
-        yield MongoStore(conn[db_name], "minimalkv-tests")
+        with MongoStore(conn[db_name], "minimalkv-tests") as store:
+            yield store
         conn.drop_database(db_name)
 
 
@@ -38,5 +39,6 @@ class TestExtendedKeyspaceDictStore(TestMongoDB, ExtendedKeyspaceTests):
             conn = pymongo.MongoClient()
         except pymongo.errors.ConnectionFailure:
             pytest.skip("could not connect to mongodb")
-        yield ExtendedKeyspaceStore(conn[db_name], "minimalkv-tests")
+        with ExtendedKeyspaceStore(conn[db_name], "minimalkv-tests") as store:
+            yield store
         conn.drop_database(db_name)

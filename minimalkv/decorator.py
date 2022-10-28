@@ -1,4 +1,5 @@
-from typing import Iterable
+from types import TracebackType
+from typing import Iterable, Optional, Type
 from urllib.parse import quote_plus, unquote_plus
 
 from minimalkv._key_value_store import KeyValueStore
@@ -37,6 +38,28 @@ class StoreDecorator:
 
     def __iter__(self) -> Iterable[str]:  # noqa D
         return self._dstore.__iter__()
+
+    def close(self):
+        """Relay a close call to the next decorator or underlying store."""
+        self._dstore.close()
+
+    def __enter__(self):
+        """Provide context manager support."""
+        return self
+
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ):
+        """Call close on underlying store or decorator.
+
+        :param exc_type: Type of optional exception encountered in context manager
+        :param exc_val: Actual optional exception encountered in context manager
+        :param exc_tb: Traceback of optional exception encountered in context manager
+        """
+        self.close()
 
 
 class KeyTransformingDecorator(StoreDecorator):  # noqa D

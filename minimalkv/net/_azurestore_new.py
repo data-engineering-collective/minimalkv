@@ -1,6 +1,7 @@
 """Implement the AzureBlockBlobStore for `azure-storage-blob~=12`."""
 import io
 from contextlib import contextmanager
+from typing import Optional
 
 from minimalkv._key_value_store import KeyValueStore
 from minimalkv.net._azurestore_common import _byte_buffer_md5, _file_md5
@@ -36,6 +37,8 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
         checksum=False,
         socket_timeout=None,
     ):
+        from azure.storage.blob import BlobServiceClient, ContainerClient
+
         # Note that socket_timeout is unused; it only exist for backward compatibility.
         # TODO: Docstring
         self.conn_string = conn_string
@@ -46,6 +49,8 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
         self.max_block_size = max_block_size
         self.max_single_put_size = max_single_put_size
         self.checksum = checksum
+        self._service_client: Optional[BlobServiceClient] = None
+        self._container_client: Optional[ContainerClient] = None
 
     # Using @lazy_property will (re-)create block_blob_service instance needed.
     # Together with the __getstate__ implementation below, this allows
@@ -62,16 +67,27 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
         if self.max_block_size:
             kwargs["max_block_size"] = self.max_block_size
 
-        service_client = BlobServiceClient.from_connection_string(
+        self._service_client = BlobServiceClient.from_connection_string(
             self.conn_string, **kwargs
         )
-        container_client = service_client.get_container_client(self.container)
+        self._container_client = self._service_client.get_container_client(
+            self.container
+        )
         if self.create_if_missing:
             with map_azure_exceptions(error_codes_pass=("ContainerAlreadyExists")):
-                container_client.create_container(
+                self._container_client.create_container(
                     public_access="container" if self.public else None
                 )
-        return container_client
+        return self._container_client
+
+    def close(self):
+        """Close container_client and service_client ports, if opened."""
+        if self._container_client is not None:
+            self._container_client.close()
+            self._container_client = None
+        if self._service_client is not None:
+            self._service_client.close()
+            self._service_client = None
 
     def _delete(self, key: str) -> None:
         with map_azure_exceptions(key, error_codes_pass=("BlobNotFound",)):
@@ -163,11 +179,12 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
             downloader.readinto(file)
 
     def __getstate__(self):  # noqa D
-        # keep all of __dict__, except lazy properties:
+        # keep all of __dict__, except lazy properties and properties, which need to be reopened:
+        dont_pickle = {"_service_client", "_container_client"}
         return {
             key: value
             for key, value in self.__dict__.items()
-            if not key.startswith(LAZY_PROPERTY_ATTR_PREFIX)
+            if not key.startswith(LAZY_PROPERTY_ATTR_PREFIX) and key not in dont_pickle
         }
 
 

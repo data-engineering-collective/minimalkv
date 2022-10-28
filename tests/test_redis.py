@@ -25,7 +25,8 @@ class TestRedisStore(TTLStore, BasicStore):
             pytest.skip("Could not connect to redis server")
 
         r.flushdb()
-        yield RedisStore(r)
+        with RedisStore(r) as store:
+            yield store
         r.flushdb()
 
 
@@ -45,5 +46,6 @@ class TestExtendedKeyspaceDictStore(TestRedisStore, ExtendedKeyspaceTests):
             pytest.skip("Could not connect to redis server")
 
         r.flushdb()
-        yield ExtendedKeyspaceStore(r)
+        with ExtendedKeyspaceStore(r) as store:
+            yield store
         r.flushdb()

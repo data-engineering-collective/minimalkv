@@ -97,10 +97,10 @@ def dirty_store(gc_credentials):
         project_name: Optional[str] = "testing"
     else:
         project_name = None
-    store = GoogleCloudStore(
+    with GoogleCloudStore(
         credentials=gc_credentials, bucket_name=uuid, project=project_name
-    )
-    yield store
+    ) as store:
+        yield store
     try_delete_bucket(get_bucket_from_store(store))
 
 
@@ -116,7 +116,7 @@ def store(dirty_store):
     if not os.environ.get("STORAGE_EMULATOR_HOST", None):
         time.sleep(0.3)
 
-    return dirty_store
+    yield dirty_store
 
 
 class TestGoogleCloudStore(OpenSeekTellStore, BasicStore):
@@ -125,11 +125,13 @@ class TestGoogleCloudStore(OpenSeekTellStore, BasicStore):
 
 def test_gcstore_pickling(store):
     store.put("key1", b"value1")
+    store.close()
 
     buf = pickle.dumps(store)
     store = pickle.loads(buf)
 
     assert store.get("key1") == b"value1"
+    store.close()
 
 
 def test_gcstore_pickling_attrs():
@@ -142,12 +144,14 @@ def test_gcstore_pickling_attrs():
     )
 
     buf = pickle.dumps(store)
+    store.close()
     store = pickle.loads(buf)
 
     assert store.bucket_name == "test_bucket"
     assert not store.create_if_missing
     assert store.bucket_creation_location == "US-CENTRAL1"
     assert store.project_name == "sample_project"
+    store.close()
 
 
 class TestExtendedKeysGCStore(TestGoogleCloudStore, ExtendedKeyspaceTests):
@@ -165,10 +169,10 @@ class TestExtendedKeysGCStore(TestGoogleCloudStore, ExtendedKeyspaceTests):
         class ExtendedKeysStore(ExtendedKeyspaceMixin, GoogleCloudStore):
             pass
 
-        store = ExtendedKeysStore(
+        with ExtendedKeysStore(
             credentials=gc_credentials, bucket_name=uuid, project=project_name
-        )
-        yield store
+        ) as store:
+            yield store
         try_delete_bucket(get_bucket_from_store(store))
 
     @pytest.fixture(scope="function")
@@ -191,3 +195,4 @@ class TestGCExceptions:
         )
         with pytest.raises(NotFound):
             store.get("key")
+        store.close()

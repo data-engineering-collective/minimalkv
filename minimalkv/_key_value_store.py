@@ -1,5 +1,6 @@
 from io import BytesIO
-from typing import IO, Iterable, Iterator, List, Optional, Union
+from types import TracebackType
+from typing import IO, Iterable, Iterator, List, Optional, Type, Union
 
 from minimalkv._constants import VALID_KEY_RE
 from minimalkv._mixins import UrlMixin
@@ -433,6 +434,33 @@ class KeyValueStore:
         """
         with open(filename, "rb") as source:
             return self._put_file(key, source)
+
+    def close(self):
+        """Clean up all open resources in child classes.
+
+        Specific store implementations might require teardown methods
+        (dangling ports, unclosed files). This allows calling close also
+        for stores, which do not require this.
+        """
+        return
+
+    def __enter__(self):
+        """Support with clause for automatic calling of close."""
+        return self
+
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ):
+        """Support with clause for automatic calling of close.
+
+        :param exc_type: Type of optional exception encountered in context manager
+        :param exc_val: Actual optional exception encountered in context manager
+        :param exc_tb: Traceback of optional exception encountered in context manager
+        """
+        self.close()
 
 
 class UrlKeyValueStore(UrlMixin, KeyValueStore):
