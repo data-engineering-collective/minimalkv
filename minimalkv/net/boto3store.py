@@ -125,18 +125,26 @@ class Boto3Store(FSSpecStore, UrlMixin, CopyMixin):  # noqa D
         self.public = public
         self.metadata = metadata or {}
 
+        # Get endpoint URL
+        self.endpoint_url = self.bucket.meta.client.meta.endpoint_url
+
         put_kwargs = {
             "StorageClass": "REDUCED_REDUNDANCY" if reduced_redundancy else "STANDARD",
         }
         super().__init__(prefix=f"{bucket.name}/{self.prefix}", put_kwargs=put_kwargs)
 
     def _create_filesystem(self) -> "S3FileSystem":
-        return S3FileSystem(
-            anon=False,
-            client_kwargs={
-                "endpoint_url": "http://127.0.0.1:9000",
-            },
-        )
+        if "127.0.0.1" in self.endpoint_url:
+            return S3FileSystem(
+                anon=False,
+                client_kwargs={
+                    "endpoint_url": self.endpoint_url,
+                },
+            )
+        else:
+            return S3FileSystem(
+                anon=False,
+            )
 
     def __new_object(self, name):
         return self.bucket.Object(self.prefix + name)
