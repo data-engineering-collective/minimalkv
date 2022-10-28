@@ -81,9 +81,7 @@ class FSSpecStoreEntry(io.BufferedIOBase):
 class FSSpecStore(KeyValueStore, CopyMixin):
     """A KeyValueStore that uses an fsspec AbstractFileSystem to store the key-value pairs."""
 
-    def __init__(
-        self, prefix: str = "", mkdir_prefix: bool = True, put_kwargs: dict = {}
-    ):
+    def __init__(self, prefix: str = "", mkdir_prefix: bool = True, write_kwargs=None):
         """
         Initialize an FSSpecStore.
 
@@ -97,9 +95,11 @@ class FSSpecStore(KeyValueStore, CopyMixin):
             If True, the prefix will be created if it does not exist.
             Analogous to the create_if_missing parameter in AzureBlockBlobStore or GoogleCloudStore.
         """
+        if write_kwargs is None:
+            write_kwargs = {}
         self._prefix = prefix
         self.mkdir_prefix = mkdir_prefix
-        self._put_kwargs = put_kwargs
+        self._write_kwargs = write_kwargs
 
     @lazy_property
     def _prefix_exists(self) -> Union[None, bool]:
@@ -165,7 +165,7 @@ class FSSpecStore(KeyValueStore, CopyMixin):
             raise KeyError(key)
 
     def _put_file(self, key: str, file: IO) -> str:
-        self._fs.pipe_file(f"{self._prefix}{key}", file.read(), **self._put_kwargs)
+        self._fs.pipe_file(f"{self._prefix}{key}", file.read(), **self._write_kwargs)
         return key
 
     def _has_key(self, key: str) -> bool:
@@ -173,7 +173,9 @@ class FSSpecStore(KeyValueStore, CopyMixin):
 
     def _copy(self, key: str, new_key: str) -> str:
         try:
-            self._fs.cp_file(f"{self._prefix}{key}", f"{self._prefix}{new_key}")
+            self._fs.cp_file(
+                f"{self._prefix}{key}", f"{self._prefix}{new_key}", **self._write_kwargs
+            )
         except FileNotFoundError:
             raise KeyError(key)
         return new_key
