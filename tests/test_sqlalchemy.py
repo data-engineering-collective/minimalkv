@@ -42,10 +42,10 @@ class TestSQLAlchemyStore(BasicStore):
     @pytest.fixture
     def store(self, engine):
         metadata = MetaData(bind=engine)
-        store = SQLAlchemyStore(engine, metadata, "minimalkv_test")
-        # create table
-        store.table.create()
-        yield store
+        with SQLAlchemyStore(engine, metadata, "minimalkv_test") as store:
+            # create table
+            store.table.create()
+            yield store
         metadata.drop_all()
 
 
@@ -56,8 +56,8 @@ class TestExtendedKeyspaceSQLAlchemyStore(TestSQLAlchemyStore, ExtendedKeyspaceT
             pass
 
         metadata = MetaData(bind=engine)
-        store = ExtendedKeyspaceStore(engine, metadata, "minimalkv_test")
-        # create table
-        store.table.create()
-        yield store
+        with ExtendedKeyspaceStore(engine, metadata, "minimalkv_test") as store:
+            # create table
+            store.table.create()
+            yield store
         metadata.drop_all()

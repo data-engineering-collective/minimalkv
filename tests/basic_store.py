@@ -146,7 +146,8 @@ class BasicStore:
             tmp.write(value)
             tmp.flush()
 
-            store.put_file(key, open(tmp.name, "rb"))
+            with open(tmp.name, "rb") as infile:
+                store.put_file(key, infile)
 
             assert store.get(key) == value
 
@@ -156,7 +157,8 @@ class BasicStore:
 
         store.get_file(key, out_filename)
 
-        assert open(out_filename, "rb").read() == value
+        with open(out_filename, "rb") as infile:
+            assert infile.read() == value
 
     def test_get_into_stream(self, store, key, value):
         store.put(key, value)
