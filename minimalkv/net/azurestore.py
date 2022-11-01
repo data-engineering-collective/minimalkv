@@ -1,8 +1,13 @@
-try:
-    from azure.storage.blob import BlockBlobService  # noqa: F401
+import warnings
 
-    from ._azurestore_old import AzureBlockBlobStore
-except ImportError:
-    from ._azurestore_new import AzureBlockBlobStore  # type: ignore
+from minimalkv.stores import AzureBlockBlobStore
 
-__all__ = ["AzureBlockBlobStore"]
+warnings.warn(
+    "This import is deprecated and will be removed in the next major release. Please use 'from minimalkv.stores import AzureBlockBlobStore' instead.",
+    category=DeprecationWarning,
+    stacklevel=2,
+)
+
+__all__ = [
+    "AzureBlockBlobStore",
+]

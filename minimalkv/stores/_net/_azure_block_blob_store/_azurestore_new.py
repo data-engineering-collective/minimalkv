@@ -4,8 +4,9 @@ from contextlib import contextmanager
 from typing import Optional
 
 from minimalkv._key_value_store import KeyValueStore
-from minimalkv.net._azurestore_common import _byte_buffer_md5, _file_md5
-from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
+from minimalkv.stores._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
+
+from ._azurestore_common import _byte_buffer_md5, _file_md5
 
 
 @contextmanager
