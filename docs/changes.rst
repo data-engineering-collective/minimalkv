@@ -1,6 +1,11 @@
 Changelog
 *********
 
+1.5.1
+=====
+
+* Implement ``Boto3Store`` using ``s3fs``. This is a drop-in replacement for the old implementation.
+
 1.5.0
 =====
 
