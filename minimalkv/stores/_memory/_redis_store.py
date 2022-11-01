@@ -2,6 +2,7 @@
 import re
 from io import BytesIO
 from typing import IO, TYPE_CHECKING, Iterator, List, Optional, Union
+from urllib.parse import ParseResult
 
 if TYPE_CHECKING:
     from redis import StrictRedis
@@ -101,3 +102,20 @@ class RedisStore(TimeToLiveMixin, KeyValueStore):
     ) -> str:
         self._put(key, file.read(), ttl_secs)
         return key
+
+    def from_parsed_url(cls, parse_url: ParseResult) -> "KeyValueStore":
+        """
+        * ``"redis"``: Returns a RedisStore. Constructs a StrictRedis using params as kwargs.
+            See StrictRedis documentation for details.
+
+        path = path[1:] if path.startswith("/") else path
+        params = {"host": host or "localhost"}
+        if port:
+            params["port"] = port
+        if userinfo:
+            params["password"] = userinfo
+        if path:
+            params["db"] = int(path)
+        return params
+        """
+        pass

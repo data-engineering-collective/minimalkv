@@ -216,3 +216,29 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
                 Params={"Bucket": self.bucket.name, "Key": key},
                 ExpiresIn=self.url_valid_time,
             )
+
+    def from_parsed_url(cls, parsed_url: ParseResult):  # noqa D
+        """
+        * ``"s3"``: Returns a plain ``minimalkv.net.botostore.BotoStore``.
+          Parameters must include ``"host"``, ``"bucket"``, ``"access_key"``, ``"secret_key"``.
+          Optional parameters are
+
+           - ``"force_bucket_suffix"`` (default: ``True``). If set, it is ensured that
+             the bucket name ends with ``-<access_key>``
+             by appending this string if necessary;
+             If ``False``, the bucket name is used as-is.
+           - ``"create_if_missing"`` (default: ``True`` ). If set, creates the bucket if it does not exist;
+             otherwise, try to retrieve the bucket and fail with an ``IOError``.
+        * ``"hs3"`` returns a variant of ``minimalkv.net.botostore.BotoStore`` that allows "/" in the key name.
+          The parameters are the same as for ``"s3"``
+
+        access_key, secret_key = _parse_userinfo(userinfo)
+        params = {
+            "host": f"{host}:{port}" if port else host,
+            "access_key": access_key,
+            "secret_key": secret_key,
+            "bucket": path[1:],
+        }
+        return params
+        """
+        pass

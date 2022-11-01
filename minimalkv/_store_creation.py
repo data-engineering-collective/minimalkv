@@ -119,13 +119,6 @@ def _create_store_hfs(type, params):
     return HFilesystemStore(params["path"])
 
 
-def _create_store_fs(type, params):
-    # TODO: Docstring with required params.
-    if params["create_if_missing"] and not os.path.exists(params["path"]):
-        os.makedirs(params["path"])
-    return FilesystemStore(params["path"])
-
-
 def _create_store_mem(type, params):
     # TODO: Docstring with required params.
     from minimalkv.stores import DictStore

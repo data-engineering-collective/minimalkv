@@ -1,6 +1,7 @@
 from io import BytesIO
 from types import TracebackType
 from typing import IO, Iterable, Iterator, List, Optional, Type, Union
+from urllib.parse import ParseResult
 
 from minimalkv._constants import VALID_KEY_RE
 from minimalkv._mixins import UrlMixin
@@ -461,6 +462,10 @@ class KeyValueStore:
         :param exc_tb: Traceback of optional exception encountered in context manager
         """
         self.close()
+
+    @classmethod
+    def from_parsed_url(cls, parse_url: ParseResult, query: dict) -> "KeyValueStore":
+        raise NotImplementedError
 
 
 class UrlKeyValueStore(UrlMixin, KeyValueStore):

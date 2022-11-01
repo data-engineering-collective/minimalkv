@@ -1,6 +1,7 @@
 import json
 import warnings
 from typing import IO, cast
+from urllib.parse import ParseResult
 
 from minimalkv.stores._fsspec_store import FSSpecStore, FSSpecStoreEntry
 
@@ -77,3 +78,28 @@ class GoogleCloudStore(FSSpecStore):
         if self._prefix_exists is False:
             raise NotFound(f"Could not find bucket: {self.bucket_name}")
         return super()._get_file(key, file)
+
+    def from_parsed_url(cls, parsed_url: ParseResult) -> "GoogleCloudStore":
+        """
+        * ``"gcs"``: Returns a ``minimalkv.net.gcstore.GoogleCloudStore``.  Parameters are
+          ``"credentials"``, ``"bucket_name"``, ``"bucket_creation_location"``, ``"project"`` and ``"create_if_missing"`` (default: ``True``).
+
+          - ``"credentials"``: either the path to a credentials.json file or a *google.auth.credentials.Credentials* object
+          - ``"bucket_name"``: Name of the bucket the blobs are stored in.
+          - ``"project"``: The name of the GCStorage project. If a credentials JSON is passed then it contains the project name
+            and this parameter will be ignored.
+          - ``"create_if_missing"``: [optional] Create new bucket to store blobs in if ``"bucket_name"`` doesn't exist yet. (default: ``True``).
+          - ``"bucket_creation_location"``: [optional] If a new bucket is created (create_if_missing=True), the location it will be created in.
+            If ``None`` then GCloud uses a default location.
+        * ``"hgcs"``: Like ``"gcs"`` but "/" are allowed in the keynames.
+
+        credentials_b64 = userinfo
+        params = {"type": scheme, "bucket_name": host}
+        params["credentials"] = base64.urlsafe_b64decode(credentials_b64.encode())
+        if "bucket_creation_location" in query:
+            params["bucket_creation_location"] = query.pop("bucket_creation_location")[
+                0
+            ]
+        return params
+        """
+        pass

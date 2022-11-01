@@ -94,7 +94,7 @@ class GitCommitStore(KeyValueStore):
 
     """
 
-    AUTHOR = f"GitCommitStore (minimalkv {__version__}) <>"
+    AUTHOR = f"GitCommitStore (minimalkv) <>"
     TIMEZONE = None
 
     def __init__(self, repo_path: str, branch: bytes = b"master", subdir: bytes = b""):

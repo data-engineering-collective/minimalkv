@@ -1,8 +1,8 @@
 import os
 import os.path
 import shutil
-import urllib.parse
 from typing import IO, Any, Callable, Iterator, List, Optional, Union, cast
+from urllib.parse import ParseResult
 
 from minimalkv._key_value_store import KeyValueStore
 from minimalkv._mixins import CopyMixin, UrlMixin
@@ -219,8 +219,23 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
                 if k.startswith(prefix):
                     yield k
         except OSError:
-            # path does not exists
+            # path does not exist
             pass
+
+    @classmethod
+    def from_parsed_url(cls, parsed_url: ParseResult, query: dict) -> "FilesystemStore":
+        """
+        * ``"fs"``: Returns a ``minimalkv.fs.FilesystemStore``. Specify the base path as "path" parameter.
+        * ``"hfs"`` returns a variant of ``minimalkv.fs.FilesystemStore``  that allows "/" in the key name.
+          The parameters are the same as for ``"file"``.
+
+        if scheme in ("fs", "hfs"):
+            return {"type": scheme, "path": host + path}
+        """
+        fs_path = parsed_url.hostname + parsed_url.path
+        if query["create_if_missing"] and not os.path.exists(fs_path):
+            os.makedirs(fs_path)
+        return FilesystemStore(fs_path)
 
 
 class WebFilesystemStore(FilesystemStore):

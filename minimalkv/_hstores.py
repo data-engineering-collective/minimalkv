@@ -41,6 +41,10 @@ class HBotoStore(ExtendedKeyspaceMixin, BotoStore):  # noqa D
         return k.size
 
 
+class HBoto3Store(ExtendedKeyspaceMixin, Boto3Store):  # noqa D
+    pass
+
+
 class HGoogleCloudStore(ExtendedKeyspaceMixin, GoogleCloudStore):  # noqa D
     pass
 

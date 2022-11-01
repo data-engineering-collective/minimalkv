@@ -2,6 +2,7 @@
 import io
 from contextlib import contextmanager
 from typing import Optional
+from urllib.parse import ParseResult
 
 from minimalkv._key_value_store import KeyValueStore
 from minimalkv.stores._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
@@ -187,6 +188,37 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
             for key, value in self.__dict__.items()
             if not key.startswith(LAZY_PROPERTY_ATTR_PREFIX) and key not in dont_pickle
         }
+
+    def from_parsed_url(cls, parsed_url: ParseResult, query) -> "AzureBlockBlobStore":
+        """
+        ``"azure"``: Returns a ``minimalkv.azure.AzureBlockBlobStorage``. Parameters are
+            ``"account_name"``, ``"account_key"``, ``"container"``, ``"use_sas"`` and ``"create_if_missing"`` (default: ``True``).
+            ``"create_if_missing"`` has to be ``False`` if ``"use_sas"`` is set. When ``"use_sas"`` is set,
+            ``"account_key"`` is interpreted as Shared Access Signature (SAS) token.FIRE
+            ``"max_connections"``: Maximum number of network connections used by one store (default: ``2``).
+            ``"socket_timeout"``: maximum timeout value in seconds (socket_timeout: ``200``).
+            ``"max_single_put_size"``: max_single_put_size is the largest size upload supported in a single put call.
+            ``"max_block_size"``: maximum block size is maximum size of the blocks(maximum size is <= 100MB)
+
+        account_name, account_key = _parse_userinfo(userinfo)
+        params = {
+            "account_name": account_name,
+            "account_key": account_key,
+            "container": host,
+        }
+        if "use_sas" in query:
+            params["use_sas"] = True
+        if "max_connections" in query:
+            params["max_connections"] = int(query.pop("max_connections")[-1])
+        if "socket_timeout" in query:
+            params["socket_timeout"] = query.pop("socket_timeout")
+        if "max_block_size" in query:
+            params["max_block_size"] = query.pop("max_block_size")
+        if "max_single_put_size" in query:
+            params["max_single_put_size"] = query.pop("max_single_put_size")
+        return params
+        """
+        pass
 
 
 class IOInterface(io.BufferedIOBase):
