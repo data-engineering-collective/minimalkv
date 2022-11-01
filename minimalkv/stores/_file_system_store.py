@@ -8,7 +8,7 @@ from minimalkv._key_value_store import KeyValueStore
 from minimalkv._mixins import CopyMixin, UrlMixin
 
 
-class FileSystemStore(KeyValueStore, UrlMixin, CopyMixin):
+class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
     """Store data in files on the filesystem under a common directory.
 
     When files are created, they will receive permissions depending on the current umask
@@ -223,7 +223,7 @@ class FileSystemStore(KeyValueStore, UrlMixin, CopyMixin):
             pass
 
 
-class WebFilesystemStore(FileSystemStore):
+class WebFilesystemStore(FilesystemStore):
     """
     FilesystemStore supporting generating URLS for web applications.
 

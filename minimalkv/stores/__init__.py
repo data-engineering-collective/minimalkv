@@ -1,5 +1,5 @@
 from ._db import MongoStore, SQLAlchemyStore
-from ._file_system_store import FileSystemStore, WebFilesystemStore
+from ._file_system_store import FilesystemStore, WebFilesystemStore
 from ._fsspec_store import FSSpecStore
 from ._git_commit_store import GitCommitStore
 from ._memory import DictStore, RedisStore
@@ -14,7 +14,7 @@ __all__ = [
     "AzureBlockBlobStore",
     "Boto3Store",
     "BotoStore",
-    "FileSystemStore",
+    "FilesystemStore",
     "FSSpecStore",
     "GitCommitStore",
     "WebFilesystemStore",
