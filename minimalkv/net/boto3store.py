@@ -61,7 +61,7 @@ class Boto3Store(FSSpecStore, UrlMixin, CopyMixin):  # noqa D
                 anon=False,
             )
 
-    def _url_for(self, key):
+    def _url_for(self, key) -> str:
         return self._fs.url(
             f"{self.bucket.name}/{self.prefix}{key}", expires=self.url_valid_time
         )
