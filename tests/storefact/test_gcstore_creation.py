@@ -16,7 +16,7 @@ from google.auth.exceptions import RefreshError
 
 def test_create_store_gcstore(mocker):
     mock_hgcstore = mocker.patch("minimalkv._hstores.HGoogleCloudStore")
-    mock_gcstore = mocker.patch("minimalkv.net.gcstore.GoogleCloudStore")
+    mock_gcstore = mocker.patch("minimalkv.stores.GoogleCloudStore")
 
     anon_credentials = AnonymousCredentials()
     create_store(

@@ -49,5 +49,5 @@ To test against a locally running Fake GCS Server instance make sure to start th
 
 before running the tests.
 
-.. autoclass:: minimalkv.net.gcstore.GoogleCloudStore
+.. autoclass:: minimalkv.stores.GoogleCloudStore
     :members: __init__

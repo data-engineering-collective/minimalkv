@@ -7,7 +7,7 @@ def test_create_store_azure(mocker):
     # Mock HAzureBlockBlobStore also here, becase otherwise it will try to inherit from
     # the mock object `mock_azure` created below, which will fail.
     mock_hazure = mocker.patch("minimalkv._hstores.HAzureBlockBlobStore")
-    mock_azure = mocker.patch("minimalkv.net.azurestore.AzureBlockBlobStore")
+    mock_azure = mocker.patch("minimalkv.stores.AzureBlockBlobStore")
     create_store(
         "azure",
         {
@@ -132,7 +132,7 @@ def test_create_store_fs(mocker):
 
 
 def test_create_store_mem(mocker):
-    mock_mem = mocker.patch("minimalkv.memory.DictStore")
+    mock_mem = mocker.patch("minimalkv.stores.DictStore")
     create_store(
         "memory",
         {"type": "memory", "wrap": "readonly"},

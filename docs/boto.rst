@@ -11,7 +11,7 @@ a backend that utilizes `boto <http://boto.cloudhackers.com/>`_ (preferably >=
 
 ``boto`` doesn't support using Google Storage with Python3. For this
 reason minimalkv has a separate Google Storage implementation for Python3 at
-:class:`~minimalkv.net.gcstore.GoogleCloudStore` which uses Google's
+:class:`~minimalkv.stores.GoogleCloudStore` which uses Google's
 ``google-cloud-storage`` library.
 
 Note that boto is not a dependency for minimalkv. You need to install it

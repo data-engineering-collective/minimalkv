@@ -49,4 +49,4 @@ before running the tests.
 
 To skip the tests of the azure backend, comment out the ``account_name`` in the ``azure_credentials.ini`` file.
 
-.. autoclass:: minimalkv.net.azurestore.AzureBlockBlobStore
+.. autoclass:: minimalkv.stores.AzureBlockBlobStore

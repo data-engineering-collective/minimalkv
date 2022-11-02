@@ -83,7 +83,7 @@ def get_store(
          otherwise, try to retrieve the bucket and fail with an ``IOError``.
     * ``"hs3"`` returns a variant of ``minimalkv.net.botostore.BotoStore`` that allows "/" in the key name.
       The parameters are the same as for ``"s3"``
-    * ``"gcs"``: Returns a ``minimalkv.net.gcstore.GoogleCloudStore``.  Parameters are
+    * ``"gcs"``: Returns a ``minimalkv.stores.GoogleCloudStore``.  Parameters are
       ``"credentials"``, ``"bucket_name"``, ``"bucket_creation_location"``, ``"project"`` and ``"create_if_missing"`` (default: ``True``).
 
       - ``"credentials"``: either the path to a credentials.json file or a *google.auth.credentials.Credentials* object

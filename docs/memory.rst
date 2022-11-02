@@ -1,10 +1,10 @@
 In-memory stores
 ****************
 The simplest conceivable key-value store is found in
-:class:`minimalkv.memory.DictStore`.  It lends itself well for testing or
+:class:`minimalkv.stores.DictStore`.  It lends itself well for testing or
 playing around with *minimalkv*.
 
-.. autoclass:: minimalkv.memory.DictStore
+.. autoclass:: minimalkv.stores.DictStore
    :members:
 
 redis-backend

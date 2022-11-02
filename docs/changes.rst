@@ -116,7 +116,7 @@ Changelog
 0.12.0
 ======
 
-* Use ``BlockBlobService.list_blob_names`` in ``minimalkv.net.azurestore.AzureBlockBlobStore.iter_keys``.
+* Use ``BlockBlobService.list_blob_names`` in ``minimalkv.stores.AzureBlockBlobStore.iter_keys``.
   This will only parse the names from Azure's XML response thus reducing CPU time
   siginificantly for this function.
 * They ``.keys()`` method on Python 3 now returns a list. This is in line with the documentation and the
@@ -184,7 +184,7 @@ Changelog
 * Added a decorator which url-encodes all keys:
   :class:`~minimalkv.decorator.URLEncodeKeysDecorator`
 * Added a Microsoft Azure Blob Storage backend:
-  :class:`~minimalkv.net.azurestore.AzureBlockBlobStore`
+  :class:`~minimalkv.stores.AzureBlockBlobStore`
 * Added ``minimalkv.contrib.ExtendedKeyspaceMixin`` which allows slashes and spaces in key names
   This mixin is experimental, unsupported and might not work with all backends.
 
