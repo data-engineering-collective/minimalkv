@@ -189,6 +189,19 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
             if not key.startswith(LAZY_PROPERTY_ATTR_PREFIX) and key not in dont_pickle
         }
 
+    def __eq__(self, other):
+        return (
+            isinstance(other, AzureBlockBlobStore)
+            and self.conn_string == other.conn_string
+            and self.container == other.container
+            and self.public == other.public
+            and self.create_if_missing == other.create_if_missing
+            and self.max_connections == other.max_connections
+            and self.max_block_size == other.max_block_size
+            and self.max_single_put_size == other.max_single_put_size
+            and self.checksum == other.checksum
+        )
+
     def from_parsed_url(cls, parsed_url: ParseResult, query) -> "AzureBlockBlobStore":
         """
         ``"azure"``: Returns a ``minimalkv.azure.AzureBlockBlobStorage``. Parameters are

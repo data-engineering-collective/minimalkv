@@ -217,6 +217,17 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
                 ExpiresIn=self.url_valid_time,
             )
 
+    def __eq__(self, other):
+        return (
+            isinstance(other, Boto3Store)
+            and self.bucket.name == other.bucket.name
+            and self.prefix == other.prefix
+            and self.url_valid_time == other.url_valid_time
+            and self.reduced_redundancy == other.reduced_redundancy
+            and self.public == other.public
+            and self.metadata == other.metadata
+        )
+
     def from_parsed_url(cls, parsed_url: ParseResult):  # noqa D
         """
         * ``"s3"``: Returns a plain ``minimalkv.net.botostore.BotoStore``.

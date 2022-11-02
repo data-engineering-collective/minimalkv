@@ -79,7 +79,21 @@ class GoogleCloudStore(FSSpecStore):
             raise NotFound(f"Could not find bucket: {self.bucket_name}")
         return super()._get_file(key, file)
 
-    def from_parsed_url(cls, parsed_url: ParseResult) -> "GoogleCloudStore":
+    def __eq__(self, other):
+        return (
+            isinstance(other, GoogleCloudStore)
+            and super().__eq__(other)
+            and self._credentials == other._credentials
+            and self.bucket_name == other.bucket_name
+            and self.create_if_missing == other.create_if_missing
+            and self.bucket_creation_location == other.bucket_creation_location
+            and self.project_name == other.project_name
+        )
+
+    @classmethod
+    def from_parsed_url(
+        cls, parsed_url: ParseResult, query: dict
+    ) -> "GoogleCloudStore":
         """
         * ``"gcs"``: Returns a ``minimalkv.net.gcstore.GoogleCloudStore``.  Parameters are
           ``"credentials"``, ``"bucket_name"``, ``"bucket_creation_location"``, ``"project"`` and ``"create_if_missing"`` (default: ``True``).

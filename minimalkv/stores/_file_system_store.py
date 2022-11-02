@@ -222,6 +222,13 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
             # path does not exist
             pass
 
+    def __eq__(self, other):
+        return (
+            isinstance(other, FilesystemStore)
+            and self.root == other.root
+            and self.perm == other.perm
+        )
+
     @classmethod
     def from_parsed_url(cls, parsed_url: ParseResult, query: dict) -> "FilesystemStore":
         """
