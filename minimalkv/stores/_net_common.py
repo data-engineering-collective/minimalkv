@@ -1,4 +1,3 @@
-# TODO: Rename this module.
 LAZY_PROPERTY_ATTR_PREFIX = "_lazy_"
 
 
