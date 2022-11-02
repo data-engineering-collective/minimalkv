@@ -11,13 +11,7 @@ from minimalkv._mixins import CopyMixin, TimeToLiveMixin, UrlMixin
 from minimalkv._store_creation import create_store
 from minimalkv._store_decoration import decorate_store
 from minimalkv._urls import url2dict
-
-try:
-    import pkg_resources
-
-    __version__: str = pkg_resources.get_distribution(__name__).version
-except Exception:  # pragma: no cover
-    __version__ = "unknown"
+from minimalkv._version import __version__
 
 __all__ = [
     "CopyMixin",
@@ -35,4 +29,5 @@ __all__ = [
     "VALID_KEY_RE",
     "VALID_KEY_REGEXP",
     "VALID_NON_NUM",
+    "__version__",
 ]
