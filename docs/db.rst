@@ -12,7 +12,7 @@ based store is available:
 
 ::
 
-  from minimalkv.db.sql import SQLAlchemyStore
+  from minimalkv.stores import SQLAlchemyStore
   from sqlalchemy import create_engine, MetaData
 
   # use echo=True to see queries

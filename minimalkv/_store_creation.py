@@ -2,7 +2,7 @@ import os
 import os.path
 from typing import TYPE_CHECKING, Any, Dict
 
-from minimalkv.fs import FilesystemStore
+from minimalkv.stores import FilesystemStore
 
 if TYPE_CHECKING:
     from minimalkv._key_value_store import KeyValueStore
@@ -39,7 +39,7 @@ def _create_store_gcs(store_type, params):
     from google.oauth2.service_account import Credentials
 
     from minimalkv._hstores import HGoogleCloudStore
-    from minimalkv.net.gcstore import GoogleCloudStore
+    from minimalkv.stores import GoogleCloudStore
 
     if type(params["credentials"]) == bytes:
         account_info = json.loads(params["credentials"].decode())
@@ -59,7 +59,7 @@ def _create_store_gcs(store_type, params):
 def _create_store_azure(type, params):
     # TODO: Docstring with required params.
     from minimalkv._hstores import HAzureBlockBlobStore
-    from minimalkv.net.azurestore import AzureBlockBlobStore
+    from minimalkv.stores import AzureBlockBlobStore
 
     conn_string = params.get("connection_string", _build_azure_url(**params))
 
@@ -103,7 +103,7 @@ def _create_store_hs3(type, params):
 
 def _create_store_s3(type, params):
     # TODO: Docstring with required params.
-    from minimalkv.net.botostore import BotoStore
+    from minimalkv.stores import BotoStore
 
     from ._boto import _get_s3bucket
 
@@ -128,7 +128,7 @@ def _create_store_fs(type, params):
 
 def _create_store_mem(type, params):
     # TODO: Docstring with required params.
-    from minimalkv.memory import DictStore
+    from minimalkv.stores import DictStore
 
     return DictStore()
 
@@ -144,7 +144,7 @@ def _create_store_redis(type, params):
     # TODO: Docstring with required params.
     from redis import StrictRedis
 
-    from minimalkv.memory.redisstore import RedisStore
+    from minimalkv.stores import RedisStore
 
     r = StrictRedis(**params)
     return RedisStore(r)

@@ -3,7 +3,7 @@
 import pytest
 
 from minimalkv.decorator import ReadOnlyDecorator
-from minimalkv.memory import DictStore
+from minimalkv.stores import DictStore
 
 
 class TestReadOnlyDecorator:

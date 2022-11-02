@@ -4,7 +4,7 @@ import pytest
 from basic_store import BasicStore
 
 from minimalkv.decorator import URLEncodeKeysDecorator
-from minimalkv.memory import DictStore
+from minimalkv.stores import DictStore
 
 
 class TestURLEncodeKeysDecorator(BasicStore):

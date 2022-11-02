@@ -10,7 +10,7 @@ from basic_store import BasicStore
 from conftest import ExtendedKeyspaceTests
 
 from minimalkv._mixins import ExtendedKeyspaceMixin
-from minimalkv.db.mongo import MongoStore
+from minimalkv.stores import MongoStore
 
 
 class TestMongoDB(BasicStore):

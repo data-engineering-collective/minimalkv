@@ -10,7 +10,7 @@ from minimalkv import CopyMixin
 from minimalkv.crypt import HMACDecorator
 from minimalkv.decorator import PrefixDecorator
 from minimalkv.idgen import HashDecorator, UUIDDecorator
-from minimalkv.net.gcstore import GoogleCloudStore
+from minimalkv.stores import GoogleCloudStore
 
 
 def is_emulated_gcstore_test(store):
@@ -346,7 +346,7 @@ class BasicStore:
     # FileSystem APIs like ParquetFile.
     def test_parquet_file(self, store):
         # Skip if were using a SQLAlchemyStore
-        from minimalkv.db.sql import SQLAlchemyStore
+        from minimalkv.stores import SQLAlchemyStore
 
         if isinstance(store, SQLAlchemyStore):
             pytest.skip("SQLAlchemyStore doesn't support ParquetFile yet")

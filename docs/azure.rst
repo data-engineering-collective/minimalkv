@@ -13,7 +13,7 @@ Here is a short example:
 
 ::
 
-   from minimalkv.net.azurestore import AzureBlockBlobStore
+   from minimalkv.stores import AzureBlockBlobStore
 
    conn_string = 'DefaultEndpointsProtocol=https;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;'
 

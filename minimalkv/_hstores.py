@@ -1,12 +1,14 @@
 import os
 
 from minimalkv._mixins import ExtendedKeyspaceMixin
-from minimalkv.fs import FilesystemStore
-from minimalkv.memory import DictStore
-from minimalkv.memory.redisstore import RedisStore
-from minimalkv.net.azurestore import AzureBlockBlobStore
-from minimalkv.net.botostore import BotoStore
-from minimalkv.net.gcstore import GoogleCloudStore
+from minimalkv.stores import (
+    AzureBlockBlobStore,
+    BotoStore,
+    DictStore,
+    FilesystemStore,
+    GoogleCloudStore,
+    RedisStore,
+)
 
 
 class HDictStore(ExtendedKeyspaceMixin, DictStore):  # noqa D

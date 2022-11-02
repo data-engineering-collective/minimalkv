@@ -14,7 +14,7 @@ from idgens import HashGen, UUIDGen
 from url_store import UrlStore
 
 from minimalkv._mixins import ExtendedKeyspaceMixin
-from minimalkv.fs import FilesystemStore, WebFilesystemStore
+from minimalkv.stores import FilesystemStore, WebFilesystemStore
 
 
 class TestBaseFilesystemStore(BasicStore, UrlStore, UUIDGen, HashGen):

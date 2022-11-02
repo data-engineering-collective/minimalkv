@@ -6,7 +6,7 @@ from idgens import HashGen, UUIDGen
 from test_hmac import HMACDec
 
 from minimalkv._mixins import ExtendedKeyspaceMixin
-from minimalkv.memory import DictStore
+from minimalkv.stores import DictStore
 
 
 class TestDictStore(BasicStore, UUIDGen, HashGen, HMACDec):

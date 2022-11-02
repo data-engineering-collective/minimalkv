@@ -38,7 +38,7 @@ Here's a simple example::
 
 Note that by changing the first two lines to::
 
-  from minimalkv.memory.redisstore import RedisStore
+  from minimalkv.stores import RedisStore
   import redis
 
   store = RedisStore(redis.StrictRedis())

@@ -11,7 +11,7 @@ from conftest import ExtendedKeyspaceTests
 from url_store import UrlStore
 
 from minimalkv._mixins import ExtendedKeyspaceMixin
-from minimalkv.net.boto3store import Boto3Store
+from minimalkv.stores import Boto3Store
 
 
 @pytest.fixture(

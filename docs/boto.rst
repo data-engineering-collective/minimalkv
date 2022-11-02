@@ -21,7 +21,7 @@ Here is a short example:
 
 ::
 
-   from minimalkv.net.botostore import BotoStore
+   from minimalkv.stores import BotoStore
    import boto
 
    con = boto.connect_s3('your_access_key', 'your_secret_key')

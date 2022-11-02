@@ -17,7 +17,7 @@ from google.cloud.exceptions import MethodNotAllowed
 from google.cloud.storage import Bucket, Client
 
 from minimalkv._mixins import ExtendedKeyspaceMixin
-from minimalkv.net.gcstore import GoogleCloudStore
+from minimalkv.stores import GoogleCloudStore
 
 
 @pytest.fixture(scope="module")

@@ -10,7 +10,7 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.pool import StaticPool
 
 from minimalkv._mixins import ExtendedKeyspaceMixin
-from minimalkv.db.sql import SQLAlchemyStore
+from minimalkv.stores import SQLAlchemyStore
 
 DSNS = [
     (

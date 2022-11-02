@@ -15,7 +15,7 @@ Here is a short example:
 
 ::
 
-   from minimalkv.net.gcstore import GoogleCloudStore
+   from minimalkv.stores import GoogleCloudStore
 
    credentials_path = "/path/to/credentials.json"
 

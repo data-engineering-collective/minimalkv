@@ -5,7 +5,7 @@ from dulwich.repo import Repo
 from idgens import HashGen, UUIDGen
 
 from minimalkv._mixins import ExtendedKeyspaceMixin
-from minimalkv.git import GitCommitStore
+from minimalkv.stores import GitCommitStore
 
 
 class TestGitCommitStore(BasicStore, UUIDGen, HashGen):

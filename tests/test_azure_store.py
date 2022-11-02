@@ -8,7 +8,7 @@ from basic_store import BasicStore, OpenSeekTellStore
 from conftest import ExtendedKeyspaceTests
 
 from minimalkv._mixins import ExtendedKeyspaceMixin
-from minimalkv.net.azurestore import AzureBlockBlobStore
+from minimalkv.stores import AzureBlockBlobStore
 
 asb = pytest.importorskip("azure.storage.blob")
 

@@ -9,7 +9,7 @@ different kind. A simple example without error-handling is a store that uses a
 
 ::
 
-  from minimalkv.memory.redisstore import RedisStore
+  from minimalkv.stores import RedisStore
   from minimalkv.fs import FilesystemStore
   from minimalkv.cache import CacheDecorator
 
