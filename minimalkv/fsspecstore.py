@@ -95,8 +95,7 @@ class FSSpecStore(KeyValueStore, CopyMixin):
             If True, the prefix will be created if it does not exist.
             Analogous to the create_if_missing parameter in AzureBlockBlobStore or GoogleCloudStore.
         """
-        if write_kwargs is None:
-            write_kwargs = {}
+        write_kwargs = write_kwargs or {}
         self._prefix = prefix
         self.mkdir_prefix = mkdir_prefix
         self._write_kwargs = write_kwargs
