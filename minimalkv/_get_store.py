@@ -2,22 +2,7 @@ from functools import reduce
 from typing import Dict, List, Type
 from urllib.parse import ParseResult, parse_qs, urlparse
 
-from minimalkv._hstores import (
-    HAzureBlockBlobStore,
-    HBoto3Store,
-    HDictStore,
-    HFilesystemStore,
-    HGoogleCloudStore,
-)
 from minimalkv._key_value_store import KeyValueStore
-from minimalkv.stores import (
-    AzureBlockBlobStore,
-    Boto3Store,
-    DictStore,
-    FilesystemStore,
-    GoogleCloudStore,
-    RedisStore,
-)
 
 
 def get_store_from_url(url: str) -> KeyValueStore:
@@ -67,6 +52,40 @@ def get_store_from_url(url: str) -> KeyValueStore:
     json_b64_encoded = base64.urlsafe_b64encode(b).decode()
 
     """
+
+    from minimalkv.stores import (
+        AzureBlockBlobStore,
+        Boto3Store,
+        DictStore,
+        FilesystemStore,
+        GoogleCloudStore,
+        RedisStore,
+    )
+    from minimalkv._hstores import (
+        HAzureBlockBlobStore,
+        HBoto3Store,
+        HDictStore,
+        HFilesystemStore,
+        HGoogleCloudStore,
+    )
+    scheme_to_store: Dict[str, Type[KeyValueStore]] = {
+        "azure": AzureBlockBlobStore,
+        "hazure": HAzureBlockBlobStore,
+        "s3": Boto3Store,
+        "hs3": HBoto3Store,
+        "boto": HBoto3Store,
+        "gcs": GoogleCloudStore,
+        "hgcs": HGoogleCloudStore,
+        "fs": FilesystemStore,
+        "file": FilesystemStore,
+        "hfs": HFilesystemStore,
+        "hfile": HFilesystemStore,
+        "filesystem": HFilesystemStore,
+        "memory": DictStore,
+        "hmemory": HDictStore,
+        "redis": RedisStore,
+    }
+
     parsed_url = urlparse(url)
     # Wrappers can be used to add functionality to a store, e.g. encryption.
     # Wrappers are separated by `+` and can be specified in two ways:
@@ -118,27 +137,3 @@ def extract_wrappers(parsed_url: ParseResult) -> List[str]:
     return old_wrappers + new_wrappers
 
 
-scheme_to_store: Dict[str, Type[KeyValueStore]] = {
-    "azure": AzureBlockBlobStore,
-    "hazure": HAzureBlockBlobStore,
-    "s3": Boto3Store,
-    "hs3": HBoto3Store,
-    "boto": HBoto3Store,
-    "gcs": GoogleCloudStore,
-    "hgcs": HGoogleCloudStore,
-    "fs": FilesystemStore,
-    "file": FilesystemStore,
-    "hfs": HFilesystemStore,
-    "hfile": HFilesystemStore,
-    "filesystem": HFilesystemStore,
-    "memory": DictStore,
-    "hmemory": HDictStore,
-    "redis": RedisStore,
-}
-
-# def get_store(
-#     type str, create_if_missing: bool = True, **params: Any
-# ) -> KeyValueStore:
-#     from minimalkv._store_creation import create_store
-#
-#     store = create_store(type, params)
