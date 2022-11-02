@@ -1,6 +1,6 @@
 from functools import reduce
-from typing import List
-from urllib.parse import parse_qs, urlparse
+from typing import Dict, List, Type
+from urllib.parse import ParseResult, parse_qs, urlparse
 
 from minimalkv._hstores import (
     HAzureBlockBlobStore,
@@ -90,7 +90,7 @@ def get_store_from_url(url: str) -> KeyValueStore:
     return wrapped_store
 
 
-def extract_wrappers(parsed_url: urlparse) -> List[str]:
+def extract_wrappers(parsed_url: ParseResult) -> List[str]:
     # split off old-style wrappers, if any:
     parts = parsed_url.scheme.split("+")
     # pop off the type of the store
@@ -118,7 +118,7 @@ def extract_wrappers(parsed_url: urlparse) -> List[str]:
     return old_wrappers + new_wrappers
 
 
-scheme_to_store = {
+scheme_to_store: Dict[str, Type[KeyValueStore]] = {
     "azure": AzureBlockBlobStore,
     "hazure": HAzureBlockBlobStore,
     "s3": Boto3Store,

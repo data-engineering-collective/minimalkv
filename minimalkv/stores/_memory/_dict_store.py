@@ -45,5 +45,6 @@ class DictStore(KeyValueStore, CopyMixin):
         """
         return filter(lambda k: k.startswith(prefix), iter(self.d))
 
-    def from_parsed_url(cls, parse_url: ParseResult) -> "KeyValueStore":
+    @classmethod
+    def from_parsed_url(cls, parse_url: ParseResult, query: dict) -> "KeyValueStore":
         return DictStore()

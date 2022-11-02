@@ -2,7 +2,7 @@ import os
 import os.path
 import shutil
 from typing import IO, Any, Callable, Iterator, List, Optional, Union, cast
-from urllib.parse import ParseResult
+from urllib.parse import ParseResult, quote
 
 from minimalkv._key_value_store import KeyValueStore
 from minimalkv._mixins import CopyMixin, UrlMixin
@@ -141,7 +141,7 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
     def _url_for(self, key: str) -> str:
         full = os.path.abspath(self._build_filename(key))
         parts = full.split(os.sep)
-        location = "/".join(urllib.parse.quote(p, safe="") for p in parts)
+        location = "/".join(quote(p, safe="") for p in parts)
         return "file://" + location
 
     def keys(self, prefix: str = "") -> List[str]:
@@ -239,7 +239,8 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
         if scheme in ("fs", "hfs"):
             return {"type": scheme, "path": host + path}
         """
-        fs_path = parsed_url.hostname + parsed_url.path
+        hostname = parsed_url.hostname or ""
+        fs_path = hostname + parsed_url.path
         if query["create_if_missing"] and not os.path.exists(fs_path):
             os.makedirs(fs_path)
         return FilesystemStore(fs_path)
@@ -299,4 +300,4 @@ class WebFilesystemStore(FilesystemStore):
             stem: str = self.url_prefix(self, key)
         else:
             stem = self.url_prefix
-        return stem + urllib.parse.quote(rel, safe="")
+        return stem + quote(rel, safe="")

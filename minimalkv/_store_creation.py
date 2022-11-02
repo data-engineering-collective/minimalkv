@@ -21,8 +21,8 @@ def create_store(type: str, params: Dict[str, Any]) -> "KeyValueStore":
         return _create_store_gcs(type, params)
     if type in ("hfs", "hfile", "filesystem"):
         return _create_store_hfs(type, params)
-    if type in ("fs", "file"):
-        return _create_store_fs(type, params)
+    # if type in ("fs", "file"):
+    #     return _create_store_fs(type, params)
     if type in ("memory"):
         return _create_store_mem(type, params)
     if type in ("hmemory"):

@@ -202,7 +202,10 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
             and self.checksum == other.checksum
         )
 
-    def from_parsed_url(cls, parsed_url: ParseResult, query) -> "AzureBlockBlobStore":
+    @classmethod
+    def from_parsed_url(
+        cls, parsed_url: ParseResult, query: dict
+    ) -> "AzureBlockBlobStore":
         """
         ``"azure"``: Returns a ``minimalkv.azure.AzureBlockBlobStorage``. Parameters are
             ``"account_name"``, ``"account_key"``, ``"container"``, ``"use_sas"`` and ``"create_if_missing"`` (default: ``True``).

@@ -2,6 +2,7 @@ import io
 from contextlib import contextmanager
 from shutil import copyfileobj
 from typing import List
+from urllib.parse import ParseResult
 
 from minimalkv import CopyMixin, KeyValueStore, UrlMixin
 
@@ -228,7 +229,8 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
             and self.metadata == other.metadata
         )
 
-    def from_parsed_url(cls, parsed_url: ParseResult):  # noqa D
+    @classmethod
+    def from_parsed_url(cls, parsed_url: ParseResult, query: dict):  # noqa D
         """
         * ``"s3"``: Returns a plain ``minimalkv.net.botostore.BotoStore``.
           Parameters must include ``"host"``, ``"bucket"``, ``"access_key"``, ``"secret_key"``.

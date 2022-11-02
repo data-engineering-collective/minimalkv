@@ -3,6 +3,7 @@ import os
 from minimalkv._mixins import ExtendedKeyspaceMixin
 from minimalkv.stores import (
     AzureBlockBlobStore,
+    Boto3Store,
     BotoStore,
     DictStore,
     FilesystemStore,

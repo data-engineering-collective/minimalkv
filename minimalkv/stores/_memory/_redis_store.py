@@ -103,7 +103,8 @@ class RedisStore(TimeToLiveMixin, KeyValueStore):
         self._put(key, file.read(), ttl_secs)
         return key
 
-    def from_parsed_url(cls, parse_url: ParseResult) -> "KeyValueStore":
+    @classmethod
+    def from_parsed_url(cls, parse_url: ParseResult, query: dict) -> "KeyValueStore":
         """
         * ``"redis"``: Returns a RedisStore. Constructs a StrictRedis using params as kwargs.
             See StrictRedis documentation for details.
