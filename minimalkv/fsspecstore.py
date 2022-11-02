@@ -81,7 +81,12 @@ class FSSpecStoreEntry(io.BufferedIOBase):
 class FSSpecStore(KeyValueStore, CopyMixin):
     """A KeyValueStore that uses an fsspec AbstractFileSystem to store the key-value pairs."""
 
-    def __init__(self, prefix: str = "", mkdir_prefix: bool = True, write_kwargs=None):
+    def __init__(
+        self,
+        prefix: str = "",
+        mkdir_prefix: bool = True,
+        write_kwargs: Optional[dict] = None,
+    ):
         """
         Initialize an FSSpecStore.
 
@@ -91,9 +96,11 @@ class FSSpecStore(KeyValueStore, CopyMixin):
         ----------
         prefix: str, optional
             The prefix to use on the FSSpecStore when storing keys.
-        mkdir_prefix : Boolean
+        mkdir_prefix: Boolean
             If True, the prefix will be created if it does not exist.
             Analogous to the create_if_missing parameter in AzureBlockBlobStore or GoogleCloudStore.
+        write_kwargs: dict, optional
+            Additional keyword arguments to pass to the fsspec FileSystem when writing files.
         """
         write_kwargs = write_kwargs or {}
         self._prefix = prefix
@@ -124,8 +131,17 @@ class FSSpecStore(KeyValueStore, CopyMixin):
         IOError
             If there was an error accessing the store.
         """
-        # `find` only lists files below a directory, so we have to split
-        # the two prefixes accordingly.
+        # `find` only lists files below a directory, so we have to join
+        # and then split the two prefixes accordingly.
+        # Example for a Boto3Store:
+        # bucketname/prefix1prefix2
+        # ========== -------        Boto3Store perspective
+        # bucket.name self.prefix
+        # ==================------- FSSpecStore perspective
+        #    self._prefix    prefix
+        # ===========-------------- What we want
+        # dir_prefix  file_prefix
+
         full_prefix = f"{self._prefix}{prefix}"
         # Find last slash in full prefix
         last_slash = full_prefix.rfind("/")

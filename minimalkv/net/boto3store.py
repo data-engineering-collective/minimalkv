@@ -49,6 +49,9 @@ class Boto3Store(FSSpecStore, UrlMixin, CopyMixin):  # noqa D
         )
 
     def _create_filesystem(self) -> "S3FileSystem":
+        if not has_s3fs:
+            raise ImportError("Cannot find optional dependency s3fs.")
+
         if "127.0.0.1" in self.endpoint_url:
             return S3FileSystem(
                 anon=False,
