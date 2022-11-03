@@ -1,11 +1,12 @@
 import io
 import os
+import warnings
 from contextlib import contextmanager
 from shutil import copyfileobj
 from typing import Dict, List, Union
 
 import boto3
-from boto.s3.bucket import Bucket
+from mypy_boto3_s3.service_resource import Bucket
 from uritools import SplitResult
 
 from minimalkv import CopyMixin, KeyValueStore, UrlMixin
@@ -115,20 +116,14 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
         if isinstance(bucket, str):
             s3_resource = boto3.resource("s3")
             bucket_resource = s3_resource.Bucket(bucket)
-        elif isinstance(bucket, Bucket):
-            bucket_resource = bucket
         else:
-            raise ValueError("bucket must be a string or a boto3 Bucket")
+            bucket_resource = bucket
 
         # Apparently it's assumed that the bucket is already created.
         # We add the option for creating the bucket here.
         if create_if_missing:
-            client = boto3.client("s3")
-            response = client.head_bucket(Bucket=bucket_resource.name)
-            # We have to check the status code manually,
-            # see https://github.com/boto/boto3/issues/2499
-            if response["ResponseMetadata"]["HTTPStatusCode"] != 200:
-                bucket_resource.create()
+            # If it already exists, this will do nothing.
+            bucket_resource.create()
 
         self.bucket = bucket_resource
         self.prefix = prefix.strip().lstrip("/")
@@ -288,7 +283,8 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
         else:
             full_host = f"http://{host}:{port}"
 
-        boto3_params["endpoint_url"] = full_host
+        if full_host != "":
+            boto3_params["endpoint_url"] = full_host
 
         # Remove Nones from client_params
         boto3_params = {k: v for k, v in boto3_params.items() if v is not None}

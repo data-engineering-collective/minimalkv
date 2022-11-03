@@ -6,6 +6,7 @@ dependencies:
   - azure-storage-blob
   - boto
   - boto3
+  - mypy-boto3-s3
   - docker-compose
   - dulwich
   - fsspec
