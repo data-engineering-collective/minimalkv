@@ -1,7 +1,7 @@
 """Implement the AzureBlockBlobStore for `azure-storage-blob~=12`."""
 import io
 from contextlib import contextmanager
-from typing import Optional, Dict
+from typing import Dict, Optional
 from urllib.parse import ParseResult, unquote
 
 from minimalkv._key_value_store import KeyValueStore
@@ -247,7 +247,9 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
         create_if_missing = query.pop("create_if_missing", "")[-1].lower() == "true"
 
         if create_if_missing and use_sas:
-            raise Exception("create_if_missing is incompatible with the use of SAS tokens.")
+            raise Exception(
+                "create_if_missing is incompatible with the use of SAS tokens."
+            )
 
         params = {
             "conn_string": _build_azure_url(account_name, account_key, use_sas),
@@ -256,11 +258,14 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
             "create_if_missing": create_if_missing,
             "max_connections": int(query.pop("max_connections", 2)),
             "max_block_size": int(query.pop("max_block_size", 4 * 1024 * 1024)),
-            "max_single_put_size": int(query.pop("max_single_put_size", 64 * 1024 * 1024)),
+            "max_single_put_size": int(
+                query.pop("max_single_put_size", 64 * 1024 * 1024)
+            ),
         }
 
         if use_hstore:
             from minimalkv._hstores import HAzureBlockBlobStore
+
             return HAzureBlockBlobStore(**params)
         else:
             return AzureBlockBlobStore(**params)

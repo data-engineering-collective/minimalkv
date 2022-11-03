@@ -1,5 +1,5 @@
 from functools import reduce
-from typing import Dict, List, Type, Any
+from typing import Any, Dict, List, Type
 from urllib.parse import ParseResult, parse_qs, urlparse
 from warnings import warn
 
@@ -54,6 +54,13 @@ def get_store_from_url(url: str) -> KeyValueStore:
 
     """
 
+    from minimalkv._hstores import (
+        HAzureBlockBlobStore,
+        HBoto3Store,
+        HDictStore,
+        HFilesystemStore,
+        HGoogleCloudStore,
+    )
     from minimalkv.stores import (
         AzureBlockBlobStore,
         Boto3Store,
@@ -62,13 +69,7 @@ def get_store_from_url(url: str) -> KeyValueStore:
         GoogleCloudStore,
         RedisStore,
     )
-    from minimalkv._hstores import (
-        HAzureBlockBlobStore,
-        HBoto3Store,
-        HDictStore,
-        HFilesystemStore,
-        HGoogleCloudStore,
-    )
+
     scheme_to_store: Dict[str, Type[KeyValueStore]] = {
         "azure": AzureBlockBlobStore,
         "hazure": HAzureBlockBlobStore,
@@ -99,7 +100,7 @@ def get_store_from_url(url: str) -> KeyValueStore:
 
     store_cls = scheme_to_store[parsed_url.scheme]
 
-    query: Dict[str: List[str]] = parse_qs(parsed_url.query)
+    query: Dict[str : List[str]] = parse_qs(parsed_url.query)
     # We will just use the last occurence for each key
     query = {k: v[-1] for k, v in query.items()}
 
