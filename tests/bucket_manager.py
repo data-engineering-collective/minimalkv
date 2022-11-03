@@ -2,6 +2,7 @@ from configparser import ConfigParser
 from contextlib import contextmanager
 from uuid import uuid4 as uuid
 
+import boto3
 import pytest
 
 boto = pytest.importorskip("boto")
@@ -46,23 +47,43 @@ def boto_bucket(
 
 @contextmanager
 def boto3_bucket(
-    access_key,
-    secret_key,
+    access_key_id,
+    secret_access_key,
     host=None,
     bucket_name=None,
     port=None,
     is_secure=None,
-    **kwargs,
 ):
     import os
 
-    import boto3
+    # Credentials where previously set in the environment.
+    # We now set them via boto3.
 
-    # Set environment variables for boto3
-    os.environ["AWS_ACCESS_KEY_ID"] = access_key
-    os.environ["AWS_SECRET_ACCESS_KEY"] = secret_key
-    os.environ["AWS_DEFAULT_REGION"] = "us-east-1"
+    bucket = boto3_bucket_resource(
+        host=host,
+        bucket_name=bucket_name,
+        port=port,
+        is_secure=is_secure,
+        access_key_id=access_key_id,
+        secret_access_key=secret_access_key,
+    )
+    bucket.create()
 
+    yield bucket
+
+    for key in bucket.objects.all():
+        key.delete()
+    bucket.delete()
+
+
+def boto3_bucket_resource(
+    access_key_id=None,
+    secret_access_key=None,
+    host=None,
+    bucket_name=None,
+    port=None,
+    is_secure=None,
+):
     # Build endpoint host
     endpoint_url = None
     if host:
@@ -72,22 +93,16 @@ def boto3_bucket(
             endpoint_url += f":{port}"
 
     name = bucket_name or f"testrun-bucket-{uuid()}"
-    s3_client = boto3.client(
-        "s3",
-        endpoint_url=endpoint_url,
-    )
-    s3_client.create_bucket(Bucket=name)
+
     s3_resource = boto3.resource(
         "s3",
         endpoint_url=endpoint_url,
+        aws_access_key_id=access_key_id,
+        aws_secret_access_key=secret_access_key,
+        region_name="us-east-1",
     )
     bucket = s3_resource.Bucket(name)
-
-    yield bucket
-
-    for key in bucket.objects.all():
-        key.delete()
-    bucket.delete()
+    return bucket
 
 
 def load_boto_credentials():

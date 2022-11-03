@@ -54,7 +54,6 @@ def get_store_from_url(url: str) -> KeyValueStore:
     json_b64_encoded = base64.urlsafe_b64encode(b).decode()
 
     """
-
     from minimalkv._hstores import (
         HAzureBlockBlobStore,
         HBoto3Store,

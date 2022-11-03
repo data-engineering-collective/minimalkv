@@ -243,13 +243,14 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
 
         """
         use_sas = query.pop("use_sas", False)
-        from minimalkv.url_utils import get_username, get_password
+        from minimalkv.url_utils import get_password, get_username
+
         account_name = get_username(parsed_url)
         account_key = get_password(parsed_url)
 
         # Mandatory parameters
         params = {
-            "conn_string": _build_azure_url(account_name, account_key, use_sas),
+            "conn_string": _build_conn_string(account_name, account_key, use_sas),
             "container": parsed_url.gethost(),
             "public": False,
         }
@@ -280,7 +281,7 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
             return AzureBlockBlobStore(**params)
 
 
-def _build_azure_url(
+def _build_conn_string(
     account_name=None,
     account_key=None,
     use_sas=False,

@@ -2,13 +2,14 @@ import pytest
 
 from minimalkv._get_store import get_store_from_url
 from minimalkv.decorator import ReadOnlyDecorator
-from minimalkv.stores import (
+from minimalkv.stores import (  # RedisStore,
     AzureBlockBlobStore,
     Boto3Store,
     DictStore,
     FilesystemStore,
-    RedisStore,
 )
+
+from ..bucket_manager import boto3_bucket_resource
 
 good_urls = [
     (
@@ -53,7 +54,18 @@ good_urls = [
     ),
     ("fs:///an/absolute/path", FilesystemStore(root="/an/absolute/path")),
     # TODO S3 might be hard to integration test because we need to set up a bucket
-    # ("s3://access_key:secret_key@endpoint:1234/bucketname", Boto3Store()),
+    (
+        "s3://access_key:secret_key@endpoint:1234/bucketname",
+        Boto3Store(
+            bucket=boto3_bucket_resource(
+                access_key_id="access_key",
+                secret_access_key="secret_key",
+                host="endpoint",
+                port=1234,
+                bucket_name="bucketname",
+            ),
+        ),
+    ),
     # TODO Redis might be hard to integration test because we need to set up StrictRedis object
     # (
     #     "redis:///2",

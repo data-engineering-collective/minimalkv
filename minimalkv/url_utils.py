@@ -4,12 +4,14 @@ from uritools import SplitResult
 
 
 def get_username(split_result: SplitResult) -> Optional[str]:
-    if not split_result.getuserinfo():
+    userinfo = split_result.getuserinfo()
+    if not userinfo:
         return None
-    return split_result.getuserinfo().split(':')[0]
+    return userinfo.split(":")[0]
 
 
 def get_password(split_result: SplitResult) -> Optional[str]:
-    if ':' not in split_result.getuserinfo():
+    userinfo = split_result.getuserinfo()
+    if not userinfo or ":" not in userinfo:
         return None
-    return split_result.getuserinfo().split(':')[1]
+    return userinfo.split(":")[1]

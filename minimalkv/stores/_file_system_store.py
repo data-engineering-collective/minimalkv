@@ -2,7 +2,7 @@ import os
 import os.path
 import shutil
 from typing import IO, Any, Callable, Dict, Iterator, List, Optional, Union, cast
-from urllib.parse import ParseResult, quote
+from urllib.parse import quote
 
 from uritools import SplitResult
 

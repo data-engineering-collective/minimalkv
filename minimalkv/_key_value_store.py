@@ -1,7 +1,6 @@
 from io import BytesIO
 from types import TracebackType
 from typing import IO, Dict, Iterable, Iterator, List, Optional, Type, Union
-from urllib.parse import ParseResult
 
 from uritools import SplitResult
 
@@ -467,7 +466,7 @@ class KeyValueStore:
 
     @classmethod
     def from_parsed_url(
-        cls, parse_url: SplitResult, query: Dict[str, str]
+        cls, parsed_url: SplitResult, query: Dict[str, str]
     ) -> "KeyValueStore":
         raise NotImplementedError
 
