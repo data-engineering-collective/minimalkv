@@ -43,8 +43,8 @@ good_urls = [
             max_connections=5,
             # These are returned from url2dict as lists because query keys might occur multiple times
             # I think they are passed into the initializer as a list, and this has never been tested
-            max_block_size="4194304",
-            max_single_put_size="67108864",
+            max_block_size=4194304,
+            max_single_put_size=67108864,
         ),
     ),
     (

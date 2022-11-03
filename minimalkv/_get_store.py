@@ -1,7 +1,8 @@
 from functools import reduce
 from typing import Any, Dict, List, Type
-from uritools import urisplit, SplitResult
 from warnings import warn
+
+from uritools import SplitResult, urisplit
 
 from minimalkv._key_value_store import KeyValueStore
 
@@ -101,9 +102,9 @@ def get_store_from_url(url: str) -> KeyValueStore:
 
     store_cls = scheme_to_store[scheme]
 
-    query: Dict[str : List[str]] = parsed_url.getquerydict()
+    query_listdict: Dict[str, List[str]] = parsed_url.getquerydict()
     # We will just use the last occurrence for each key
-    query = {k: v[-1] for k, v in query.items()}
+    query = {k: v[-1] for k, v in query_listdict.items()}
 
     store = store_cls.from_parsed_url(parsed_url, query)
 
@@ -171,7 +172,7 @@ def get_store(
          otherwise, try to retrieve the bucket and fail with an ``IOError``.
     * ``"hs3"`` returns a variant of ``minimalkv.net.botostore.BotoStore`` that allows "/" in the key name.
       The parameters are the same as for ``"s3"``
-    * ``"gcs"``: Returns a ``minimalkv.net.gcstore.GoogleCloudStore``.  Parameters are
+    * ``"gcs"``: Returns a ``minimalkv.stores.GoogleCloudStore``.  Parameters are
       ``"credentials"``, ``"bucket_name"``, ``"bucket_creation_location"``, ``"project"`` and ``"create_if_missing"`` (default: ``True``).
 
       - ``"credentials"``: either the path to a credentials.json file or a *google.auth.credentials.Credentials* object

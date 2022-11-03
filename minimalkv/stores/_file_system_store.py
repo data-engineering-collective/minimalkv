@@ -1,8 +1,10 @@
 import os
 import os.path
 import shutil
-from typing import IO, Any, Callable, Iterator, List, Optional, Union, cast
+from typing import IO, Any, Callable, Dict, Iterator, List, Optional, Union, cast
 from urllib.parse import ParseResult, quote
+
+from uritools import SplitResult
 
 from minimalkv._key_value_store import KeyValueStore
 from minimalkv._mixins import CopyMixin, UrlMixin
@@ -230,7 +232,9 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
         )
 
     @classmethod
-    def from_parsed_url(cls, parsed_url: ParseResult, query: dict) -> "FilesystemStore":
+    def from_parsed_url(
+        cls, parsed_url: SplitResult, query: Dict[str, str]
+    ) -> "FilesystemStore":
         """
         * ``"fs"``: Returns a ``minimalkv.fs.FilesystemStore``. Specify the base path as "path" parameter.
         * ``"hfs"`` returns a variant of ``minimalkv.fs.FilesystemStore``  that allows "/" in the key name.
@@ -239,9 +243,9 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
         if scheme in ("fs", "hfs"):
             return {"type": scheme, "path": host + path}
         """
-        hostname = parsed_url.hostname or ""
-        fs_path = hostname + parsed_url.path
-        if query["create_if_missing"] and not os.path.exists(fs_path):
+        hostname = parsed_url.gethost() or ""
+        fs_path = hostname + parsed_url.getpath()
+        if query.get("create_if_missing") and not os.path.exists(fs_path):
             os.makedirs(fs_path)
         return FilesystemStore(fs_path)
 
