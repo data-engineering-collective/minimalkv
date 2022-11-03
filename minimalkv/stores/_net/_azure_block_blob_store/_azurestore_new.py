@@ -4,6 +4,8 @@ from contextlib import contextmanager
 from typing import Dict, Optional
 from urllib.parse import ParseResult, unquote
 
+from uritools import SplitResult
+
 from minimalkv._key_value_store import KeyValueStore
 from minimalkv.stores._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
 
@@ -191,7 +193,7 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
 
     def __eq__(self, other):
         print(other)
-        breakpoint()
+        # breakpoint()
         return (
             isinstance(other, AzureBlockBlobStore)
             and self.conn_string == other.conn_string
@@ -206,7 +208,7 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
 
     @classmethod
     def from_parsed_url(
-        cls, parsed_url: ParseResult, query: Dict[str, str], use_hstore: bool = False
+        cls, parsed_url: SplitResult, query: Dict[str, str], use_hstore: bool = False
     ) -> "AzureBlockBlobStore":
         """
         ``"azure"``: Returns a ``minimalkv.azure.AzureBlockBlobStorage``. Parameters are
@@ -241,27 +243,34 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
 
         """
         use_sas = query.pop("use_sas", False)
-        account_name = unquote(parsed_url.username)
-        account_key = unquote(parsed_url.password)
+        from minimalkv.url_utils import get_username, get_password
+        account_name = get_username(parsed_url)
+        account_key = get_password(parsed_url)
 
-        create_if_missing = query.pop("create_if_missing", "")[-1].lower() == "true"
-
-        if create_if_missing and use_sas:
-            raise Exception(
-                "create_if_missing is incompatible with the use of SAS tokens."
-            )
-
+        # Mandatory parameters
         params = {
             "conn_string": _build_azure_url(account_name, account_key, use_sas),
-            "container": parsed_url.hostname,
+            "container": parsed_url.gethost(),
             "public": False,
-            "create_if_missing": create_if_missing,
-            "max_connections": int(query.pop("max_connections", 2)),
-            "max_block_size": int(query.pop("max_block_size", 4 * 1024 * 1024)),
-            "max_single_put_size": int(
-                query.pop("max_single_put_size", 64 * 1024 * 1024)
-            ),
         }
+
+        if "create_if_missing" in query:
+            create_if_missing = query.pop("create_if_missing", "").lower() == "true"
+            params["create_if_missing"] = create_if_missing
+
+            if create_if_missing and use_sas:
+                raise Exception(
+                    "create_if_missing is incompatible with the use of SAS tokens."
+                )
+
+        if "max_connections" in query:
+            params["max_connections"] = int(query.pop("max_connections"))
+
+        if "max_block_size" in query:
+            params["max_block_size"] = int(query.pop("max_block_size"))
+
+        if "max_single_put_size" in query:
+            params["max_single_put_size"] = int(query.pop("max_single_put_size"))
 
         if use_hstore:
             from minimalkv._hstores import HAzureBlockBlobStore

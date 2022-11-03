@@ -1,6 +1,6 @@
 from functools import reduce
 from typing import Any, Dict, List, Type
-from urllib.parse import ParseResult, parse_qs, urlparse
+from uritools import urisplit, SplitResult
 from warnings import warn
 
 from minimalkv._key_value_store import KeyValueStore
@@ -88,20 +88,21 @@ def get_store_from_url(url: str) -> KeyValueStore:
         "redis": RedisStore,
     }
 
-    parsed_url = urlparse(url)
+    parsed_url = urisplit(url)
     # Wrappers can be used to add functionality to a store, e.g. encryption.
     # Wrappers are separated by `+` and can be specified in two ways:
     # 1. As part of the scheme, e.g. "s3+readonly://..." (old style)
     # 2. As the fragment, e.g. "s3://...#wrap:readonly" (new style)
     wrappers = extract_wrappers(parsed_url)
 
-    if parsed_url.scheme not in scheme_to_store:
-        raise ValueError(f'Unknown storage type "{parsed_url.scheme}"')
+    scheme = parsed_url.getscheme()
+    if scheme not in scheme_to_store:
+        raise ValueError(f'Unknown storage type "{scheme}"')
 
-    store_cls = scheme_to_store[parsed_url.scheme]
+    store_cls = scheme_to_store[scheme]
 
-    query: Dict[str : List[str]] = parse_qs(parsed_url.query)
-    # We will just use the last occurence for each key
+    query: Dict[str : List[str]] = parsed_url.getquerydict()
+    # We will just use the last occurrence for each key
     query = {k: v[-1] for k, v in query.items()}
 
     store = store_cls.from_parsed_url(parsed_url, query)
@@ -114,15 +115,15 @@ def get_store_from_url(url: str) -> KeyValueStore:
     return wrapped_store
 
 
-def extract_wrappers(parsed_url: ParseResult) -> List[str]:
+def extract_wrappers(parsed_url: SplitResult) -> List[str]:
     # split off old-style wrappers, if any:
-    parts = parsed_url.scheme.split("+")
+    parts = parsed_url.getscheme().split("+")
     # pop off the type of the store
     parts.pop(-1)
     old_wrappers = list(reversed(parts))
 
     # find new-style wrappers, if any:
-    fragment = parsed_url.fragment
+    fragment = parsed_url.getfragment()
     fragments = fragment.split("#") if fragment else []
     wrap_spec = list(filter(lambda s: s.startswith("wrap:"), fragments))
     if wrap_spec:

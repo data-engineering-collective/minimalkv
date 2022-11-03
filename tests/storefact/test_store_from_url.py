@@ -83,12 +83,8 @@ def test_raise_on_invalid_store():
 
 @pytest.mark.parametrize("url, expected", good_urls)
 def test_get_store_from_url(url, expected):
-    assert get_store_from_url(url) == AzureBlockBlobStore(
-        conn_string="DefaultEndpointsProtocol=https;AccountName=MYACCOUNT;AccountKey=dead/beef",
-        create_if_missing=True,
-        container="1buc-ket1",
-    )
-    print("hellooooo")
+    actual = get_store_from_url(url)
+    assert actual == expected
 
 
 @pytest.mark.parametrize("url, raises", bad_urls)
