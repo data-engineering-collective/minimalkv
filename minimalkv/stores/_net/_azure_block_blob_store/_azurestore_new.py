@@ -1,8 +1,8 @@
 """Implement the AzureBlockBlobStore for `azure-storage-blob~=12`."""
 import io
 from contextlib import contextmanager
-from typing import Optional
-from urllib.parse import ParseResult
+from typing import Optional, Dict
+from urllib.parse import ParseResult, unquote
 
 from minimalkv._key_value_store import KeyValueStore
 from minimalkv.stores._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
@@ -190,6 +190,8 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
         }
 
     def __eq__(self, other):
+        print(other)
+        breakpoint()
         return (
             isinstance(other, AzureBlockBlobStore)
             and self.conn_string == other.conn_string
@@ -204,7 +206,7 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
 
     @classmethod
     def from_parsed_url(
-        cls, parsed_url: ParseResult, query: dict
+        cls, parsed_url: ParseResult, query: Dict[str, str], use_hstore: bool = False
     ) -> "AzureBlockBlobStore":
         """
         ``"azure"``: Returns a ``minimalkv.azure.AzureBlockBlobStorage``. Parameters are
@@ -233,8 +235,57 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
         if "max_single_put_size" in query:
             params["max_single_put_size"] = query.pop("max_single_put_size")
         return params
+
+        * AzureBlockBlockStorage: ``azure://account_name:account_key@container[?create_if_missing=true]``
+        * AzureBlockBlockStorage (SAS): ``azure://account_name:shared_access_signature@container?use_sas&create_if_missing=false``
+
         """
-        pass
+        use_sas = query.pop("use_sas", False)
+        account_name = unquote(parsed_url.username)
+        account_key = unquote(parsed_url.password)
+
+        create_if_missing = query.pop("create_if_missing", "")[-1].lower() == "true"
+
+        if create_if_missing and use_sas:
+            raise Exception("create_if_missing is incompatible with the use of SAS tokens.")
+
+        params = {
+            "conn_string": _build_azure_url(account_name, account_key, use_sas),
+            "container": parsed_url.hostname,
+            "public": False,
+            "create_if_missing": create_if_missing,
+            "max_connections": int(query.pop("max_connections", 2)),
+            "max_block_size": int(query.pop("max_block_size", 4 * 1024 * 1024)),
+            "max_single_put_size": int(query.pop("max_single_put_size", 64 * 1024 * 1024)),
+        }
+
+        if use_hstore:
+            from minimalkv._hstores import HAzureBlockBlobStore
+            return HAzureBlockBlobStore(**params)
+        else:
+            return AzureBlockBlobStore(**params)
+
+
+def _build_azure_url(
+    account_name=None,
+    account_key=None,
+    use_sas=False,
+    default_endpoints_protocol=None,
+):
+    protocol = default_endpoints_protocol or "https"
+    if use_sas:
+        return (
+            "DefaultEndpointsProtocol={protocol};AccountName={account_name};"
+            "SharedAccessSignature={shared_access_signature}".format(
+                protocol=protocol,
+                account_name=account_name,
+                shared_access_signature=account_key,
+            )
+        )
+    else:
+        return "DefaultEndpointsProtocol={protocol};AccountName={account_name};AccountKey={account_key}".format(
+            protocol=protocol, account_name=account_name, account_key=account_key
+        )
 
 
 class IOInterface(io.BufferedIOBase):

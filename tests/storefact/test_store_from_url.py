@@ -53,15 +53,16 @@ good_urls = [
     ),
     ("fs:///an/absolute/path", FilesystemStore(root="/an/absolute/path")),
     # TODO S3 might be hard to integration test because we need to set up a bucket
-    ("s3://access_key:secret_key@endpoint:1234/bucketname", Boto3Store()),
-    (
-        "redis:///2",
-        # RedisStore(
-        #     host="localhost",
-        #     db=2,
-        #     redis=
-        # ),
-    ),
+    # ("s3://access_key:secret_key@endpoint:1234/bucketname", Boto3Store()),
+    # TODO Redis might be hard to integration test because we need to set up StrictRedis object
+    # (
+    #     "redis:///2",
+    #     RedisStore(
+    #         host="localhost",
+    #         db=2,
+    #         redis=
+    #     ),
+    # ),
     ("memory://", DictStore()),
 ]
 
@@ -82,7 +83,12 @@ def test_raise_on_invalid_store():
 
 @pytest.mark.parametrize("url, expected", good_urls)
 def test_get_store_from_url(url, expected):
-    assert get_store_from_url(url) == expected
+    assert get_store_from_url(url) ==         AzureBlockBlobStore(
+            conn_string="DefaultEndpointsProtocol=https;AccountName=MYACCOUNT;AccountKey=dead/beef",
+            create_if_missing=True,
+            container="1buc-ket1",
+        )
+    print("hellooooo")
 
 
 @pytest.mark.parametrize("url, raises", bad_urls)

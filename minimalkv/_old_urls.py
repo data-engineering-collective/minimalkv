@@ -150,6 +150,14 @@ def _parse_userinfo(userinfo: str) -> List[str]:
     parts: list of str
         URL-encoded user-info split at ``:``.
     """
+    warn(
+        """
+        _parse_userinfo will be removed in the next major release.
+        If you want to create a KeyValueStore from a URL, use get_store_from_url.
+        """,
+        DeprecationWarning,
+        stacklevel=2,
+    )
     if hasattr(userinfo, "split"):
         parts = userinfo.split(":", 1)
 
