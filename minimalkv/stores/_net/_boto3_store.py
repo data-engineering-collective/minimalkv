@@ -276,15 +276,18 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
         }
         host = parsed_url.gethost()
         port = parsed_url.getport()
-        if host is None:
-            full_host = None
-        elif port is None:
-            full_host = host
-        else:
-            full_host = f"http://{host}:{port}"
 
-        if full_host != "":
-            boto3_params["endpoint_url"] = full_host
+        is_secure = query.get("is_secure", "true").lower() == "true"
+        endpoint_scheme = "https" if is_secure else "http"
+
+        if host is None:
+            endpoint_url = None
+        elif port is None:
+            endpoint_url = f"{endpoint_scheme}://{host}"
+        else:
+            endpoint_url = f"{endpoint_scheme}://{host}:{port}"
+
+        boto3_params["endpoint_url"] = endpoint_url
 
         # Remove Nones from client_params
         boto3_params = {k: v for k, v in boto3_params.items() if v is not None}
