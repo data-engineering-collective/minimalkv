@@ -2,7 +2,6 @@
 import io
 from contextlib import contextmanager
 from typing import Dict, Optional
-from urllib.parse import ParseResult, unquote
 
 from uritools import SplitResult
 
@@ -211,6 +210,8 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
         cls, parsed_url: SplitResult, query: Dict[str, str], use_hstore: bool = False
     ) -> "AzureBlockBlobStore":
         """
+        Build an AzureBlockBlobStore from a parsed URL.
+
         ``"azure"``: Returns a ``minimalkv.azure.AzureBlockBlobStorage``. Parameters are
             ``"account_name"``, ``"account_key"``, ``"container"``, ``"use_sas"`` and ``"create_if_missing"`` (default: ``True``).
             ``"create_if_missing"`` has to be ``False`` if ``"use_sas"`` is set. When ``"use_sas"`` is set,
@@ -273,12 +274,7 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
         if "max_single_put_size" in query:
             params["max_single_put_size"] = int(query.pop("max_single_put_size"))
 
-        if use_hstore:
-            from minimalkv._hstores import HAzureBlockBlobStore
-
-            return HAzureBlockBlobStore(**params)
-        else:
-            return AzureBlockBlobStore(**params)
+        return cls(**params)
 
 
 def _build_conn_string(
