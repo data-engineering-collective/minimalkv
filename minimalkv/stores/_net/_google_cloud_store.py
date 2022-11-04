@@ -1,7 +1,9 @@
 import json
 import warnings
-from typing import IO, cast
-from urllib.parse import ParseResult
+from typing import IO, Dict, cast
+
+from google.oauth2.service_account import Credentials
+from uritools import SplitResult
 
 from minimalkv.stores._fsspec_store import FSSpecStore, FSSpecStoreEntry
 
@@ -92,7 +94,7 @@ class GoogleCloudStore(FSSpecStore):
 
     @classmethod
     def from_parsed_url(
-        cls, parsed_url: ParseResult, query: dict
+        cls, parsed_url: SplitResult, query: Dict[str, str]
     ) -> "GoogleCloudStore":
         """
         * ``"gcs"``: Returns a ``minimalkv.net.gcstore.GoogleCloudStore``.  Parameters are
@@ -107,13 +109,32 @@ class GoogleCloudStore(FSSpecStore):
             If ``None`` then GCloud uses a default location.
         * ``"hgcs"``: Like ``"gcs"`` but "/" are allowed in the keynames.
 
-        credentials_b64 = userinfo
-        params = {"type": scheme, "bucket_name": host}
-        params["credentials"] = base64.urlsafe_b64decode(credentials_b64.encode())
-        if "bucket_creation_location" in query:
-            params["bucket_creation_location"] = query.pop("bucket_creation_location")[
-                0
-            ]
-        return params
+        * GoogleCloudStorage: ``gcs://<base64 encoded credentials JSON>@bucket_name[?create_if_missing=true][&bucket_creation_location=EUROPE-WEST1]``
         """
-        pass
+
+        params = {"bucket_name": parsed_url.gethost()}
+
+        # Decode credentials
+        credentials = parsed_url.getuserinfo()
+        if credentials is not None:
+            # Get as bytes
+            credentials = credentials.encode()
+            # Decode base64
+            import base64
+
+            credentials = base64.b64decode(credentials)
+            # Load as JSON
+            credentials_dict = json.loads(credentials)
+            credentials = Credentials.from_service_account_info(
+                credentials_dict,
+                scopes=["https://www.googleapis.com/auth/devstorage.read_write"],
+            )
+            params["project"] = credentials_dict["project_id"]
+            params["credentials"] = credentials
+
+        params["create_if_missing"] = (
+            query.get("create_if_missing", "true").lower() == "true"
+        )
+        params["bucket_creation_location"] = query.get("bucket_creation_location", None)
+
+        return cls(**params)
