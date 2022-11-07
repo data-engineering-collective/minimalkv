@@ -3,7 +3,7 @@ from typing import IO, TYPE_CHECKING, Dict, Iterator, Optional, Union
 
 from uritools import SplitResult
 
-from minimalkv.net._net_common import lazy_property, LAZY_PROPERTY_ATTR_PREFIX
+from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
 
 if TYPE_CHECKING:
     from fsspec import AbstractFileSystem

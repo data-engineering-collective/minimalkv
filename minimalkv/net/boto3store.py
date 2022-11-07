@@ -322,6 +322,7 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
 
         if parsed_url.getscheme() == "hs3":
             from minimalkv._hstores import HBoto3Store
+
             return HBoto3Store(bucket, create_if_missing=create_if_missing)
         else:
             return Boto3Store(bucket, create_if_missing=create_if_missing)

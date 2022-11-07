@@ -110,9 +110,10 @@ def _create_store_hs3(type, params):
 
 def _create_store_s3(type, params):
     # TODO: Docstring with required params.
+    from minimalkv.net.botostore import BotoStore
+
     from ._boto import _get_s3bucket
 
-    from minimalkv.net.botostore import BotoStore
     return BotoStore(_get_s3bucket(**params))
 
 
@@ -130,12 +131,14 @@ def _create_store_fs(type, params):
     if params["create_if_missing"] and not os.path.exists(params["path"]):
         os.makedirs(params["path"])
     from minimalkv.fs import FilesystemStore
+
     return FilesystemStore(params["path"])
 
 
 def _create_store_mem(type, params):
     # TODO: Docstring with required params.
     from minimalkv.memory import DictStore
+
     return DictStore()
 
 
@@ -149,9 +152,11 @@ def _create_store_hmem(type, params):
 def _create_store_redis(type, params):
     # TODO: Docstring with required params.
     from redis import StrictRedis
+
     r = StrictRedis(**params)
 
     from minimalkv.memory.redisstore import RedisStore
+
     return RedisStore(r)
 
 

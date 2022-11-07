@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import re
 from io import BytesIO
-from typing import IO, TYPE_CHECKING, Iterator, List, Optional, Union, Dict
+from typing import IO, TYPE_CHECKING, Dict, Iterator, List, Optional, Union
 
 from uritools import SplitResult
 

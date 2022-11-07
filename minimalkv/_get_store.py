@@ -4,15 +4,6 @@ from warnings import warn
 
 from uritools import SplitResult, urisplit
 
-from minimalkv._key_value_store import KeyValueStore
-from minimalkv.net.azurestore import AzureBlockBlobStore
-from minimalkv.net.boto3store import Boto3Store
-
-from minimalkv.net.gcstore import GoogleCloudStore
-from minimalkv.fs import FilesystemStore
-from minimalkv.memory import DictStore
-from minimalkv.memory.redisstore import RedisStore
-
 from minimalkv._hstores import (
     HAzureBlockBlobStore,
     HBoto3Store,
@@ -20,6 +11,13 @@ from minimalkv._hstores import (
     HFilesystemStore,
     HGoogleCloudStore,
 )
+from minimalkv._key_value_store import KeyValueStore
+from minimalkv.fs import FilesystemStore
+from minimalkv.memory import DictStore
+from minimalkv.memory.redisstore import RedisStore
+from minimalkv.net.azurestore import AzureBlockBlobStore
+from minimalkv.net.boto3store import Boto3Store
+from minimalkv.net.gcstore import GoogleCloudStore
 
 
 def get_store_from_url(
