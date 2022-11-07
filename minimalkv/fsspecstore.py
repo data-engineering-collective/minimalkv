@@ -103,7 +103,7 @@ class FSSpecStore(KeyValueStore, CopyMixin):
             Additional keyword arguments to pass to the fsspec FileSystem when writing files.
         """
         write_kwargs = write_kwargs or {}
-        self._prefix = prefix
+        self.prefix = prefix
         self.mkdir_prefix = mkdir_prefix
         self._write_kwargs = write_kwargs
 
@@ -114,7 +114,7 @@ class FSSpecStore(KeyValueStore, CopyMixin):
         # Check if prefix exists.
         # Used by inheriting classes to check if e.g. a bucket exists.
         try:
-            return self._fs.exists(self._prefix)
+            return self._fs.exists(self.prefix)
         except (OSError, RefreshError):
             return None
 
@@ -142,7 +142,7 @@ class FSSpecStore(KeyValueStore, CopyMixin):
         # ===========-------------- What we want
         # dir_prefix  file_prefix
 
-        full_prefix = f"{self._prefix}{prefix}"
+        full_prefix = f"{self.prefix}{prefix}"
         # Find last slash in full prefix
         last_slash = full_prefix.rfind("/")
         if last_slash == -1:
@@ -155,41 +155,41 @@ class FSSpecStore(KeyValueStore, CopyMixin):
         all_files_and_dirs = self._fs.find(dir_prefix, prefix=file_prefix)
 
         return map(
-            lambda k: k.replace(f"{self._prefix}", ""),
+            lambda k: k.replace(f"{self.prefix}", ""),
             all_files_and_dirs,
         )
 
     def _delete(self, key: str) -> None:
         try:
-            self._fs.rm_file(f"{self._prefix}{key}")
+            self._fs.rm_file(f"{self.prefix}{key}")
         except FileNotFoundError:
             pass
 
     def _open(self, key: str) -> IO:
         try:
-            return self._fs.open(f"{self._prefix}{key}")
+            return self._fs.open(f"{self.prefix}{key}")
         except FileNotFoundError:
             raise KeyError(key)
 
     # Required to prevent error when credentials are not sufficient for listing objects
     def _get_file(self, key: str, file: IO) -> str:
         try:
-            file.write(self._fs.cat_file(f"{self._prefix}{key}"))
+            file.write(self._fs.cat_file(f"{self.prefix}{key}"))
             return key
         except FileNotFoundError:
             raise KeyError(key)
 
     def _put_file(self, key: str, file: IO) -> str:
-        self._fs.pipe_file(f"{self._prefix}{key}", file.read(), **self._write_kwargs)
+        self._fs.pipe_file(f"{self.prefix}{key}", file.read(), **self._write_kwargs)
         return key
 
     def _has_key(self, key: str) -> bool:
-        return self._fs.exists(f"{self._prefix}{key}")
+        return self._fs.exists(f"{self.prefix}{key}")
 
     def _copy(self, key: str, new_key: str) -> str:
         try:
             self._fs.cp_file(
-                f"{self._prefix}{key}", f"{self._prefix}{new_key}", **self._write_kwargs
+                f"{self.prefix}{key}", f"{self.prefix}{new_key}", **self._write_kwargs
             )
         except FileNotFoundError:
             raise KeyError(key)
@@ -203,8 +203,8 @@ class FSSpecStore(KeyValueStore, CopyMixin):
     def _fs(self) -> "AbstractFileSystem":
         fs = self._create_filesystem()
 
-        if self.mkdir_prefix and not fs.exists(self._prefix):
-            fs.mkdir(self._prefix)
+        if self.mkdir_prefix and not fs.exists(self.prefix):
+            fs.mkdir(self.prefix)
         return fs
 
     # Skips lazy properties.
