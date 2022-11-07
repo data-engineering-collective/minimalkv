@@ -1,13 +1,13 @@
 import os
 
 from minimalkv._mixins import ExtendedKeyspaceMixin
-from minimalkv.fs import FilesystemStore
 from minimalkv.memory import DictStore
 from minimalkv.memory.redisstore import RedisStore
 from minimalkv.net.azurestore import AzureBlockBlobStore
 from minimalkv.net.botostore import BotoStore
+from minimalkv.net.boto3store import Boto3Store
 from minimalkv.net.gcstore import GoogleCloudStore
-
+from minimalkv.fs import FilesystemStore
 
 class HDictStore(ExtendedKeyspaceMixin, DictStore):  # noqa D
     pass
@@ -37,6 +37,10 @@ class HBotoStore(ExtendedKeyspaceMixin, BotoStore):  # noqa D
         """
         k = self.bucket.lookup(self.prefix + key)
         return k.size
+
+
+class HBoto3Store(ExtendedKeyspaceMixin, Boto3Store):  # noqa D
+    pass
 
 
 class HGoogleCloudStore(ExtendedKeyspaceMixin, GoogleCloudStore):  # noqa D

@@ -1,8 +1,10 @@
 import os
 import os.path
 import shutil
-import urllib.parse
-from typing import IO, Any, Callable, Iterator, List, Optional, Union, cast
+from typing import IO, Any, Callable, Dict, Iterator, List, Optional, Union, cast
+from urllib.parse import quote
+
+from uritools import SplitResult
 
 from minimalkv._key_value_store import KeyValueStore
 from minimalkv._mixins import CopyMixin, UrlMixin
@@ -141,7 +143,7 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
     def _url_for(self, key: str) -> str:
         full = os.path.abspath(self._build_filename(key))
         parts = full.split(os.sep)
-        location = "/".join(urllib.parse.quote(p, safe="") for p in parts)
+        location = "/".join(quote(p, safe="") for p in parts)
         return "file://" + location
 
     def keys(self, prefix: str = "") -> List[str]:
@@ -219,8 +221,33 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
                 if k.startswith(prefix):
                     yield k
         except OSError:
-            # path does not exists
+            # path does not exist
             pass
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, FilesystemStore)
+            and self.root == other.root
+            and self.perm == other.perm
+        )
+
+    @classmethod
+    def from_parsed_url(
+        cls, parsed_url: SplitResult, query: Dict[str, str]
+    ) -> "FilesystemStore":
+        """
+        * ``"fs"``: Returns a ``minimalkv.fs.FilesystemStore``. Specify the base path as "path" parameter.
+        * ``"hfs"`` returns a variant of ``minimalkv.fs.FilesystemStore``  that allows "/" in the key name.
+          The parameters are the same as for ``"file"``.
+
+        if scheme in ("fs", "hfs"):
+            return {"type": scheme, "path": host + path}
+        """
+        hostname = parsed_url.gethost() or ""
+        fs_path = hostname + parsed_url.getpath()
+        if query.get("create_if_missing") and not os.path.exists(fs_path):
+            os.makedirs(fs_path)
+        return FilesystemStore(fs_path)
 
 
 class WebFilesystemStore(FilesystemStore):
@@ -277,4 +304,4 @@ class WebFilesystemStore(FilesystemStore):
             stem: str = self.url_prefix(self, key)
         else:
             stem = self.url_prefix
-        return stem + urllib.parse.quote(rel, safe="")
+        return stem + quote(rel, safe="")

@@ -6,8 +6,8 @@ from typing import IO, Iterator, List, Optional, Union
 from dulwich.objects import Blob, Commit, Tree
 from dulwich.repo import Repo
 
-from minimalkv import __version__
 from minimalkv._key_value_store import KeyValueStore
+from minimalkv import __version__
 
 
 def _on_tree(

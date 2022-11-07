@@ -1,8 +1,7 @@
 import os
 import os.path
 from typing import TYPE_CHECKING, Any, Dict
-
-from minimalkv.fs import FilesystemStore
+from warnings import warn
 
 if TYPE_CHECKING:
     from minimalkv._key_value_store import KeyValueStore
@@ -10,6 +9,14 @@ if TYPE_CHECKING:
 
 def create_store(type: str, params: Dict[str, Any]) -> "KeyValueStore":
     """Create store of type ``type`` with ``params``."""
+    warn(
+        """
+        create_store will be removed in the next major release.
+        If you want to create a KeyValueStore from a URL, use get_store_from_url.
+        """,
+        DeprecationWarning,
+        stacklevel=2,
+    )
     # TODO: More detailed docstring
     if type in ("azure", "hazure"):
         return _create_store_azure(type, params)
@@ -103,10 +110,9 @@ def _create_store_hs3(type, params):
 
 def _create_store_s3(type, params):
     # TODO: Docstring with required params.
-    from minimalkv.net.botostore import BotoStore
-
     from ._boto import _get_s3bucket
 
+    from minimalkv.net.botostore import BotoStore
     return BotoStore(_get_s3bucket(**params))
 
 
@@ -123,13 +129,13 @@ def _create_store_fs(type, params):
     # TODO: Docstring with required params.
     if params["create_if_missing"] and not os.path.exists(params["path"]):
         os.makedirs(params["path"])
+    from minimalkv.fs import FilesystemStore
     return FilesystemStore(params["path"])
 
 
 def _create_store_mem(type, params):
     # TODO: Docstring with required params.
     from minimalkv.memory import DictStore
-
     return DictStore()
 
 
@@ -143,10 +149,9 @@ def _create_store_hmem(type, params):
 def _create_store_redis(type, params):
     # TODO: Docstring with required params.
     from redis import StrictRedis
+    r = StrictRedis(**params)
 
     from minimalkv.memory.redisstore import RedisStore
-
-    r = StrictRedis(**params)
     return RedisStore(r)
 
 

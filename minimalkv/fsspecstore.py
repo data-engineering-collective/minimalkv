@@ -1,12 +1,15 @@
 import io
-from typing import IO, TYPE_CHECKING, Iterator, Optional, Union
+from typing import IO, TYPE_CHECKING, Dict, Iterator, Optional, Union
+
+from uritools import SplitResult
+
+from minimalkv.net._net_common import lazy_property, LAZY_PROPERTY_ATTR_PREFIX
 
 if TYPE_CHECKING:
     from fsspec import AbstractFileSystem
     from fsspec.spec import AbstractBufferedFile
 
 from minimalkv import KeyValueStore
-from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
 
 # The complete path of the key is structured as follows:
 # /Users/simon/data/mykvstore/file1
@@ -177,3 +180,9 @@ class FSSpecStore(KeyValueStore):
             for key, value in self.__dict__.items()
             if not key.startswith(LAZY_PROPERTY_ATTR_PREFIX)
         }
+
+    @classmethod
+    def from_parsed_url(
+        cls, parsed_url: SplitResult, query: Dict[str, str]
+    ) -> "KeyValueStore":
+        raise NotImplementedError

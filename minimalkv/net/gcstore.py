@@ -1,6 +1,9 @@
 import json
 import warnings
-from typing import IO, cast
+from typing import IO, Dict, cast
+
+from google.oauth2.service_account import Credentials
+from uritools import SplitResult
 
 from minimalkv.fsspecstore import FSSpecStore, FSSpecStoreEntry
 
@@ -77,3 +80,61 @@ class GoogleCloudStore(FSSpecStore):
         if self._prefix_exists is False:
             raise NotFound(f"Could not find bucket: {self.bucket_name}")
         return super()._get_file(key, file)
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, GoogleCloudStore)
+            and super().__eq__(other)
+            and self._credentials == other._credentials
+            and self.bucket_name == other.bucket_name
+            and self.create_if_missing == other.create_if_missing
+            and self.bucket_creation_location == other.bucket_creation_location
+            and self.project_name == other.project_name
+        )
+
+    @classmethod
+    def from_parsed_url(
+        cls, parsed_url: SplitResult, query: Dict[str, str]
+    ) -> "GoogleCloudStore":
+        """
+        * ``"gcs"``: Returns a ``minimalkv.net.gcstore.GoogleCloudStore``.  Parameters are
+          ``"credentials"``, ``"bucket_name"``, ``"bucket_creation_location"``, ``"project"`` and ``"create_if_missing"`` (default: ``True``).
+
+          - ``"credentials"``: either the path to a credentials.json file or a *google.auth.credentials.Credentials* object
+          - ``"bucket_name"``: Name of the bucket the blobs are stored in.
+          - ``"project"``: The name of the GCStorage project. If a credentials JSON is passed then it contains the project name
+            and this parameter will be ignored.
+          - ``"create_if_missing"``: [optional] Create new bucket to store blobs in if ``"bucket_name"`` doesn't exist yet. (default: ``True``).
+          - ``"bucket_creation_location"``: [optional] If a new bucket is created (create_if_missing=True), the location it will be created in.
+            If ``None`` then GCloud uses a default location.
+        * ``"hgcs"``: Like ``"gcs"`` but "/" are allowed in the keynames.
+
+        * GoogleCloudStorage: ``gcs://<base64 encoded credentials JSON>@bucket_name[?create_if_missing=true][&bucket_creation_location=EUROPE-WEST1]``
+        """
+
+        params = {"bucket_name": parsed_url.gethost()}
+
+        # Decode credentials
+        credentials = parsed_url.getuserinfo()
+        if credentials is not None:
+            # Get as bytes
+            credentials = credentials.encode()
+            # Decode base64
+            import base64
+
+            credentials = base64.b64decode(credentials)
+            # Load as JSON
+            credentials_dict = json.loads(credentials)
+            credentials = Credentials.from_service_account_info(
+                credentials_dict,
+                scopes=["https://www.googleapis.com/auth/devstorage.read_write"],
+            )
+            params["project"] = credentials_dict["project_id"]
+            params["credentials"] = credentials
+
+        params["create_if_missing"] = (
+            query.get("create_if_missing", "true").lower() == "true"
+        )
+        params["bucket_creation_location"] = query.get("bucket_creation_location", None)
+
+        return cls(**params)

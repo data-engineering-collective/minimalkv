@@ -1,11 +1,30 @@
 from functools import reduce
-from typing import Any
+from typing import Any, Dict, List, Optional, Type
+from warnings import warn
+
+from uritools import SplitResult, urisplit
 
 from minimalkv._key_value_store import KeyValueStore
-from minimalkv._urls import url2dict
+from minimalkv.net.azurestore import AzureBlockBlobStore
+from minimalkv.net.boto3store import Boto3Store
+
+from minimalkv.net.gcstore import GoogleCloudStore
+from minimalkv.fs import FilesystemStore
+from minimalkv.memory import DictStore
+from minimalkv.memory.redisstore import RedisStore
+
+from minimalkv._hstores import (
+    HAzureBlockBlobStore,
+    HBoto3Store,
+    HDictStore,
+    HFilesystemStore,
+    HGoogleCloudStore,
+)
 
 
-def get_store_from_url(url: str) -> KeyValueStore:
+def get_store_from_url(
+    url: str, store_cls: Optional[Type[KeyValueStore]] = None
+) -> KeyValueStore:
     """
     Take a URL and return a minimalkv store according to the parameters in the URL.
 
@@ -13,6 +32,9 @@ def get_store_from_url(url: str) -> KeyValueStore:
     ----------
     url : str
         Access-URL, see below for supported formats.
+    store_cls : Optional[Type[KeyValueStore]]
+        The class of the store to create.
+        If the URL scheme doesn't match the class, a ValueError is raised.
 
     Returns
     -------
@@ -52,7 +74,82 @@ def get_store_from_url(url: str) -> KeyValueStore:
     json_b64_encoded = base64.urlsafe_b64encode(b).decode()
 
     """
-    return get_store(**url2dict(url))
+
+    scheme_to_store: Dict[str, Type[KeyValueStore]] = {
+        "azure": AzureBlockBlobStore,
+        "hazure": HAzureBlockBlobStore,
+        "s3": Boto3Store,
+        "hs3": HBoto3Store,
+        "boto": HBoto3Store,
+        "gcs": GoogleCloudStore,
+        "hgcs": HGoogleCloudStore,
+        "fs": FilesystemStore,
+        "file": FilesystemStore,
+        "hfs": HFilesystemStore,
+        "hfile": HFilesystemStore,
+        "filesystem": HFilesystemStore,
+        "memory": DictStore,
+        "hmemory": HDictStore,
+        "redis": RedisStore,
+    }
+
+    parsed_url = urisplit(url)
+    # Wrappers can be used to add functionality to a store, e.g. encryption.
+    # Wrappers are separated by `+` and can be specified in two ways:
+    # 1. As part of the scheme, e.g. "s3+readonly://..." (old style)
+    # 2. As the fragment, e.g. "s3://...#wrap:readonly" (new style)
+    wrappers = extract_wrappers(parsed_url)
+
+    scheme = parsed_url.getscheme()
+    if scheme not in scheme_to_store:
+        raise ValueError(f'Unknown storage type "{scheme}"')
+
+    store_cls_from_url = scheme_to_store[scheme]
+    if store_cls is not None and store_cls_from_url != store_cls:
+        raise ValueError(
+            f"URL scheme {scheme} does not match store class {store_cls.__name__}"
+        )
+
+    query_listdict: Dict[str, List[str]] = parsed_url.getquerydict()
+    # We will just use the last occurrence for each key
+    query = {k: v[-1] for k, v in query_listdict.items()}
+
+    store = store_cls_from_url.from_parsed_url(parsed_url, query)
+
+    # apply wrappers/decorators:
+    from minimalkv._store_decoration import decorate_store
+
+    wrapped_store = reduce(decorate_store, wrappers, store)
+
+    return wrapped_store
+
+
+def extract_wrappers(parsed_url: SplitResult) -> List[str]:
+    # split off old-style wrappers, if any:
+    parts = parsed_url.getscheme().split("+")
+    # pop off the type of the store
+    parts.pop(-1)
+    old_wrappers = list(reversed(parts))
+
+    # find new-style wrappers, if any:
+    fragment = parsed_url.getfragment()
+    fragments = fragment.split("#") if fragment else []
+    wrap_spec = list(filter(lambda s: s.startswith("wrap:"), fragments))
+    if wrap_spec:
+        fragment_wrappers = wrap_spec[-1].partition("wrap:")[
+            2
+        ]  # remove the 'wrap:' part
+        new_wrappers = list(fragment_wrappers.split("+"))
+    else:
+        new_wrappers = []
+
+    # can't have both:
+    if old_wrappers and new_wrappers:
+        raise ValueError(
+            "Adding store wrappers via store type as well as via wrap parameter are not allowed. Preferably use wrap."
+        )
+
+    return old_wrappers + new_wrappers
 
 
 def get_store(
@@ -83,7 +180,7 @@ def get_store(
          otherwise, try to retrieve the bucket and fail with an ``IOError``.
     * ``"hs3"`` returns a variant of ``minimalkv.net.botostore.BotoStore`` that allows "/" in the key name.
       The parameters are the same as for ``"s3"``
-    * ``"gcs"``: Returns a ``minimalkv.net.gcstore.GoogleCloudStore``.  Parameters are
+    * ``"gcs"``: Returns a ``minimalkv.stores.GoogleCloudStore``.  Parameters are
       ``"credentials"``, ``"bucket_name"``, ``"bucket_creation_location"``, ``"project"`` and ``"create_if_missing"`` (default: ``True``).
 
       - ``"credentials"``: either the path to a credentials.json file or a *google.auth.credentials.Credentials* object
@@ -118,7 +215,15 @@ def get_store(
         Key value store of type ``type`` as described in ``kwargs`` parameters.
 
     """
-    from minimalkv._store_creation import create_store
+    warn(
+        """
+        get_store will be removed in the next major release.
+        If you want to create a KeyValueStore from a URL, use get_store_from_url.
+        """,
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    from minimalkv._old_store_creation import create_store
     from minimalkv._store_decoration import decorate_store
 
     # split off old-style wrappers, if any:

@@ -43,3 +43,10 @@ class DictStore(KeyValueStore, CopyMixin):
 
         """
         return filter(lambda k: k.startswith(prefix), iter(self.d))
+
+    def __eq__(self, other):
+        return self.d == other.d
+
+    @classmethod
+    def from_parsed_url(cls) -> "DictStore":  # noqa D
+        return DictStore()
