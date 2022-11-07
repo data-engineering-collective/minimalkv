@@ -277,6 +277,9 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
         account_name = get_username(parsed_url)
         account_key = get_password(parsed_url)
 
+        if account_key is None or account_name is None:
+            raise ValueError("Missing account name or key in URL")
+
         # Mandatory parameters
         params = {
             "conn_string": _build_conn_string(account_name, account_key, use_sas),

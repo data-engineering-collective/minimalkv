@@ -5,7 +5,7 @@ from bucket_manager import boto_bucket, boto_credentials
 
 
 @pytest.fixture(
-    params=boto_credentials, ids=[c["access_key"] for c in boto_credentials]
+    params=boto_credentials, ids=[c["access_key_id"] for c in boto_credentials]
 )
 def credentials(request):
     return request.param

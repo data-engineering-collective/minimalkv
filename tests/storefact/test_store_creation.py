@@ -77,15 +77,15 @@ def test_create_store_hs3(mocker):
         "hs3",
         {
             "host": "endpoint:1234",
-            "access_key": "access_key",
-            "secret_key": "secret_key",
+            "access_key_id": "access_key",
+            "secret_access_key": "secret_key",
             "bucket": "bucketname",
         },
     )
     mock_hs3.assert_called_once_with(
         host="endpoint:1234",
-        access_key="access_key",
-        secret_key="secret_key",
+        access_key_id="access_key",
+        secret_access_key="secret_key",
         bucket="bucketname",
     )
 
@@ -121,7 +121,7 @@ def test_create_store_hfs(mocker):
 
 
 def test_create_store_fs(mocker):
-    mock_fs = mocker.patch("minimalkv._store_creation.FilesystemStore")
+    mock_fs = mocker.patch("minimalkv._old_store_creation.FilesystemStore")
     mock_makedirs = mocker.patch("os.makedirs")
     create_store(
         "fs",

@@ -6,6 +6,8 @@ from warnings import warn
 if TYPE_CHECKING:
     from minimalkv._key_value_store import KeyValueStore
 
+from minimalkv.fs import FilesystemStore
+
 
 def create_store(type: str, params: Dict[str, Any]) -> "KeyValueStore":
     """Create store of type ``type`` with ``params``."""
@@ -130,7 +132,6 @@ def _create_store_fs(type, params):
     # TODO: Docstring with required params.
     if params["create_if_missing"] and not os.path.exists(params["path"]):
         os.makedirs(params["path"])
-    from minimalkv.fs import FilesystemStore
 
     return FilesystemStore(params["path"])
 
