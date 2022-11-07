@@ -1,5 +1,5 @@
 from functools import reduce
-from typing import Any, Dict, List, Type
+from typing import Any, Dict, List, Optional, Type
 from warnings import warn
 
 from uritools import SplitResult, urisplit
@@ -7,7 +7,9 @@ from uritools import SplitResult, urisplit
 from minimalkv._key_value_store import KeyValueStore
 
 
-def get_store_from_url(url: str) -> KeyValueStore:
+def get_store_from_url(
+    url: str, store_cls: Optional[Type[KeyValueStore]] = None
+) -> KeyValueStore:
     """
     Take a URL and return a minimalkv store according to the parameters in the URL.
 
@@ -15,6 +17,9 @@ def get_store_from_url(url: str) -> KeyValueStore:
     ----------
     url : str
         Access-URL, see below for supported formats.
+    store_cls : Optional[Type[KeyValueStore]]
+        The class of the store to create.
+        If the URL scheme doesn't match the class, a ValueError is raised.
 
     Returns
     -------
@@ -99,13 +104,17 @@ def get_store_from_url(url: str) -> KeyValueStore:
     if scheme not in scheme_to_store:
         raise ValueError(f'Unknown storage type "{scheme}"')
 
-    store_cls = scheme_to_store[scheme]
+    store_cls_from_url = scheme_to_store[scheme]
+    if store_cls is not None and store_cls_from_url != store_cls:
+        raise ValueError(
+            f"URL scheme {scheme} does not match store class {store_cls.__name__}"
+        )
 
     query_listdict: Dict[str, List[str]] = parsed_url.getquerydict()
     # We will just use the last occurrence for each key
     query = {k: v[-1] for k, v in query_listdict.items()}
 
-    store = store_cls.from_parsed_url(parsed_url, query)
+    store = store_cls_from_url.from_parsed_url(parsed_url, query)
 
     # apply wrappers/decorators:
     from minimalkv._store_decoration import decorate_store

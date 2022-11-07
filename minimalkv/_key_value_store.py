@@ -100,7 +100,7 @@ class KeyValueStore:
         implement a specialized function if data needs to be written to disk or streamed.
 
         If ``file`` is a string, contents of ``key`` are written to a newly created file
-        with the filename ``file``. Otherwise the data will be written using the
+        with the filename ``file``. Otherwise, the data will be written using the
         ``write`` method of ``file``.
 
         Parameters
@@ -465,9 +465,42 @@ class KeyValueStore:
         self.close()
 
     @classmethod
+    def from_url(cls, url: str) -> "KeyValueStore":
+        """Create a Store from a URL.
+
+        Parameters
+        ----------
+        url : str
+            URL to create store from.
+
+        Returns
+        -------
+        store : KeyValueStore
+            Store created from URL.
+        """
+        from minimalkv import get_store_from_url
+
+        return get_store_from_url(url, store_cls=cls)
+
+    @classmethod
     def from_parsed_url(
         cls, parsed_url: SplitResult, query: Dict[str, str]
     ) -> "KeyValueStore":
+        """
+        Build an KeyValueStore from a parsed URL.
+
+        Parameters
+        ----------
+        parsed_url: SplitResult
+            The parsed URL.
+        query: Dict[str, str]
+            Query parameters from the URL.
+
+        Returns
+        -------
+        store : KeyValueStore
+            The created KeyValueStore.
+        """
         raise NotImplementedError
 
 

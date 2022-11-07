@@ -38,7 +38,6 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
         max_block_size=None,
         max_single_put_size=None,
         checksum=False,
-        socket_timeout=None,
     ):
         from azure.storage.blob import BlobServiceClient, ContainerClient
 
@@ -107,7 +106,6 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
         with map_azure_exceptions(key, ("BlobNotFound",)):
             blob_client.get_blob_properties()
             return True
-        return False
 
     def iter_keys(self, prefix=None):  # noqa D
         with map_azure_exceptions():
@@ -206,42 +204,72 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
         )
 
     @classmethod
+    def from_url(cls, url: str) -> "AzureBlockBlobStore":
+        """
+        Create an AzureBlockBlobStore from a URL.
+
+        URl format:
+        ``azure://<account_name>:<account_key>@<container_name>[?<query_args>]``
+
+        **Positional arguments**:
+
+        ``account_name``: The name of the Azure storage account
+
+        ``account_key``: The access key or SAS token of the Azure storage account
+
+        ``container_name``: The name of the container to use
+
+        **Query arguments**:
+
+        ``use_sas``: Use the ``account_key`` as a shared access signature (SAS) token (default: ``False``)
+
+        ``create_if_missing``: Create the container if it does not exist.
+        Has to be ``False`` if ``use_sas`` is set (default: ``True``)
+
+        ``max_connections``: The maximum number of parallel connections to use when uploading
+        or downloading blobs (default: ``2``)
+
+        ``max_single_put_size``: max_single_put_size is the largest size upload supported in a single put call
+
+        ``max_block_size``: maximum block size is maximum size of the blocks (maximum size is <= 100MB)
+
+        Parameters
+        ----------
+        url
+            URL to create store from.
+
+        Returns
+        -------
+        store
+            AzureBlockBlobStore created from URL.
+        """
+        from minimalkv import get_store_from_url
+
+        store = get_store_from_url(url, store_cls=cls)
+        if not isinstance(store, cls):
+            raise ValueError(f"Expected {cls}, got {type(store)}")
+        return store
+
+    @classmethod
     def from_parsed_url(
-        cls, parsed_url: SplitResult, query: Dict[str, str], use_hstore: bool = False
+        cls, parsed_url: SplitResult, query: Dict[str, str]
     ) -> "AzureBlockBlobStore":
         """
         Build an AzureBlockBlobStore from a parsed URL.
 
-        ``"azure"``: Returns a ``minimalkv.azure.AzureBlockBlobStorage``. Parameters are
-            ``"account_name"``, ``"account_key"``, ``"container"``, ``"use_sas"`` and ``"create_if_missing"`` (default: ``True``).
-            ``"create_if_missing"`` has to be ``False`` if ``"use_sas"`` is set. When ``"use_sas"`` is set,
-            ``"account_key"`` is interpreted as Shared Access Signature (SAS) token.FIRE
-            ``"max_connections"``: Maximum number of network connections used by one store (default: ``2``).
-            ``"socket_timeout"``: maximum timeout value in seconds (socket_timeout: ``200``).
-            ``"max_single_put_size"``: max_single_put_size is the largest size upload supported in a single put call.
-            ``"max_block_size"``: maximum block size is maximum size of the blocks(maximum size is <= 100MB)
+        See :func:`from_url` for details on the expected format of the URL.
 
-        account_name, account_key = _parse_userinfo(userinfo)
-        params = {
-            "account_name": account_name,
-            "account_key": account_key,
-            "container": host,
-        }
-        if "use_sas" in query:
-            params["use_sas"] = True
-        if "max_connections" in query:
-            params["max_connections"] = int(query.pop("max_connections")[-1])
-        if "socket_timeout" in query:
-            params["socket_timeout"] = query.pop("socket_timeout")
-        if "max_block_size" in query:
-            params["max_block_size"] = query.pop("max_block_size")
-        if "max_single_put_size" in query:
-            params["max_single_put_size"] = query.pop("max_single_put_size")
-        return params
+        Parameters
+        ----------
+        parsed_url: SplitResult
+            The parsed URL.
+        query: Dict[str, str]
+            Query parameters from the URL.
 
-        * AzureBlockBlockStorage: ``azure://account_name:account_key@container[?create_if_missing=true]``
-        * AzureBlockBlockStorage (SAS): ``azure://account_name:shared_access_signature@container?use_sas&create_if_missing=false``
-
+        Returns
+        -------
+        store : KeyValueStore
+            The created KeyValueStore.
         """
         use_sas = query.pop("use_sas", False)
         from minimalkv.url_utils import get_password, get_username
