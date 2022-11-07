@@ -1,4 +1,5 @@
 import pytest
+from bucket_manager import boto3_bucket_resource
 
 from minimalkv._get_store import get_store, get_store_from_url
 from minimalkv.decorator import ReadOnlyDecorator
@@ -6,8 +7,6 @@ from minimalkv.fs import FilesystemStore
 from minimalkv.memory import DictStore
 from minimalkv.net.azurestore import AzureBlockBlobStore
 from minimalkv.net.boto3store import Boto3Store
-
-from ..bucket_manager import boto3_bucket_resource
 
 good_urls = [
     (
