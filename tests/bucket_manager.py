@@ -10,8 +10,8 @@ boto = pytest.importorskip("boto")
 
 @contextmanager
 def boto_bucket(
-    access_key,
-    secret_key,
+    access_key_id,
+    secret_access_key,
     host,
     connect_func="connect_s3",
     ordinary_calling_format=False,
@@ -23,8 +23,8 @@ def boto_bucket(
         from boto.s3.connection import OrdinaryCallingFormat
 
         conn = getattr(boto, connect_func)(
-            access_key,
-            secret_key,
+            access_key_id,
+            secret_access_key,
             host=host,
             calling_format=OrdinaryCallingFormat(),
             port=port,
@@ -32,7 +32,7 @@ def boto_bucket(
         )
     else:
         conn = getattr(boto, connect_func)(
-            access_key, secret_key, host=host, port=port, is_secure=is_secure
+            access_key_id, secret_access_key, host=host, port=port, is_secure=is_secure
         )
 
     name = bucket_name or f"testrun-bucket-{uuid()}"

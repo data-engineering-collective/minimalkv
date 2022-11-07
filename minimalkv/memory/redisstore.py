@@ -122,4 +122,9 @@ class RedisStore(TimeToLiveMixin, KeyValueStore):
             params["db"] = int(path)
         return params
         """
-        pass
+        if parsed_url.getscheme() == "hredis":
+            from minimalkv._hstores import HRedisStore
+
+            return HRedisStore()
+        else:
+            return RedisStore()
