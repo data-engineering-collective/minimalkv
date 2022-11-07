@@ -4,20 +4,7 @@ from warnings import warn
 
 from uritools import SplitResult, urisplit
 
-from minimalkv._hstores import (
-    HAzureBlockBlobStore,
-    HBoto3Store,
-    HDictStore,
-    HFilesystemStore,
-    HGoogleCloudStore,
-)
 from minimalkv._key_value_store import KeyValueStore
-from minimalkv.fs import FilesystemStore
-from minimalkv.memory import DictStore
-from minimalkv.memory.redisstore import RedisStore
-from minimalkv.net.azurestore import AzureBlockBlobStore
-from minimalkv.net.boto3store import Boto3Store
-from minimalkv.net.gcstore import GoogleCloudStore
 
 
 def get_store_from_url(
@@ -72,6 +59,19 @@ def get_store_from_url(
     json_b64_encoded = base64.urlsafe_b64encode(b).decode()
 
     """
+    from minimalkv._hstores import (
+        HAzureBlockBlobStore,
+        HBoto3Store,
+        HDictStore,
+        HFilesystemStore,
+        HGoogleCloudStore,
+    )
+    from minimalkv.fs import FilesystemStore
+    from minimalkv.memory import DictStore
+    from minimalkv.memory.redisstore import RedisStore
+    from minimalkv.net.azurestore import AzureBlockBlobStore
+    from minimalkv.net.boto3store import Boto3Store
+    from minimalkv.net.gcstore import GoogleCloudStore
 
     scheme_to_store: Dict[str, Type[KeyValueStore]] = {
         "azure": AzureBlockBlobStore,
