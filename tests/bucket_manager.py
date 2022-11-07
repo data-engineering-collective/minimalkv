@@ -53,6 +53,7 @@ def boto3_bucket(
     bucket_name=None,
     port=None,
     is_secure=None,
+    **kwargs,
 ):
     # Credentials where previously set in the environment.
     # We now set them via boto3.
@@ -129,8 +130,8 @@ def load_boto_credentials():
 
     for section in parser.sections():
         yield {
-            "access_key": parser.get(section, "access_key"),
-            "secret_key": parser.get(section, "secret_key"),
+            "access_key_id": parser.get(section, "access_key"),
+            "secret_access_key": parser.get(section, "secret_key"),
             "connect_func": parser.get(section, "connect_func"),
             "host": parser.get(section, "host"),
             "is_secure": parser.getboolean(section, "is_secure"),
