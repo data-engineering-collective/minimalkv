@@ -74,5 +74,5 @@ class S3FSStore(FSSpecStore, UrlMixin, CopyMixin):  # noqa D
 
     def _url_for(self, key) -> str:
         return self._fs.url(
-            f"{self.bucket.name}/{self.prefix}{key}", expires=self.url_valid_time
+            f"{self.bucket.name}/{self.object_prefix}{key}", expires=self.url_valid_time
         )
