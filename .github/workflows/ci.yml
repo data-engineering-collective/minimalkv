@@ -37,7 +37,7 @@ jobs:
         with:
           workload_identity_provider: 'projects/498651197656/locations/global/workloadIdentityPools/qc-minimalkv-gh-actions-pool/providers/github-actions-provider'
           service_account: 'sa-github-actions@qc-minimalkv.iam.gserviceaccount.com'
-          token_format: 'access_token'
+          token_format: 'id_token'
           create_credentials_file: true
       - name: Test variable equality
         run: |
