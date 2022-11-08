@@ -2,7 +2,7 @@ import json
 import warnings
 from typing import IO, Dict, cast
 
-from google.oauth2.service_account import Credentials
+from google.oauth2.service_account import Credentials, IDTokenCredentials
 from uritools import SplitResult
 
 from minimalkv.fsspecstore import FSSpecStore, FSSpecStoreEntry
@@ -184,10 +184,17 @@ class GoogleCloudStore(FSSpecStore):
             credentials = base64.urlsafe_b64decode(credentials)
             # Load as JSON
             credentials_dict = json.loads(credentials)
-            credentials = Credentials.from_service_account_info(
-                credentials_dict,
-                scopes=["https://www.googleapis.com/auth/devstorage.read_write"],
-            )
+            try:
+                credentials = Credentials.from_service_account_info(
+                    credentials_dict,
+                    scopes=["https://www.googleapis.com/auth/devstorage.read_write"],
+                )
+            except ValueError:
+                print("Moooooooiiiiinnnnnn")
+                credentials = IDTokenCredentials.from_service_account_info(
+                    credentials_dict,
+                    scopes=["https://www.googleapis.com/auth/devstorage.read_write"],
+                )
             params["project"] = credentials_dict["project_id"]
             params["credentials"] = credentials
 
