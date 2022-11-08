@@ -370,9 +370,4 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
 
         create_if_missing = query.get("create_if_missing", "true").lower() == "true"
 
-        if parsed_url.getscheme() == "hs3":
-            from minimalkv._hstores import HBoto3Store
-
-            return HBoto3Store(bucket, create_if_missing=create_if_missing)
-        else:
-            return Boto3Store(bucket, create_if_missing=create_if_missing)
+        return cls(bucket, create_if_missing=create_if_missing)

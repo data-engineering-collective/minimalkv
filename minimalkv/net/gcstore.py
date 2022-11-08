@@ -93,23 +93,82 @@ class GoogleCloudStore(FSSpecStore):
         )
 
     @classmethod
+    def from_url(cls, url: str) -> "GoogleCloudStore":
+        """
+        Create a ``GoogleCloudStore`` from a URL.
+
+        URl format:
+        ``gcs://credentials@bucket_name[?<query_args>]``
+
+        **Positional arguments:**
+
+        ``credentials``: A service account JSON object encoded as base64.
+        See here_ for how to obtain such a JSON object.
+
+        Get the encoded credentials as a string like this::
+
+            from pathlib import Path
+            import base64
+            json_as_bytes = Path(<path_to_json>).read_bytes()
+            json_b64_encoded = base64.urlsafe_b64encode(json_as_bytes).decode()
+
+        ``bucket_name``: Name of the bucket the blobs are stored in.
+
+        **Query arguments**:
+
+        ``project``: The name of the GCStorage project. If a credentials JSON is passed then it contains the project name
+        and this parameter will be ignored.
+
+        ``create_if_missing``: [optional] Create new bucket to store blobs in if ``bucket_name`` doesn't exist yet.
+        (default: ``True``).
+
+        ``bucket_creation_location``: [optional] If a new bucket is created (``create_if_missing=True``),
+        the location it will be created in.
+        If ``None`` then GCloud uses a default location.
+
+        **Notes**:
+
+        If the scheme is ``hgcs``, an ``HGoogleCloudStore`` is returned which allows ``/`` in key names.
+
+        .. _here: https://cloud.google.com/iam/docs/creating-managing-service-account-keys
+
+        Parameters
+        ----------
+        url
+            URL to create store from.
+
+        Returns
+        -------
+        store
+            GoogleCloudStore created from URL.
+        """
+        from minimalkv import get_store_from_url
+
+        store = get_store_from_url(url, store_cls=cls)
+        if not isinstance(store, cls):
+            raise ValueError(f"Expected {cls}, got {type(store)}")
+        return store
+
+    @classmethod
     def from_parsed_url(
         cls, parsed_url: SplitResult, query: Dict[str, str]
     ) -> "GoogleCloudStore":
         """
-        * ``"gcs"``: Returns a ``minimalkv.net.gcstore.GoogleCloudStore``.  Parameters are
-          ``"credentials"``, ``"bucket_name"``, ``"bucket_creation_location"``, ``"project"`` and ``"create_if_missing"`` (default: ``True``).
+        Build a GoogleCloudStore from a parsed URL.
 
-          - ``"credentials"``: either the path to a credentials.json file or a *google.auth.credentials.Credentials* object
-          - ``"bucket_name"``: Name of the bucket the blobs are stored in.
-          - ``"project"``: The name of the GCStorage project. If a credentials JSON is passed then it contains the project name
-            and this parameter will be ignored.
-          - ``"create_if_missing"``: [optional] Create new bucket to store blobs in if ``"bucket_name"`` doesn't exist yet. (default: ``True``).
-          - ``"bucket_creation_location"``: [optional] If a new bucket is created (create_if_missing=True), the location it will be created in.
-            If ``None`` then GCloud uses a default location.
-        * ``"hgcs"``: Like ``"gcs"`` but "/" are allowed in the keynames.
+        See :func:`from_url` for details on the expected format of the URL.
 
-        * GoogleCloudStorage: ``gcs://<base64 encoded credentials JSON>@bucket_name[?create_if_missing=true][&bucket_creation_location=EUROPE-WEST1]``
+        Parameters
+        ----------
+        parsed_url: SplitResult
+            The parsed URL.
+        query: Dict[str, str]
+            Query parameters from the URL.
+
+        Returns
+        -------
+        store : GoogleCloudStore
+            The created GoogleCloudStore.
         """
 
         params = {"bucket_name": parsed_url.gethost()}

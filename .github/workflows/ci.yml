@@ -26,6 +26,16 @@ jobs:
           use-mamba: true
           python-version: ${{ matrix.PYTHON_VERSION }}
           environment-file: environment.yml
+      # The CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE variable holds the path to the
+      # service account key file. See here: https://github.com/google-github-actions/auth#other-inputs
+      - id: google_auth
+        name: 'Authenticate to Google Cloud'
+        uses: google-github-actions/auth@v0.4.0
+        with:
+          workload_identity_provider: 'projects/498651197656/locations/global/workloadIdentityPools/qc-minimalkv-gh-actions-pool/providers/github-actions-provider'
+          service_account: 'sa-github-actions@qc-minimalkv.iam.gserviceaccount.com'
+          token_format: 'access_token'
+          create_credentials_file: true
       - name: Run the unittests
         shell: bash -x -l {0}
         run: |
@@ -33,7 +43,7 @@ jobs:
           docker-compose up -d
           while ! docker exec mysql mysqladmin status -h 127.0.0.1 -u minimalkv_test --password=minimalkv_test; \
             do sleep 3; done
-          pytest -n auto --dist loadfile -rs --cov=minimalkv --cov-report=xml
+          pytest -n auto --dist loadfile -rs --cov=minimalkv --cov-report=xml -k test_gcstore_live_from_url
           python -m build
       - name: Publish package
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags') && matrix.PYTHON_VERSION == '3.10'

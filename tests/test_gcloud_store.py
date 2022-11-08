@@ -51,6 +51,30 @@ def gc_credentials():
         del os.environ["STORAGE_EMULATOR_HOST"]
 
 
+@pytest.fixture(scope="module")
+def gc_live_credentials_base64():
+    import base64
+    from pathlib import Path
+
+    path = os.environ.get("CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE")
+    if path is None:
+        pytest.skip("No credentials found")
+        return
+
+    json_as_bytes = Path(path).read_bytes()
+    json_b64_encoded = base64.urlsafe_b64encode(json_as_bytes).decode()
+    return json_b64_encoded
+
+
+def test_gcstore_live_from_url(gc_live_credentials_base64):
+    url = f"gcs://{gc_live_credentials_base64}@my-gcs-bucket1823785929?create_if_missing=true&bucket_creation_location=EUROPE-WEST1"
+    from minimalkv import get_store_from_url
+
+    store = get_store_from_url(url)
+    store.put("foo", b"bar")
+    assert store.get("foo") == b"bar"
+
+
 def try_delete_bucket(bucket):
     # normally here we should delete the bucket
     # however the emulator (fake-gcs-server) doesn't currently support bucket deletion.
