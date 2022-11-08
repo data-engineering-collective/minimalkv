@@ -207,7 +207,7 @@ class GoogleCloudStore(FSSpecStore):
                 params["project"] = credentials_dict["project_id"]
             params["credentials"] = credentials_dict
 
-        credentials, project = google.auth.default(scopes=["https://www.googleapis.com/auth/devstorage.read_write"])
+        credentials, project = google.auth.default()
         # credentials = identity_pool.Credentials.from_info(credentials_dict)
         params["credentials"] = credentials
 
