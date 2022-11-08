@@ -1,9 +1,11 @@
 import json
 import os
 import warnings
-from typing import IO, Dict, cast, Union, Optional
+from typing import IO, Dict, Optional, Union, cast
 
-from google.oauth2.service_account import Credentials, IDTokenCredentials
+import google.oauth2.id_token
+from google.auth import identity_pool
+from google.oauth2 import service_account
 from uritools import SplitResult
 
 from minimalkv.fsspecstore import FSSpecStore, FSSpecStoreEntry
@@ -25,7 +27,7 @@ class GoogleCloudStore(FSSpecStore):
     def __init__(
         self,
         bucket_name: str,
-        credentials: Optional[Union[str, dict, Credentials]] = None,
+        credentials: Optional[Union[str, dict]] = None,
         create_if_missing: bool = True,
         bucket_creation_location: str = "EUROPE-WEST3",
         project=None,
@@ -205,13 +207,16 @@ class GoogleCloudStore(FSSpecStore):
                 params["project"] = credentials_dict["project_id"]
             params["credentials"] = credentials_dict
 
+            credentials = identity_pool.Credentials.from_info(credentials_dict)
+            params["credentials"] = credentials
+
         if "project" not in params:
             params["project"] = (
-                os.environ.get("CLOUDSDK_PROJECT") or
-                os.environ.get("CLOUDSDK_CORE_PROJECT") or
-                os.environ.get("GCP_PROJECT") or
-                os.environ.get("GCLOUD_PROJECT") or
-                os.environ.get("GOOGLE_CLOUD_PROJECT")
+                os.environ.get("CLOUDSDK_PROJECT")
+                or os.environ.get("CLOUDSDK_CORE_PROJECT")
+                or os.environ.get("GCP_PROJECT")
+                or os.environ.get("GCLOUD_PROJECT")
+                or os.environ.get("GOOGLE_CLOUD_PROJECT")
             )
 
         params["create_if_missing"] = (
