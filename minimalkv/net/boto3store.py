@@ -247,24 +247,74 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
         )
 
     @classmethod
+    def from_url(cls, url: str) -> "Boto3Store":
+        """
+        Create a ``Boto3Store`` from a URL.
+
+        URl format:
+        ``s3://access_key_id:secret_access_key@endpoint/bucket[?<query_args>]``
+
+        **Positional arguments**:
+
+        ``access_key_id``: The access key ID of the S3 user.
+
+        ``secret_access_key``: The secret access key of the S3 user.
+
+        ``endpoint``: The endpoint of the S3 service. Leave empty for standard AWS.
+
+        ``bucket``: The name of the bucket.
+
+        **Query arguments**:
+
+        ``force_bucket_suffix`` (default: ``True``): If set, it is ensured that
+         the bucket name ends with ``-<access_key>``
+         by appending this string if necessary.
+         If ``False``, the bucket name is used as-is.
+
+        ``create_if_missing`` (default: ``True`` ): If set, creates the bucket if it does not exist;
+         otherwise, try to retrieve the bucket and fail with an ``IOError``.
+
+        **Notes**:
+
+        If the scheme is ``hs3``, an ``HBoto3Store`` is returned which allows ``/`` in key names.
+
+        Parameters
+        ----------
+        url
+            URL to create store from.
+
+        Returns
+        -------
+        store
+            Boto3Store created from URL.
+        """
+        from minimalkv import get_store_from_url
+
+        store = get_store_from_url(url, store_cls=cls)
+        if not isinstance(store, cls):
+            raise ValueError(f"Expected {cls}, got {type(store)}")
+        return store
+
+    @classmethod
     def from_parsed_url(
         cls, parsed_url: SplitResult, query: Dict[str, str]
     ) -> "Boto3Store":  # noqa D
         """
-        Create a Boto3Store from a parsed URL.
+        Build a Boto3Store from a parsed URL.
 
-        URL Format:
-        ``s3://access_key_id:secret_access_key@endpoint/bucket``
+        See :func:`from_url` for details on the expected format of the URL.
 
-        Optional query parameters are:
-        - ``"force_bucket_suffix"`` (default: ``True``). If set, it is ensured that
-         the bucket name ends with ``-<access_key>``
-         by appending this string if necessary;
-         If ``False``, the bucket name is used as-is.
-        - ``"create_if_missing"`` (default: ``True`` ). If set, creates the bucket if it does not exist;
-         otherwise, try to retrieve the bucket and fail with an ``IOError``.
+        Parameters
+        ----------
+        parsed_url: SplitResult
+            The parsed URL.
+        query: Dict[str, str]
+            Query parameters from the URL.
 
-        If the scheme is `"hs3"``, an ``HBoto3Store`` is returned which allows "/" in key names.
+        Returns
+        -------
+        store : Boto3Store
+            The created Boto3Store.
         """
 
         url_access_key_id = get_username(parsed_url)

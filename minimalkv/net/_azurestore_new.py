@@ -206,7 +206,7 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
     @classmethod
     def from_url(cls, url: str) -> "AzureBlockBlobStore":
         """
-        Create an AzureBlockBlobStore from a URL.
+        Create an ``AzureBlockBlobStore`` from a URL.
 
         URl format:
         ``azure://<account_name>:<account_key>@<container_name>[?<query_args>]``
@@ -232,6 +232,11 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
         ``max_single_put_size``: max_single_put_size is the largest size upload supported in a single put call
 
         ``max_block_size``: maximum block size is maximum size of the blocks (maximum size is <= 100MB)
+
+        **Notes**:
+
+        If the ``hazure`` scheme is used, an ``HAzureBlockBlobStore`` will be created.
+        It supports ``/`` as part of object keys.
 
         Parameters
         ----------
@@ -268,8 +273,8 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
 
         Returns
         -------
-        store : KeyValueStore
-            The created KeyValueStore.
+        store : AzureBlockBlobStore
+            The created AzureBlockBlobStore.
         """
         use_sas = query.pop("use_sas", False)
         from minimalkv.url_utils import get_password, get_username

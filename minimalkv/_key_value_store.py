@@ -480,7 +480,10 @@ class KeyValueStore:
         """
         from minimalkv import get_store_from_url
 
-        return get_store_from_url(url, store_cls=cls)
+        store = get_store_from_url(url, store_cls=cls)
+        if not isinstance(store, cls):
+            raise ValueError(f"Expected {cls}, got {type(store)}")
+        return store
 
     @classmethod
     def from_parsed_url(
