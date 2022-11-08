@@ -23,6 +23,8 @@ jobs:
       SIMPLEKV_CI: 1
     steps:
       - uses: actions/checkout@v2
+      - name: Show URL
+        run: echo ${ACTIONS_ID_TOKEN_REQUEST_URL}
       - uses: conda-incubator/setup-miniconda@v2
         with:
           miniforge-variant: Mambaforge
@@ -31,8 +33,6 @@ jobs:
           environment-file: environment.yml
       # The CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE variable holds the path to the
       # service account key file. See here: https://github.com/google-github-actions/auth#other-inputs
-      - name: Show URL
-        run: echo ${ACTIONS_ID_TOKEN_REQUEST_URL}
       - id: google_auth
         name: 'Authenticate to Google Cloud'
         uses: google-github-actions/auth@v0.4.0
