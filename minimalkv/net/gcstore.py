@@ -1,6 +1,7 @@
 import json
+import os
 import warnings
-from typing import IO, Dict, cast
+from typing import IO, Dict, cast, Union, Optional
 
 from google.oauth2.service_account import Credentials, IDTokenCredentials
 from uritools import SplitResult
@@ -23,8 +24,8 @@ class GoogleCloudStore(FSSpecStore):
 
     def __init__(
         self,
-        credentials,
         bucket_name: str,
+        credentials: Optional[Union[str, dict, Credentials]] = None,
         create_if_missing: bool = True,
         bucket_creation_location: str = "EUROPE-WEST3",
         project=None,
@@ -174,6 +175,9 @@ class GoogleCloudStore(FSSpecStore):
 
         params = {"bucket_name": parsed_url.gethost()}
 
+        if "project" in query:
+            params["project"] = query["project"]
+
         # Decode credentials
         credentials = parsed_url.getuserinfo()
         if credentials is not None:
@@ -196,8 +200,19 @@ class GoogleCloudStore(FSSpecStore):
             #         credentials_dict,
             #         scopes=["https://www.googleapis.com/auth/devstorage.read_write"],
             #     )
-            params["project"] = credentials_dict["project_id"]
+
+            if "project_id" in credentials_dict:
+                params["project"] = credentials_dict["project_id"]
             params["credentials"] = credentials_dict
+
+        if "project" not in params:
+            params["project"] = (
+                os.environ.get("CLOUDSDK_PROJECT") or
+                os.environ.get("CLOUDSDK_CORE_PROJECT") or
+                os.environ.get("GCP_PROJECT") or
+                os.environ.get("GCLOUD_PROJECT") or
+                os.environ.get("GOOGLE_CLOUD_PROJECT")
+            )
 
         params["create_if_missing"] = (
             query.get("create_if_missing", "true").lower() == "true"
