@@ -207,8 +207,9 @@ class GoogleCloudStore(FSSpecStore):
                 params["project"] = credentials_dict["project_id"]
             params["credentials"] = credentials_dict
 
-            credentials = identity_pool.Credentials.from_info(credentials_dict)
-            params["credentials"] = credentials
+        credentials, project = google.auth.default()
+        # credentials = identity_pool.Credentials.from_info(credentials_dict)
+        params["credentials"] = credentials
 
         if "project" not in params:
             params["project"] = (
