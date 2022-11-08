@@ -36,6 +36,7 @@ class GoogleCloudStore(FSSpecStore):
                 with open(credentials) as f:
                     credentials_dict = json.load(f)
                     project = project or credentials_dict["project_id"]
+                credentials = credentials_dict
             except (FileNotFoundError, json.JSONDecodeError, KeyError) as error:
                 warnings.warn(
                     f"""
@@ -184,19 +185,19 @@ class GoogleCloudStore(FSSpecStore):
             credentials = base64.urlsafe_b64decode(credentials)
             # Load as JSON
             credentials_dict = json.loads(credentials)
-            try:
-                credentials = Credentials.from_service_account_info(
-                    credentials_dict,
-                    scopes=["https://www.googleapis.com/auth/devstorage.read_write"],
-                )
-            except ValueError:
-                print("Moooooooiiiiinnnnnn")
-                credentials = IDTokenCredentials.from_service_account_info(
-                    credentials_dict,
-                    scopes=["https://www.googleapis.com/auth/devstorage.read_write"],
-                )
+            # try:
+            #     credentials = Credentials.from_service_account_info(
+            #         credentials_dict,
+            #         scopes=["https://www.googleapis.com/auth/devstorage.read_write"],
+            #     )
+            # except ValueError:
+            #     print("Moooooooiiiiinnnnnn")
+            #     credentials = IDTokenCredentials.from_service_account_info(
+            #         credentials_dict,
+            #         scopes=["https://www.googleapis.com/auth/devstorage.read_write"],
+            #     )
             params["project"] = credentials_dict["project_id"]
-            params["credentials"] = credentials
+            params["credentials"] = credentials_dict
 
         params["create_if_missing"] = (
             query.get("create_if_missing", "true").lower() == "true"
