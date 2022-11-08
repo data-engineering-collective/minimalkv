@@ -181,7 +181,7 @@ class GoogleCloudStore(FSSpecStore):
             # Decode base64
             import base64
 
-            credentials = base64.b64decode(credentials)
+            credentials = base64.urlsafe_b64decode(credentials)
             # Load as JSON
             credentials_dict = json.loads(credentials)
             credentials = Credentials.from_service_account_info(
