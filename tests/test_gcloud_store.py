@@ -56,8 +56,9 @@ def gc_live_credentials_base64():
     import base64
     from pathlib import Path
 
-    path = os.environ.get("CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE")
+    path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
     if path is None:
+        # path = "/Users/simon/code/minimalkv/nice-road-330220-167c4b1bbd12.json"
         pytest.skip("No credentials found")
         return
 

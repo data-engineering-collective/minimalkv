@@ -23,8 +23,6 @@ jobs:
       SIMPLEKV_CI: 1
     steps:
       - uses: actions/checkout@v2
-      - name: Show URL
-        run: echo ${ACTIONS_ID_TOKEN_REQUEST_URL}
       - uses: conda-incubator/setup-miniconda@v2
         with:
           miniforge-variant: Mambaforge
@@ -41,6 +39,13 @@ jobs:
           service_account: 'sa-github-actions@qc-minimalkv.iam.gserviceaccount.com'
           token_format: 'access_token'
           create_credentials_file: true
+      - name: Test variable equality
+        run: |
+          if [ "${GOOGLE_APPLICATION_CREDENTIALS}" == "${CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE}" ]; then
+            echo "GOOGLE_APPLICATION_CREDENTIALS and CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE are equal"
+          else
+            echo "GOOGLE_APPLICATION_CREDENTIALS and CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE are not equal"
+          fi
       - name: Run the unittests
         shell: bash -x -l {0}
         run: |
