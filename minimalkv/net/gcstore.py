@@ -86,8 +86,7 @@ class GoogleCloudStore(FSSpecStore):
         """Assert that two stores are equal."""
         return (
             isinstance(other, GoogleCloudStore)
-            and super().__eq__(other)
-            and self._credentials == other._credentials
+            and isinstance(self._credentials, other._credentials.__class__)
             and self.bucket_name == other.bucket_name
             and self.create_if_missing == other.create_if_missing
             and self.bucket_creation_location == other.bucket_creation_location
@@ -214,6 +213,8 @@ class GoogleCloudStore(FSSpecStore):
         params["create_if_missing"] = (
             query.get("create_if_missing", "true").lower() == "true"
         )
-        params["bucket_creation_location"] = query.get("bucket_creation_location", None)
+
+        if "bucket_creation_location" in query:
+            params["bucket_creation_location"] = query["bucket_creation_location"]
 
         return cls(**params)

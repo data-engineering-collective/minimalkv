@@ -4,7 +4,7 @@ import pathlib
 
 import pytest
 
-from minimalkv._get_store import get_store_from_url
+from minimalkv._get_store import get_store, get_store_from_url
 from minimalkv._old_store_creation import create_store
 from minimalkv._old_urls import url2dict
 from minimalkv.net.gcstore import GoogleCloudStore
@@ -70,12 +70,12 @@ SHORT_URL = (
     },
 )
 ACTUAL_URL = (
-    f"gcs://{base64.urlsafe_b64encode(pathlib.Path('tests/storefact/gcstore_cred_example.json').read_bytes()).decode()}"
+    f"gcs://{base64.urlsafe_b64encode(pathlib.Path('tests/store_creation/gcstore_cred_example.json').read_bytes()).decode()}"
     f"@default_bucket?create_if_missing=false",
     {
         "type": "gcs",
         "credentials": pathlib.Path(
-            "tests/storefact/gcstore_cred_example.json"
+            "tests/store_creation/gcstore_cred_example.json"
         ).read_bytes(),
         "bucket_name": "default_bucket",
         "create_if_missing": False,
@@ -91,7 +91,7 @@ def test_url2dict(url, expected):
 def test_json_decode():
     url, _ = ACTUAL_URL
     creds = url2dict(url)["credentials"]
-    with open("tests/storefact/gcstore_cred_example.json") as file:
+    with open("tests/store_creation/gcstore_cred_example.json") as file:
         assert json.loads(creds) == json.load(file)
 
 
@@ -103,3 +103,19 @@ def test_complete():
     assert store.project_name == "central-splice-296415"  # type: ignore
     with pytest.raises(RefreshError):
         store.get("somekey")
+
+
+def test_compare_store_from_url():
+    url, _ = ACTUAL_URL
+    new_store = get_store_from_url(url)
+    old_store = get_store(**url2dict(url))
+
+    from unittest.mock import patch
+
+    from minimalkv.fsspecstore import FSSpecStore
+
+    # pytest tries to check whether the stores are iterable,
+    # which requires connecting to GCS, which is not possible.
+    # Thus we mock iter_keys and say that the stores are not iterable.
+    with patch.object(FSSpecStore, "iter_keys", side_effect=NotImplementedError):
+        assert new_store == old_store
