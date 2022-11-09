@@ -68,7 +68,7 @@ class GoogleCloudStore(FSSpecStore):
 
         return GCSFileSystem(
             project=self.project_name,
-            token=path, #self._credentials,
+            token="google_default", #path, #self._credentials,
             access="read_write",
             default_location=self.bucket_creation_location,
         )
