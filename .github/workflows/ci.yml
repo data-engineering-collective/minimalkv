@@ -36,14 +36,6 @@ jobs:
           workload_identity_provider: 'projects/498651197656/locations/global/workloadIdentityPools/qc-minimalkv-gh-actions-pool/providers/github-actions-provider'
           service_account: 'sa-github-actions@qc-minimalkv.iam.gserviceaccount.com'
           token_format: 'access_token'
-#          id_token_audience: "https://iam.googleapis.com/projects/498651197656/locations/global/workloadIdentityPools/qc-minimalkv-gh-actions-pool/providers/github-actions-provider"
-#      - name: Test variable equality
-#        run: |
-#          if [ "${GOOGLE_APPLICATION_CREDENTIALS}" == "${CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE}" ]; then
-#            echo "GOOGLE_APPLICATION_CREDENTIALS and CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE are equal"
-#          else
-#            echo "GOOGLE_APPLICATION_CREDENTIALS and CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE are not equal"
-#          fi
       - name: Run the unittests
         shell: bash -x -l {0}
         run: |
@@ -52,7 +44,6 @@ jobs:
           while ! docker exec mysql mysqladmin status -h 127.0.0.1 -u minimalkv_test --password=minimalkv_test; \
             do sleep 3; done
           pytest -n auto --dist loadfile -rs --cov=minimalkv --cov-report=xml
-#          -k test_gcstore_live_from_url
           python -m build
       - name: Publish package
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags') && matrix.PYTHON_VERSION == '3.10'
