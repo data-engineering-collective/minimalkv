@@ -64,9 +64,11 @@ class GoogleCloudStore(FSSpecStore):
         if not has_gcsfs:
             raise ImportError("Cannot find optional dependency gcsfs.")
 
+        path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
+
         return GCSFileSystem(
             project=self.project_name,
-            token=self._credentials,
+            token=path, #self._credentials,
             access="read_write",
             default_location=self.bucket_creation_location,
         )
