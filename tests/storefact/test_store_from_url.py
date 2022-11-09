@@ -1,7 +1,7 @@
 import pytest
-from bucket_manager import boto3_bucket_resource
+from bucket_manager import boto3_bucket_reference
 
-from minimalkv._get_store import get_store, get_store_from_url
+from minimalkv._get_store import get_store_from_url
 from minimalkv.decorator import ReadOnlyDecorator
 from minimalkv.fs import FilesystemStore
 from minimalkv.memory import DictStore
@@ -54,7 +54,7 @@ good_urls = [
     (
         "s3://access_key:secret_key@endpoint:1234/bucketname?create_if_missing=false",
         Boto3Store(
-            bucket=boto3_bucket_resource(
+            bucket=boto3_bucket_reference(
                 access_key_id="access_key",
                 secret_access_key="secret_key",
                 host="endpoint",

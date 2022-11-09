@@ -58,7 +58,7 @@ def boto3_bucket(
     # Credentials where previously set in the environment.
     # We now set them via boto3.
 
-    bucket = boto3_bucket_resource(
+    bucket = boto3_bucket_reference(
         host=host,
         bucket_name=bucket_name,
         port=port,
@@ -75,7 +75,7 @@ def boto3_bucket(
     bucket.delete()
 
 
-def boto3_bucket_resource(
+def boto3_bucket_reference(
     access_key_id=None,
     secret_access_key=None,
     host=None,

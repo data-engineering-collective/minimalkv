@@ -51,7 +51,8 @@ jobs:
           docker-compose up -d
           while ! docker exec mysql mysqladmin status -h 127.0.0.1 -u minimalkv_test --password=minimalkv_test; \
             do sleep 3; done
-          pytest -n auto --dist loadfile -rs --cov=minimalkv --cov-report=xml -k test_gcstore_live_from_url
+          pytest -n auto --dist loadfile -rs --cov=minimalkv --cov-report=xml
+#          -k test_gcstore_live_from_url
           python -m build
       - name: Publish package
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags') && matrix.PYTHON_VERSION == '3.10'

@@ -83,7 +83,7 @@ class GoogleCloudStore(FSSpecStore):
         return super()._get_file(key, file)
 
     def __eq__(self, other):
-        """Assert that two stores are equal.    """
+        """Assert that two stores are equal."""
         return (
             isinstance(other, GoogleCloudStore)
             and super().__eq__(other)
