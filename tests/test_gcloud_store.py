@@ -58,9 +58,9 @@ def gc_live_credentials_base64():
 
     path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
     if path is None:
-        # path = "/Users/simon/code/minimalkv/nice-road-330220-167c4b1bbd12.json"
-        pytest.skip("No credentials found")
-        return
+        path = "/testscripts/nice-road-330220-167c4b1bbd12.json"
+        # pytest.skip("No credentials found")
+        # return
 
     json_as_bytes = Path(path).read_bytes()
     json_b64_encoded = base64.urlsafe_b64encode(json_as_bytes).decode()

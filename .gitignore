@@ -111,4 +111,4 @@ Pipfile.lock
 # minimalkv
 store/
 # Exploratory code
-exp.py
+testscripts/

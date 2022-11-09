@@ -55,6 +55,16 @@ resource "google_service_account_iam_binding" "qc-minimalkv-account-iam" {
   service_account_id = google_service_account.service_account_gha.name
   role = "roles/iam.workloadIdentityUser"
   members = [
-    "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github_actions.name}/attribute.repository/data-engineering-collective/minimalkv"
+    "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github_actions.name}/attribute.repository/data-engineering-collective/minimalkv",
+    "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github_actions.name}/attribute.repository/simonbohnen/minimalkv"
+  ]
+}
+
+resource "google_service_account_iam_binding" "qc-minimalkv-account-iam-token-creator" {
+  service_account_id = google_service_account.service_account_gha.name
+  role = "roles/iam.serviceAccountTokenCreator"
+  members = [
+    "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github_actions.name}/attribute.repository/data-engineering-collective/minimalkv",
+    "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github_actions.name}/attribute.repository/simonbohnen/minimalkv"
   ]
 }
