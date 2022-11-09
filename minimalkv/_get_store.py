@@ -123,6 +123,25 @@ def get_store_from_url(
 
 
 def extract_wrappers(parsed_url: SplitResult) -> List[str]:
+    """
+    Extract wrappers from a parsed URL.
+
+    Wrappers allow you to add additional functionality to a store, e.g. encryption.
+    Wrappers are specified in the fragment part of the URL, e.g. "s3://...#wrap:readonly+urlencode"
+
+    Wrappers can also be specified as part of the scheme, e.g. "s3+readonly+urlencode://...".
+    This is deprecated and will be removed in a future version.
+
+    Parameters
+    ----------
+    parsed_url: SplitResult
+        The parsed URL.
+
+    Returns
+    -------
+    wrappers: List[str]
+        The list of wrappers.
+    """
     # split off old-style wrappers, if any:
     parts = parsed_url.getscheme().split("+")
     # pop off the type of the store
@@ -178,7 +197,7 @@ def get_store(
          otherwise, try to retrieve the bucket and fail with an ``IOError``.
     * ``"hs3"`` returns a variant of ``minimalkv.net.botostore.BotoStore`` that allows "/" in the key name.
       The parameters are the same as for ``"s3"``
-    * ``"gcs"``: Returns a ``minimalkv.stores.GoogleCloudStore``.  Parameters are
+    * ``"gcs"``: Returns a ``minimalkv.net.gcstore.GoogleCloudStore``.  Parameters are
       ``"credentials"``, ``"bucket_name"``, ``"bucket_creation_location"``, ``"project"`` and ``"create_if_missing"`` (default: ``True``).
 
       - ``"credentials"``: either the path to a credentials.json file or a *google.auth.credentials.Credentials* object

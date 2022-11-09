@@ -83,6 +83,7 @@ class GoogleCloudStore(FSSpecStore):
         return super()._get_file(key, file)
 
     def __eq__(self, other):
+        """Assert that two stores are equal.    """
         return (
             isinstance(other, GoogleCloudStore)
             and super().__eq__(other)
@@ -99,14 +100,16 @@ class GoogleCloudStore(FSSpecStore):
         Create a ``GoogleCloudStore`` from a URL.
 
         URl format:
-        ``gcs://credentials@bucket_name[?<query_args>]``
+        ``gcs://[credentials@]bucket_name[?<query_args>]``
 
         **Positional arguments:**
 
-        ``credentials``: A service account JSON object encoded as base64.
+        ``credentials``:
+        Optional: A service account to use instead of the default credentials.
+        Encode the service account key JSON object as a base64 string.
         See here_ for how to obtain such a JSON object.
 
-        Get the encoded credentials as a string like this::
+        Encode the credentials into base64 like this::
 
             from pathlib import Path
             import base64
@@ -177,20 +180,27 @@ class GoogleCloudStore(FSSpecStore):
             params["project"] = query["project"]
 
         # Decode credentials
-        credentials = parsed_url.getuserinfo()
-        if credentials is not None:
+        credentials_base64_string: str = parsed_url.getuserinfo()
+        if credentials_base64_string is not None:
             # Get as bytes
-            credentials = credentials.encode()
-            # Decode base64
+            credentials_base64_bytes: bytes = credentials_base64_string.encode()
             import base64
 
-            credentials = base64.urlsafe_b64decode(credentials)
+            credentials_bytes: bytes = base64.urlsafe_b64decode(
+                credentials_base64_bytes
+            )
             # Load as JSON
-            credentials_dict = json.loads(credentials)
+            credentials_dict = json.loads(credentials_bytes)
 
             if "project_id" in credentials_dict:
                 params["project"] = credentials_dict["project_id"]
-            params["credentials"] = credentials_dict
+
+            from google.oauth2.service_account import Credentials
+
+            params["credentials"] = Credentials.from_service_account_info(
+                credentials_dict,
+                scopes=["https://www.googleapis.com/auth/devstorage.read_write"],
+            )
 
         if "project" not in params:
             params["project"] = (

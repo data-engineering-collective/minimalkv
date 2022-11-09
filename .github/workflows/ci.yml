@@ -29,18 +29,14 @@ jobs:
           use-mamba: true
           python-version: ${{ matrix.PYTHON_VERSION }}
           environment-file: environment.yml
-      # The CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE variable holds the path to the
-      # service account key file. See here: https://github.com/google-github-actions/auth#other-inputs
       - id: google_auth
         name: 'Authenticate to Google Cloud'
         uses: google-github-actions/auth@v0.4.0
         with:
           workload_identity_provider: 'projects/498651197656/locations/global/workloadIdentityPools/qc-minimalkv-gh-actions-pool/providers/github-actions-provider'
           service_account: 'sa-github-actions@qc-minimalkv.iam.gserviceaccount.com'
-          token_format: 'id_token'
-          access-token-scopes: "https://www.googleapis.com/auth/devstorage.read_write"
-          create_credentials_file: true
-          id_token_audience: "https://iam.googleapis.com/projects/498651197656/locations/global/workloadIdentityPools/qc-minimalkv-gh-actions-pool/providers/github-actions-provider"
+          token_format: 'access_token'
+#          id_token_audience: "https://iam.googleapis.com/projects/498651197656/locations/global/workloadIdentityPools/qc-minimalkv-gh-actions-pool/providers/github-actions-provider"
       - name: Test variable equality
         run: |
           if [ "${GOOGLE_APPLICATION_CREDENTIALS}" == "${CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE}" ]; then

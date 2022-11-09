@@ -9,16 +9,19 @@ TRUEVALUES = ("true",)
 
 def url2dict(url: str, raise_on_extra_params: bool = False) -> Dict[str, Any]:
     """Create dictionary with parameters from url.
+
     Parameters
     ----------
     url : str
         Access-URL, see below for supported forms.
     raise_on_extra_params : bool, optional, default = False
         Whether to raise on unexpected params.
+
     Returns
     -------
     params : dict
         Parameter dictionary suitable for get_store()
+
     Note
     ----
     Supported formats:
@@ -138,13 +141,16 @@ def extract_params(scheme, host, port, path, query, userinfo):  # noqa D
 
 
 def _parse_userinfo(userinfo: str) -> List[str]:
-    """Try to split the URL's userinfo into fields separated by :.
+    """Try to split the URL's userinfo into fields separated by `:`.
+
     The user info is the part between ``://`` and ``@``. If anything looks wrong, remind
     the user to percent-encode values.
+
     Parameters
     ----------
     userinfo : str
         URL-encoded user-info.
+
     Returns
     -------
     parts: list of str

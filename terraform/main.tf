@@ -3,25 +3,27 @@ variable "project_id" {
   description = "GCP project name"
 }
 
-# General Project Setup
-
-#data "google_billing_account" "acct" {
-#  display_name = "QuantCo"
-#  open         = true
-#}
-
 provider "google" {
-  project = "${var.project_id}"
+  project = var.project_id
   region  = "europe-west3"
 }
 
-#resource "google_project" "qc-minimalkv" {
-#  name       = "${var.project_id}"
-#  project_id = "${var.project_id}"
-#  org_id     = "945985937868"
-#
-##  billing_account = data.google_billing_account.acct.id
-#}
+# Set up the backend bucket
+
+resource "google_storage_bucket" "backend" {
+  name = "qc-minimalkv-backend"
+  versioning {
+    enabled = true
+  }
+  location = "EU"
+}
+
+terraform {
+  backend "gcs" {
+    bucket  = "qc-minimalkv-backend"
+    prefix  = "terraform/state"
+  }
+}
 
 # Workload Identify Federation with Github Actions
 
@@ -51,6 +53,7 @@ resource "google_service_account" "service_account_gha" {
   display_name = "GHA Service Accont"
 }
 
+# Grant the external identities permission to impersonate the service account
 resource "google_service_account_iam_binding" "qc-minimalkv-account-iam" {
   service_account_id = google_service_account.service_account_gha.name
   role = "roles/iam.workloadIdentityUser"
@@ -60,6 +63,7 @@ resource "google_service_account_iam_binding" "qc-minimalkv-account-iam" {
   ]
 }
 
+# Grant the external identities permission to create tokens for the service account
 resource "google_service_account_iam_binding" "qc-minimalkv-account-iam-token-creator" {
   service_account_id = google_service_account.service_account_gha.name
   role = "roles/iam.serviceAccountTokenCreator"
@@ -67,4 +71,11 @@ resource "google_service_account_iam_binding" "qc-minimalkv-account-iam-token-cr
     "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github_actions.name}/attribute.repository/data-engineering-collective/minimalkv",
     "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github_actions.name}/attribute.repository/simonbohnen/minimalkv"
   ]
+}
+
+# Grant the service account permission to access GCS buckets
+resource "google_project_iam_member" "sa-storageaccess" {
+  role    = "roles/storage.admin"
+  member  = "serviceAccount:${google_service_account.service_account_gha.email}"
+  project = "qc-minimalkv"
 }
