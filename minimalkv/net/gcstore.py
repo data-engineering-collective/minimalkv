@@ -3,9 +3,6 @@ import os
 import warnings
 from typing import IO, Dict, Optional, Union, cast
 
-import google.oauth2.id_token
-from google.auth import identity_pool
-from google.oauth2 import service_account
 from uritools import SplitResult
 
 from minimalkv.fsspecstore import FSSpecStore, FSSpecStoreEntry
@@ -64,11 +61,9 @@ class GoogleCloudStore(FSSpecStore):
         if not has_gcsfs:
             raise ImportError("Cannot find optional dependency gcsfs.")
 
-        path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
-
         return GCSFileSystem(
-            project=self.project_name,
-            token="google_default", #path, #self._credentials,
+            project="qc-minimalkv",
+            token=self._credentials or "google_default",
             access="read_write",
             default_location=self.bucket_creation_location,
         )
@@ -176,7 +171,6 @@ class GoogleCloudStore(FSSpecStore):
         store : GoogleCloudStore
             The created GoogleCloudStore.
         """
-
         params = {"bucket_name": parsed_url.gethost()}
 
         if "project" in query:
@@ -193,25 +187,10 @@ class GoogleCloudStore(FSSpecStore):
             credentials = base64.urlsafe_b64decode(credentials)
             # Load as JSON
             credentials_dict = json.loads(credentials)
-            # try:
-            #     credentials = Credentials.from_service_account_info(
-            #         credentials_dict,
-            #         scopes=["https://www.googleapis.com/auth/devstorage.read_write"],
-            #     )
-            # except ValueError:
-            #     print("Moooooooiiiiinnnnnn")
-            #     credentials = IDTokenCredentials.from_service_account_info(
-            #         credentials_dict,
-            #         scopes=["https://www.googleapis.com/auth/devstorage.read_write"],
-            #     )
 
             if "project_id" in credentials_dict:
                 params["project"] = credentials_dict["project_id"]
             params["credentials"] = credentials_dict
-
-        credentials, project = google.auth.default()
-        # credentials = identity_pool.Credentials.from_info(credentials_dict)
-        params["credentials"] = credentials
 
         if "project" not in params:
             params["project"] = (

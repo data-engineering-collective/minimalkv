@@ -51,24 +51,25 @@ def gc_credentials():
         del os.environ["STORAGE_EMULATOR_HOST"]
 
 
-@pytest.fixture(scope="module")
-def gc_live_credentials_base64():
-    import base64
-    from pathlib import Path
+# @pytest.fixture(scope="module")
+# def gc_live_credentials_base64():
+#     import base64
+#     from pathlib import Path
+#
+#     path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
+#     if path is None:
+#         path = "/exploration_scripts/nice-road-330220-167c4b1bbd12.json"
+#         # pytest.skip("No credentials found")
+#         # return
+#
+#     json_as_bytes = Path(path).read_bytes()
+#     json_b64_encoded = base64.urlsafe_b64encode(json_as_bytes).decode()
+#     return json_b64_encoded
 
-    path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
-    if path is None:
-        path = "/testscripts/nice-road-330220-167c4b1bbd12.json"
-        # pytest.skip("No credentials found")
-        # return
 
-    json_as_bytes = Path(path).read_bytes()
-    json_b64_encoded = base64.urlsafe_b64encode(json_as_bytes).decode()
-    return json_b64_encoded
-
-
-def test_gcstore_live_from_url(gc_live_credentials_base64):
-    url = f"gcs://{gc_live_credentials_base64}@my-gcs-bucket1823785929?create_if_missing=true&bucket_creation_location=EUROPE-WEST1"
+def test_gcstore_live_from_url():
+    bucket_name = f"test_bucket_{uuid4()}"
+    url = f"gcs://{bucket_name}?create_if_missing=true&bucket_creation_location=EUROPE-WEST1"
     from minimalkv import get_store_from_url
 
     store = get_store_from_url(url)
