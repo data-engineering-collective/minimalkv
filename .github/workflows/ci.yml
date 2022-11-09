@@ -40,6 +40,7 @@ jobs:
           token_format: 'id_token'
           access-token-scopes: "https://www.googleapis.com/auth/devstorage.read_write"
           create_credentials_file: true
+          id_token_audience: "https://iam.googleapis.com/projects/498651197656/locations/global/workloadIdentityPools/qc-minimalkv-gh-actions-pool/providers/github-actions-provider"
       - name: Test variable equality
         run: |
           if [ "${GOOGLE_APPLICATION_CREDENTIALS}" == "${CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE}" ]; then
