@@ -106,9 +106,7 @@ def extract_params(scheme, host, port, path, query, userinfo):  # noqa D
         params = {"type": scheme, "bucket_name": host}
         params["credentials"] = base64.urlsafe_b64decode(credentials_b64.encode())
         if "bucket_creation_location" in query:
-            params["bucket_creation_location"] = query.pop("bucket_creation_location")[
-                0
-            ]
+            params["bucket_creation_location"] = query.pop("bucket_creation_location")
         return params
     if scheme in ("fs", "hfs"):
         return {"type": scheme, "path": host + path}
@@ -131,7 +129,7 @@ def extract_params(scheme, host, port, path, query, userinfo):  # noqa D
         if "use_sas" in query:
             params["use_sas"] = True
         if "max_connections" in query:
-            params["max_connections"] = int(query.pop("max_connections")[-1])
+            params["max_connections"] = int(query.pop("max_connections"))
         if "socket_timeout" in query:
             params["socket_timeout"] = query.pop("socket_timeout")
         if "max_block_size" in query:

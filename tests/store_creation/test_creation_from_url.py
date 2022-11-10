@@ -18,6 +18,10 @@ good_urls = [
             conn_string="DefaultEndpointsProtocol=https;AccountName=MYACCOUNT;AccountKey=dead/beef",
             create_if_missing=True,
             container="1buc-ket1",
+            checksum=True,
+            max_single_put_size=67108864,
+            max_block_size=4194304,
+            max_connections=2,
         ),
     ),
     (
@@ -26,6 +30,10 @@ good_urls = [
             conn_string="DefaultEndpointsProtocol=https;AccountName=MYACCOUNT;AccountKey=deadbeef",
             create_if_missing=True,
             container="1bucket1",
+            checksum=True,
+            max_single_put_size=67108864,
+            max_block_size=4194304,
+            max_connections=2,
         ),
     ),
     (
@@ -34,6 +42,9 @@ good_urls = [
             conn_string="DefaultEndpointsProtocol=https;AccountName=MYACCOUNT;AccountKey=deadbeef",
             container="1bucket1",
             max_connections=5,
+            checksum=True,
+            max_single_put_size=67108864,
+            max_block_size=4194304,
         ),
     ),
     (
@@ -42,10 +53,9 @@ good_urls = [
             conn_string="DefaultEndpointsProtocol=https;AccountName=MYACCOUNT;AccountKey=deadbeef",
             container="1bucket1",
             max_connections=5,
-            # These are returned from url2dict as lists because query keys might occur multiple times
-            # I think they are passed into the initializer as a list, and this has never been tested
             max_block_size=4194304,
             max_single_put_size=67108864,
+            checksum=True,
         ),
     ),
     (
@@ -56,20 +66,19 @@ good_urls = [
         "fs:///an/absolute/path?create_if_missing=false",
         FilesystemStore(root="/an/absolute/path"),
     ),
-    # TODO S3 might be hard to integration test because we need to set up a bucket
-    # (
-    #     "s3://access_key:secret_key@endpoint:1234/bucketname?create_if_missing=false",
-    #     Boto3Store(
-    #         bucket=boto3_bucket_reference(
-    #             access_key="access_key",
-    #             secret_key="secret_key",
-    #             host="endpoint",
-    #             port=1234,
-    #             bucket_name="bucketname-access_key",
-    #             is_secure=True,
-    #         ),
-    #     ),
-    # ),
+    (
+        "s3://access_key:secret_key@endpoint:1234/bucketname?create_if_missing=false",
+        Boto3Store(
+            bucket=boto3_bucket_reference(
+                access_key="access_key",
+                secret_key="secret_key",
+                host="endpoint",
+                port=1234,
+                bucket_name="bucketname-access_key",
+                is_secure=True,
+            ),
+        ),
+    ),
     (
         "redis:///2",
         RedisStore(
@@ -110,22 +119,21 @@ def test_raise_on_invalid_store():
 @pytest.mark.parametrize("url, expected", good_urls)
 def test_get_store_from_url(url, expected):
     actual = get_store_from_url(url)
-    assert actual == expected
+    check_store_equal(actual, expected)
 
 
 @pytest.mark.parametrize("url, expected", good_urls)
 def test_compare_store_creation(url, expected):
+    if isinstance(expected, Boto3Store):
+        pytest.skip(
+            """
+            The old store creation method will attempt to create a
+            connection to AWS. This is currently not supported.
+            """
+        )
     store1 = get_store_from_url(url)
     store2 = get_store(**url2dict(url))
-    from unittest.mock import patch
-
-    # pytest tries to check whether the stores are iterable,
-    # which requires connecting to GCS, which is not possible.
-    # Thus we mock iter_keys and say that the stores are not iterable.
-    from minimalkv import KeyValueStore
-
-    with patch.object(KeyValueStore, "__iter__", side_effect=NotImplementedError):
-        assert store1 == store2
+    check_store_equal(store1, store2)
 
 
 @pytest.mark.parametrize("url, raises", bad_urls)
@@ -139,3 +147,15 @@ def test_creation_wrapper():
         get_store_from_url("memory://#wrap:readonly"),
         ReadOnlyDecorator,
     )
+
+
+def check_store_equal(store1, store2):
+    from unittest.mock import patch
+
+    # pytest tries to check whether the stores are iterable,
+    # which requires connecting to GCS, which is not possible.
+    # Thus we mock iter_keys and say that the stores are not iterable.
+    from minimalkv import KeyValueStore
+
+    with patch.object(KeyValueStore, "__iter__", side_effect=NotImplementedError):
+        assert store1 == store2
