@@ -51,7 +51,7 @@ class GoogleCloudStore(FSSpecStore):
         self.bucket_creation_location = bucket_creation_location
         self.project_name = project
 
-        super().__init__(prefix=f"{bucket_name}/", create_prefix=create_if_missing)
+        super().__init__(prefix=f"{bucket_name}/", mkdir_prefix=create_if_missing)
 
     def _create_filesystem(self) -> "GCSFileSystem":
         if not has_gcsfs:

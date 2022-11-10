@@ -85,8 +85,7 @@ class FSSpecStore(KeyValueStore, CopyMixin):
     def __init__(
         self,
         prefix: str = "",
-        mkdir_prefix: Optional[bool] = None,
-        create_prefix: Optional[bool] = None,
+        mkdir_prefix: bool = True,
         write_kwargs: Optional[dict] = None,
         custom_fs: Optional["AbstractFileSystem"] = None,
     ):
@@ -99,7 +98,7 @@ class FSSpecStore(KeyValueStore, CopyMixin):
         ----------
         prefix: str, optional
             The prefix to use on the FSSpecStore when storing keys.
-        create_prefix: bool, optional
+        mkdir_prefix: bool, optional
             If True, the prefix will be created if it does not exist.
             Analogous to the create_if_missing parameter in AzureBlockBlobStore or GoogleCloudStore.
         write_kwargs: dict, optional
@@ -109,15 +108,7 @@ class FSSpecStore(KeyValueStore, CopyMixin):
         """
         write_kwargs = write_kwargs or {}
         self._prefix = prefix
-
-        if mkdir_prefix is not None:
-            warnings.warn(
-                "The mkdir_prefix parameter is deprecated and will be removed in a future version. "
-                "Use create_prefix instead.",
-                DeprecationWarning,
-            )
-        self._create_prefix = create_prefix or mkdir_prefix or True
-
+        self._mkdir_prefix = mkdir_prefix
         self._write_kwargs = write_kwargs
         self._custom_fs = custom_fs
 
@@ -141,11 +132,11 @@ class FSSpecStore(KeyValueStore, CopyMixin):
         """
         warnings.warn(
             "The mkdir_prefix attribute is deprecated!"
-            "It will be renamed to _create_prefix in the next release.",
+            "It will be renamed to _mkdir_prefix in the next release.",
             DeprecationWarning,
         )
 
-        return self._create_prefix
+        return self._mkdir_prefix
 
     @property
     def prefix(self):
@@ -250,7 +241,7 @@ class FSSpecStore(KeyValueStore, CopyMixin):
         else:
             fs = self._create_filesystem()
 
-        if self._create_prefix and not fs.exists(self._prefix):
+        if self._mkdir_prefix and not fs.exists(self._prefix):
             fs.mkdir(self._prefix)
         return fs
 
