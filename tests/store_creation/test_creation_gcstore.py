@@ -1,6 +1,7 @@
 import base64
 import json
 import pathlib
+from uuid import uuid4
 
 import pytest
 
@@ -106,6 +107,7 @@ def test_complete():
 
 
 def test_compare_store_from_url():
+    """Compare old and new store creation."""
     url, _ = ACTUAL_URL
     new_store = get_store_from_url(url)
     old_store = get_store(**url2dict(url))
@@ -119,3 +121,18 @@ def test_compare_store_from_url():
     # Thus we mock iter_keys and say that the stores are not iterable.
     with patch.object(FSSpecStore, "iter_keys", side_effect=NotImplementedError):
         assert new_store == old_store
+
+
+def test_gcstore_live_from_url():
+    """
+    Test live store creation from URL.
+
+    This only works if application default credentials are set up.
+    """
+    bucket_name = f"test_bucket_{uuid4()}"
+    url = f"gcs://{bucket_name}?create_if_missing=true&bucket_creation_location=EUROPE-WEST1"
+    from minimalkv import get_store_from_url
+
+    store = get_store_from_url(url)
+    store.put("foo", b"bar")
+    assert store.get("foo") == b"bar"

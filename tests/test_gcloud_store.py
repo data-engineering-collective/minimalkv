@@ -67,16 +67,6 @@ def gc_credentials():
 #     return json_b64_encoded
 
 
-def test_gcstore_live_from_url():
-    bucket_name = f"test_bucket_{uuid4()}"
-    url = f"gcs://{bucket_name}?create_if_missing=true&bucket_creation_location=EUROPE-WEST1"
-    from minimalkv import get_store_from_url
-
-    store = get_store_from_url(url)
-    store.put("foo", b"bar")
-    assert store.get("foo") == b"bar"
-
-
 def try_delete_bucket(bucket):
     # normally here we should delete the bucket
     # however the emulator (fake-gcs-server) doesn't currently support bucket deletion.

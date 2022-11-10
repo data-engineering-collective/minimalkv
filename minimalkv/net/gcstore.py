@@ -3,6 +3,7 @@ import os
 import warnings
 from typing import IO, Dict, Optional, Union, cast
 
+from google.auth.credentials import Credentials
 from uritools import SplitResult
 
 from minimalkv.fsspecstore import FSSpecStore, FSSpecStoreEntry
@@ -15,6 +16,22 @@ except ImportError:
     has_gcsfs = False
 
 
+def _get_project_from_credentials(
+    credentials: Union[str, dict, Credentials]
+) -> Optional[str]:
+    if isinstance(credentials, str):
+        with open(credentials) as file:
+            credentials = json.load(file)
+
+    if isinstance(credentials, dict):
+        return credentials.get("project_id")
+
+    if credentials.hasattr("project_id"):
+        return credentials.project_id
+
+    return None
+
+
 class GoogleCloudStore(FSSpecStore):
     """A store using ``Google Cloud storage`` as a backend.
 
@@ -24,25 +41,48 @@ class GoogleCloudStore(FSSpecStore):
     def __init__(
         self,
         bucket_name: str,
-        credentials: Optional[Union[str, dict]] = None,
+        credentials: Optional[Union[str, dict, Credentials]] = None,
         create_if_missing: bool = True,
         bucket_creation_location: str = "EUROPE-WEST3",
-        project=None,
+        project: Optional[str] = None,
     ):
-        if isinstance(credentials, str):
-            # Parse JSON from path to extract project name
-            # The project name is required to create new buckets
+        """
+        Create a new GoogleCloudStore.
+
+        The `credentials` parameter can be
+        - a path to a JSON file containing the credentials, e.g. a service account key
+        - a dictionary containing the credentials
+        - a google.auth.credentials.Credentials object
+
+        If `credentials` is None, the application default credentials will be used.
+        The credentials are passed on to gcsfs, see here_ for their documentation.
+
+        .. _here: https://gcsfs.readthedocs.io/en/latest/#credentials
+
+        Parameters
+        ----------
+        bucket_name: str
+            The name of the bucket to store the entries in.
+        credentials: Optional[Union[str, dict, Credentials]]
+            The credentials to use for the store. See above for details.
+        create_if_missing: bool
+            If True, the bucket will be created if it does not exist.
+        bucket_creation_location: str
+            The location to create the bucket in if it does not exist, e.g. "EUROPE-WEST3".
+            Only relevant if create_if_missing is True.
+        project: Optional[str]
+            The project the bucket is in or should be created in.
+            If None, gcsfs will try to infer the project from the credentials.
+        """
+        if project is None and credentials is not None:
             try:
-                with open(credentials) as f:
-                    credentials_dict = json.load(f)
-                    project = project or credentials_dict["project_id"]
-                credentials = credentials_dict
-            except (FileNotFoundError, json.JSONDecodeError, KeyError) as error:
+                project = _get_project_from_credentials(credentials)
+            except Exception as error:
                 warnings.warn(
                     f"""
-                    Could not get the project name from the credentials file.
-                    You set create_if_missing to {create_if_missing}.
-                    You will not be able to create a new bucket for this store.
+                    Could not infer the project name from the credentials.
+                    You set create_if_missing to `{create_if_missing}`.
+                    You might not be able to create a new bucket for this store.
 
                     This was caused by the following error:
                     {error}
@@ -61,9 +101,11 @@ class GoogleCloudStore(FSSpecStore):
         if not has_gcsfs:
             raise ImportError("Cannot find optional dependency gcsfs.")
 
+        # If self._credentials is None, gcsfs will try to
+        # find application default credentials.
         return GCSFileSystem(
-            project="qc-minimalkv",
-            token=self._credentials or "google_default",
+            project=self.project_name,
+            token=self._credentials,
             access="read_write",
             default_location=self.bucket_creation_location,
         )
