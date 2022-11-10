@@ -232,20 +232,46 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
         )
 
     @classmethod
+    def from_url(cls, url: str) -> "FilesystemStore":
+        """Create a FilesystemStore from a URL.
+
+        Parameters
+        ----------
+        url : str
+            URL to create store from. Must start with ``file://``.
+        """
+        from minimalkv import get_store_from_url
+
+        store = get_store_from_url(url, store_cls=cls)
+        if not isinstance(store, cls):
+            raise ValueError(f"Expected {cls}, got {type(store)}")
+        return store
+
+    @classmethod
     def from_parsed_url(
         cls, parsed_url: SplitResult, query: Dict[str, str]
     ) -> "FilesystemStore":
         """
-        * ``"fs"``: Returns a ``minimalkv.fs.FilesystemStore``. Specify the base path as "path" parameter.
-        * ``"hfs"`` returns a variant of ``minimalkv.fs.FilesystemStore``  that allows "/" in the key name.
-          The parameters are the same as for ``"file"``.
+        Build a FilesystemStore from a parsed URL.
 
-        if scheme in ("fs", "hfs"):
-            return {"type": scheme, "path": host + path}
+        See :func:`from_url` for details on the expected format of the URL.
+
+        Parameters
+        ----------
+        parsed_url: SplitResult
+            The parsed URL.
+        query: Dict[str, str]
+            Query parameters from the URL.
+
+        Returns
+        -------
+        store : FilesystemStore
+            The created FilesystemStore.
         """
         hostname = parsed_url.gethost() or ""
         fs_path = hostname + parsed_url.getpath()
-        if query.get("create_if_missing") and not os.path.exists(fs_path):
+        create_if_missing = query.get("create_if_missing", "true").lower() == "true"
+        if create_if_missing and not os.path.exists(fs_path):
             os.makedirs(fs_path)
         return FilesystemStore(fs_path)
 

@@ -82,10 +82,10 @@ def _create_store_azure(type, params):
             public=False,
             create_if_missing=params["create_if_missing"],
             checksum=params.get("checksum", True),
-            max_connections=params.get("max_connections", 2),
+            max_connections=int(params.get("max_connections", 2)),
             socket_timeout=params.get("socket_timeout", (20, 100)),
-            max_block_size=params.get("max_block_size", (4194304)),
-            max_single_put_size=params.get("max_single_put_size", (67108864)),
+            max_block_size=int(params.get("max_block_size", 4194304)),
+            max_single_put_size=int(params.get("max_single_put_size", 67108864)),
         )
     else:
         return HAzureBlockBlobStore(
@@ -94,10 +94,10 @@ def _create_store_azure(type, params):
             public=False,
             create_if_missing=params["create_if_missing"],
             checksum=params.get("checksum", True),
-            max_connections=params.get("max_connections", 2),
+            max_connections=int(params.get("max_connections", 2)),
             socket_timeout=params.get("socket_timeout", (20, 100)),
-            max_block_size=params.get("max_block_size", (4194304)),
-            max_single_put_size=params.get("max_single_put_size", (67108864)),
+            max_block_size=int(params.get("max_block_size", 4194304)),
+            max_single_put_size=int(params.get("max_single_put_size", 67108864)),
         )
 
 
@@ -154,6 +154,8 @@ def _create_store_redis(type, params):
     # TODO: Docstring with required params.
     from redis import StrictRedis
 
+    # RedisStore doesn't support the create_if_missing parameter
+    params.pop("create_if_missing", None)
     r = StrictRedis(**params)
 
     from minimalkv.memory.redisstore import RedisStore

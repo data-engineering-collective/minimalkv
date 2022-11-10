@@ -1,16 +1,19 @@
 #!/usr/bin/env python
 import re
 from io import BytesIO
-from typing import IO, TYPE_CHECKING, Dict, Iterator, List, Optional, Union
+from typing import IO, Dict, Iterator, List, Optional, Union, TYPE_CHECKING
 
-from uritools import SplitResult
-
-if TYPE_CHECKING:
-    from redis import StrictRedis
+from uritools import SplitResult, uriunsplit
 
 from minimalkv._constants import FOREVER, NOT_SET
 from minimalkv._key_value_store import KeyValueStore
 from minimalkv._mixins import TimeToLiveMixin
+
+try:
+    from redis import StrictRedis, Redis
+    has_redis = True
+except ImportError:
+    has_redis = False
 
 
 class RedisStore(TimeToLiveMixin, KeyValueStore):
@@ -104,27 +107,66 @@ class RedisStore(TimeToLiveMixin, KeyValueStore):
         self._put(key, file.read(), ttl_secs)
         return key
 
+    def __eq__(self, other):
+        return repr(self.redis.connection_pool) == repr(other.redis.connection_pool)
+
+    @classmethod
+    def from_url(cls, url: str) -> "RedisStore":
+        """
+        Create a ``RedisStore`` from a URL.
+
+        URl format:
+        ``redis://[[password@]host[:port]][/db]``
+
+        See the `redis-py documentation`_ for more details.
+
+        .. _redis-py documentation: https://redis.readthedocs.io/en/stable/connections.html#redis.Redis.from_url
+
+        **Notes**:
+
+        If the scheme is ``hredis``, an ``HRedisStore`` is returned which allows ``/`` in key names.
+
+        The ``redis`` package is required for this method.
+
+        Parameters
+        ----------
+        url
+            URL to create store from.
+
+        Returns
+        -------
+        store
+            RedisStore created from URL.
+        """
+        if not has_redis:
+            raise ImportError("Cannot find optional dependency redis.")
+
+        if url.startswith("hredis://"):
+            # Drop `h` from scheme
+            url = url[1:]
+        redis = StrictRedis.from_url(url)
+        return cls(redis)
+
     @classmethod
     def from_parsed_url(
         cls, parsed_url: SplitResult, query: Dict[str, str]
     ) -> "RedisStore":  # noqa D
         """
-        * ``"redis"``: Returns a RedisStore. Constructs a StrictRedis using params as kwargs.
-            See StrictRedis documentation for details.
+        Build a RedisStore from a parsed URL.
 
-        path = path[1:] if path.startswith("/") else path
-        params = {"host": host or "localhost"}
-        if port:
-            params["port"] = port
-        if userinfo:
-            params["password"] = userinfo
-        if path:
-            params["db"] = int(path)
-        return params
+        See :func:`from_url` for details on the expected format of the URL.
+
+        Parameters
+        ----------
+        parsed_url: SplitResult
+            The parsed URL.
+        query: Dict[str, str]
+            Query parameters from the URL.
+
+        Returns
+        -------
+        store : RedisStore
+            The created RedisStore.
         """
-        if parsed_url.getscheme() == "hredis":
-            from minimalkv._hstores import HRedisStore
-
-            return HRedisStore()
-        else:
-            return RedisStore()
+        url = uriunsplit(parsed_url)
+        return cls.from_url(url)

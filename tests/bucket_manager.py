@@ -10,8 +10,8 @@ boto = pytest.importorskip("boto")
 
 @contextmanager
 def boto_bucket(
-    access_key_id,
-    secret_access_key,
+    access_key,
+    secret_key,
     host,
     connect_func="connect_s3",
     ordinary_calling_format=False,
@@ -23,8 +23,8 @@ def boto_bucket(
         from boto.s3.connection import OrdinaryCallingFormat
 
         conn = getattr(boto, connect_func)(
-            access_key_id,
-            secret_access_key,
+            access_key,
+            secret_key,
             host=host,
             calling_format=OrdinaryCallingFormat(),
             port=port,
@@ -32,7 +32,7 @@ def boto_bucket(
         )
     else:
         conn = getattr(boto, connect_func)(
-            access_key_id, secret_access_key, host=host, port=port, is_secure=is_secure
+            access_key, secret_key, host=host, port=port, is_secure=is_secure
         )
 
     name = bucket_name or f"testrun-bucket-{uuid()}"
@@ -47,8 +47,8 @@ def boto_bucket(
 
 @contextmanager
 def boto3_bucket(
-    access_key_id,
-    secret_access_key,
+    access_key,
+    secret_key,
     host=None,
     bucket_name=None,
     port=None,
@@ -63,8 +63,8 @@ def boto3_bucket(
         bucket_name=bucket_name,
         port=port,
         is_secure=is_secure,
-        access_key_id=access_key_id,
-        secret_access_key=secret_access_key,
+        access_key=access_key,
+        secret_key=secret_key,
     )
     bucket.create()
 
@@ -76,8 +76,8 @@ def boto3_bucket(
 
 
 def boto3_bucket_reference(
-    access_key_id=None,
-    secret_access_key=None,
+    access_key=None,
+    secret_key=None,
     host=None,
     bucket_name=None,
     port=None,
@@ -96,8 +96,8 @@ def boto3_bucket_reference(
     s3_resource = boto3.resource(
         "s3",
         endpoint_url=endpoint_url,
-        aws_access_key_id=access_key_id,
-        aws_secret_access_key=secret_access_key,
+        aws_access_key_id=access_key,
+        aws_secret_access_key=secret_key,
         region_name="us-east-1",
     )
     bucket = s3_resource.Bucket(name)
@@ -130,8 +130,8 @@ def load_boto_credentials():
 
     for section in parser.sections():
         yield {
-            "access_key_id": parser.get(section, "access_key"),
-            "secret_access_key": parser.get(section, "secret_key"),
+            "access_key": parser.get(section, "access_key"),
+            "secret_key": parser.get(section, "secret_key"),
             "connect_func": parser.get(section, "connect_func"),
             "host": parser.get(section, "host"),
             "is_secure": parser.getboolean(section, "is_secure"),

@@ -3,13 +3,13 @@ import os
 import warnings
 from typing import IO, Dict, Optional, Union, cast
 
-from google.auth.credentials import Credentials
 from uritools import SplitResult
 
 from minimalkv.fsspecstore import FSSpecStore, FSSpecStoreEntry
 
 try:
     from gcsfs import GCSFileSystem
+    from google.auth.credentials import Credentials
 
     has_gcsfs = True
 except ImportError:

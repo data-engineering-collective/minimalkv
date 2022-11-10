@@ -77,15 +77,15 @@ def test_create_store_hs3(mocker):
         "hs3",
         {
             "host": "endpoint:1234",
-            "access_key_id": "access_key",
-            "secret_access_key": "secret_key",
+            "access_key": "access_key",
+            "secret_key": "secret_key",
             "bucket": "bucketname",
         },
     )
     mock_hs3.assert_called_once_with(
         host="endpoint:1234",
-        access_key_id="access_key",
-        secret_access_key="secret_key",
+        access_key="access_key",
+        secret_key="secret_key",
         bucket="bucketname",
     )
 

@@ -38,6 +38,7 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
         max_block_size=None,
         max_single_put_size=None,
         checksum=False,
+        socket_timeout=None,
     ):
         from azure.storage.blob import BlobServiceClient, ContainerClient
 
@@ -189,8 +190,6 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
         }
 
     def __eq__(self, other):
-        print(other)
-        # breakpoint()
         return (
             isinstance(other, AzureBlockBlobStore)
             and self.conn_string == other.conn_string
@@ -232,6 +231,8 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
         ``max_single_put_size``: max_single_put_size is the largest size upload supported in a single put call
 
         ``max_block_size``: maximum block size is maximum size of the blocks (maximum size is <= 100MB)
+
+        ``checksum``: Whether to compute and store MD5 checksums for uploaded blobs (default: ``True``)
 
         **Notes**:
 
@@ -301,14 +302,10 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
                     "create_if_missing is incompatible with the use of SAS tokens."
                 )
 
-        if "max_connections" in query:
-            params["max_connections"] = int(query.pop("max_connections"))
-
-        if "max_block_size" in query:
-            params["max_block_size"] = int(query.pop("max_block_size"))
-
-        if "max_single_put_size" in query:
-            params["max_single_put_size"] = int(query.pop("max_single_put_size"))
+        params["max_connections"] = int(query.pop("max_connections", 2))
+        params["max_block_size"] = int(query.pop("max_block_size", 4194304))
+        params["max_single_put_size"] = int(query.pop("max_single_put_size", 67108864))
+        params["checksum"] = query.pop("checksum", "true").lower() == "true"
 
         return cls(**params)
 

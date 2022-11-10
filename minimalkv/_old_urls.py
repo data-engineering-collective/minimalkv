@@ -44,12 +44,17 @@ def url2dict(url: str, raise_on_extra_params: bool = False) -> Dict[str, Any]:
     )
 
     u = urisplit(url)
+
+    query_listdict: Dict[str, List[str]] = u.getquerydict()
+    # We will just use the last occurrence for each key
+    query = {k: v[-1] for k, v in query_listdict.items()}
+
     parsed = dict(
         scheme=u.getscheme(),
         host=u.gethost(),
         port=u.getport(),
         path=u.getpath(),
-        query=u.getquerydict(),
+        query=query,
         userinfo=u.getuserinfo(),
     )
     fragment = u.getfragment()
@@ -64,10 +69,8 @@ def url2dict(url: str, raise_on_extra_params: bool = False) -> Dict[str, Any]:
         wrappers = wrap_spec[-1].partition("wrap:")[2]  # remove the 'wrap:' part
         params["wrap"] = wrappers
 
-    if "create_if_missing" in parsed["query"]:
-        create_if_missing = parsed["query"].pop("create_if_missing")[
-            -1
-        ]  # use last appearance of key
+    if "create_if_missing" in query:
+        create_if_missing = query.pop("create_if_missing")
         params["create_if_missing"] = create_if_missing in TRUEVALUES
 
     # get store-specific parameters:
