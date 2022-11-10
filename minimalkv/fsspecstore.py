@@ -1,7 +1,5 @@
 import io
-from typing import IO, TYPE_CHECKING, Dict, Iterator, Optional, Union
-
-from uritools import SplitResult
+from typing import IO, TYPE_CHECKING, Iterator, Optional, Union
 
 from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
 
@@ -180,9 +178,3 @@ class FSSpecStore(KeyValueStore):
             for key, value in self.__dict__.items()
             if not key.startswith(LAZY_PROPERTY_ATTR_PREFIX)
         }
-
-    @classmethod
-    def from_parsed_url(
-        cls, parsed_url: SplitResult, query: Dict[str, str]
-    ) -> "KeyValueStore":
-        raise NotImplementedError

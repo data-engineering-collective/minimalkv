@@ -225,6 +225,13 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
             pass
 
     def __eq__(self, other):
+        """
+        Check if two FilesystemStores are equal.
+
+        Returns true if the root path of the stores
+        and the default file permissions are the same.
+        Does not check the contents of the stores.
+        """
         return (
             isinstance(other, FilesystemStore)
             and self.root == other.root

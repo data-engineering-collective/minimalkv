@@ -47,10 +47,34 @@ class DictStore(KeyValueStore, CopyMixin):
         return filter(lambda k: k.startswith(prefix), iter(self.d))
 
     def __eq__(self, other):
-        return self.d == other.d
+        return self.d is other.d
+
+    @classmethod
+    def from_url(cls, url: SplitResult, **kwargs) -> "DictStore":
+        """
+        Create a DictStore from a URL.
+
+        URL format: memory://
+
+        **Notes**:
+
+        If the ``hazure`` scheme is used, an ``HAzureBlockBlobStore`` will be created.
+        It supports ``/`` as part of object keys.
+        """
+        return cls(**kwargs)
 
     @classmethod
     def from_parsed_url(
         cls, parsed_url: SplitResult, query: Dict[str, str]
     ) -> "DictStore":
+        """
+        Create a DictStore from a parsed URL.
+
+        URL format: memory://
+
+        **Notes**:
+
+        If the ``hazure`` scheme is used, an ``HAzureBlockBlobStore`` will be created.
+        It supports ``/`` as part of object keys.
+        """
         return DictStore()

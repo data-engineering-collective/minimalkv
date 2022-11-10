@@ -9,7 +9,7 @@ from mypy_boto3_s3.service_resource import Bucket
 from uritools import SplitResult
 
 from minimalkv import CopyMixin, KeyValueStore, UrlMixin
-from minimalkv.url_utils import get_password, get_username
+from minimalkv.url_utils import _get_password, _get_username
 
 
 def _public_readable(grants: List) -> bool:  # TODO: What kind of list
@@ -317,8 +317,8 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
             The created Boto3Store.
         """
 
-        url_access_key_id = get_username(parsed_url)
-        url_secret_access_key = get_password(parsed_url)
+        url_access_key_id = _get_username(parsed_url)
+        url_secret_access_key = _get_password(parsed_url)
         boto3_params = {
             "aws_access_key_id": url_access_key_id,
             "aws_secret_access_key": url_secret_access_key,

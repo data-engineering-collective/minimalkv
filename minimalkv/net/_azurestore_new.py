@@ -278,10 +278,10 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
             The created AzureBlockBlobStore.
         """
         use_sas = query.pop("use_sas", False)
-        from minimalkv.url_utils import get_password, get_username
+        from minimalkv.url_utils import _get_password, _get_username
 
-        account_name = get_username(parsed_url)
-        account_key = get_password(parsed_url)
+        account_name = _get_username(parsed_url)
+        account_key = _get_password(parsed_url)
 
         if account_key is None or account_name is None:
             raise ValueError("Missing account name or key in URL")
