@@ -166,17 +166,10 @@ class FSSpecStore(KeyValueStore, CopyMixin):
         IOError
             If there was an error accessing the store.
         """
-        # `find` only lists files below a directory, so we have to join
-        # and then split the two prefixes accordingly.
-        # Example for a Boto3Store:
-        #   bucketname   /    prefix1    prefix2
-        # ==============   -------------          Boto3Store perspective
-        #   bucket.name    object_prefix
-        # ============================= --------- this function's perspective
-        #        self._prefix            prefix
-        # ==============   ---------------------- What we want
-        #   dir_prefix          file_prefix
-
+        # We want to look for files whose path starts with the full prefix.
+        # `find` lists all files in a directory and allows
+        # limiting results to files whose names start with a given prefix.
+        # Thus, we have to split the full path into a directory and a file prefix.
         full_prefix = f"{self._prefix}{prefix}"
         # Find last slash in full prefix
         last_slash = full_prefix.rfind("/")
@@ -187,6 +180,7 @@ class FSSpecStore(KeyValueStore, CopyMixin):
         else:
             dir_prefix = full_prefix[: last_slash + 1]
             file_prefix = full_prefix[last_slash + 1 :]
+
         all_files_and_dirs = self._fs.find(dir_prefix, prefix=file_prefix)
 
         return map(

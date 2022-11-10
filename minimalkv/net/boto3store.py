@@ -1,7 +1,7 @@
 import io
 from contextlib import contextmanager
 from shutil import copyfileobj
-from typing import List
+from typing import List, Optional
 
 from minimalkv import CopyMixin, KeyValueStore, UrlMixin
 
@@ -97,7 +97,8 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
     def __init__(
         self,
         bucket,
-        prefix="",
+        prefix: Optional[str] = None,
+        object_prefix="",
         url_valid_time=0,
         reduced_redundancy=False,
         public=False,
@@ -111,7 +112,18 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
             if bucket not in s3_resource.buckets.all():
                 raise ValueError("invalid s3 bucket name")
         self.bucket = bucket
-        self.object_prefix = prefix.strip().lstrip("/")
+
+        if prefix is not None:
+            import warnings
+
+            warnings.warn(
+                "The prefix argument is deprecated and will be removed in a future version. "
+                "Use object_prefix instead.",
+                DeprecationWarning,
+            )
+            object_prefix = object_prefix or prefix
+        self.object_prefix = object_prefix.strip().lstrip("/")
+
         self.url_valid_time = url_valid_time
         self.reduced_redundancy = reduced_redundancy
         self.public = public

@@ -21,7 +21,7 @@ class S3FSStore(FSSpecStore, UrlMixin, CopyMixin):  # noqa D
     def __init__(
         self,
         bucket,
-        prefix="",
+        object_prefix="",
         url_valid_time=0,
         reduced_redundancy=False,
         public=False,
@@ -36,7 +36,7 @@ class S3FSStore(FSSpecStore, UrlMixin, CopyMixin):  # noqa D
                 raise ValueError("invalid s3 bucket name")
 
         self.bucket = bucket
-        self.object_prefix = prefix.strip().lstrip("/")
+        self.object_prefix = object_prefix.strip().lstrip("/")
         self.url_valid_time = url_valid_time
         self.reduced_redundancy = reduced_redundancy
         self.public = public
