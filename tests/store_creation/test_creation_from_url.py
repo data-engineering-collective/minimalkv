@@ -1,11 +1,9 @@
-from unittest.mock import MagicMock, Mock
-
 import pytest
 from bucket_manager import boto3_bucket_reference
-from redis.client import StrictRedis, Redis
+from redis.client import Redis, StrictRedis
 
 from minimalkv import url2dict
-from minimalkv._get_store import get_store_from_url, get_store
+from minimalkv._get_store import get_store, get_store_from_url
 from minimalkv.decorator import ReadOnlyDecorator
 from minimalkv.fs import FilesystemStore
 from minimalkv.memory import DictStore
@@ -116,7 +114,6 @@ def test_get_store_from_url(url, expected):
 
 
 @pytest.mark.parametrize("url, expected", good_urls)
-#@patch("minimalkv._key_value_store.KeyValueStore.__iter__", side_effect=NotImplementedError)
 def test_compare_store_creation(url, expected):
     store1 = get_store_from_url(url)
     store2 = get_store(**url2dict(url))
@@ -126,6 +123,7 @@ def test_compare_store_creation(url, expected):
     # which requires connecting to GCS, which is not possible.
     # Thus we mock iter_keys and say that the stores are not iterable.
     from minimalkv import KeyValueStore
+
     with patch.object(KeyValueStore, "__iter__", side_effect=NotImplementedError):
         assert store1 == store2
 

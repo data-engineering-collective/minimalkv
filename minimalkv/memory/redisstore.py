@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import re
 from io import BytesIO
-from typing import IO, Dict, Iterator, List, Optional, Union, TYPE_CHECKING
+from typing import IO, Dict, Iterator, List, Optional, Union
 
 from uritools import SplitResult, uriunsplit
 
@@ -10,7 +10,8 @@ from minimalkv._key_value_store import KeyValueStore
 from minimalkv._mixins import TimeToLiveMixin
 
 try:
-    from redis import StrictRedis, Redis
+    from redis import StrictRedis
+
     has_redis = True
 except ImportError:
     has_redis = False
