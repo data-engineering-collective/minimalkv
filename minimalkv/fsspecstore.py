@@ -178,13 +178,13 @@ class FSSpecStore(KeyValueStore, CopyMixin):
         # `find` only lists files below a directory, so we have to join
         # and then split the two prefixes accordingly.
         # Example for a Boto3Store:
-        # bucketname/prefix1prefix2
-        # ========== -------        Boto3Store perspective
-        # bucket.name self._prefix
-        # ==================------- FSSpecStore perspective
-        #    self._prefix    prefix
-        # ===========-------------- What we want
-        # dir_prefix  file_prefix
+        #   bucketname   /    prefix1    prefix2
+        # ==============   -------------          Boto3Store perspective
+        #   bucket.name    object_prefix
+        # ============================= --------- this function's perspective
+        #        self._prefix            prefix
+        # ==============   ---------------------- What we want
+        #   dir_prefix          file_prefix
 
         full_prefix = f"{self._prefix}{prefix}"
         # Find last slash in full prefix
