@@ -30,6 +30,7 @@ jobs:
           python-version: ${{ matrix.PYTHON_VERSION }}
           environment-file: environment.yml
       - id: google_auth
+        if: ${{ env.ACTIONS_ID_TOKEN_REQUEST_URL != '' }}
         name: 'Authenticate to Google Cloud'
         uses: google-github-actions/auth@v0.4.0
         with:
