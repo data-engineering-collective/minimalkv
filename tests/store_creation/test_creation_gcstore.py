@@ -1,5 +1,6 @@
 import base64
 import json
+import os
 import pathlib
 from uuid import uuid4
 
@@ -129,6 +130,10 @@ def test_gcstore_live_from_url():
 
     This only works if application default credentials are set up.
     """
+    # Skip test if GOOGLE_APPLICATION_CREDENTIALS is not set.
+    if os.environ.get("GOOGLE_APPLICATION_CREDENTIALS") is None:
+        pytest.skip("This test requires authentication with GCS.")
+
     bucket_name = f"test_bucket_{uuid4()}"
     url = f"gcs://{bucket_name}?create_if_missing=true&bucket_creation_location=EUROPE-WEST1"
     from minimalkv import get_store_from_url
