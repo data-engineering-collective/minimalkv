@@ -29,11 +29,15 @@ jobs:
 #          use-mamba: true
 #          python-version: ${{ matrix.PYTHON_VERSION }}
 #          environment-file: environment.yml
-      - name: Print URL
+      - name: Check if ID Token generation is enabled
         run: |
-          echo $ACTIONS_ID_TOKEN_REQUEST_URL
+          if [ $ACTIONS_ID_TOKEN_REQUEST_URL == '' ]; then
+            echo "ID Token generation is not enabled"
+            exit 1
+          fi
+        continue-on-error: true
       - id: google_auth
-        if: env.ACTIONS_ID_TOKEN_REQUEST_URL == ''
+        if: success()
         name: 'Authenticate to Google Cloud'
         uses: google-github-actions/auth@v1
         with:
