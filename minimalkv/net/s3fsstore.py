@@ -1,6 +1,6 @@
 import warnings
 
-from minimalkv import CopyMixin, UrlMixin
+from minimalkv import UrlMixin
 from minimalkv.fsspecstore import FSSpecStore
 
 try:
@@ -17,7 +17,7 @@ warnings.warn(
 )
 
 
-class S3FSStore(FSSpecStore, UrlMixin, CopyMixin):  # noqa D
+class S3FSStore(FSSpecStore, UrlMixin):  # noqa D
     def __init__(
         self,
         bucket,
