@@ -109,6 +109,13 @@ class RedisStore(TimeToLiveMixin, KeyValueStore):
         return key
 
     def __eq__(self, other):
+        """
+        Assert that two ``RedisStore``s are equal.
+
+        The connection parameters such as host, port, db, etc. are compared.
+        See :func:`from_url` for details on the connection parameters.
+        Does not compare the contents of the stores.
+        """
         return repr(self.redis.connection_pool) == repr(other.redis.connection_pool)
 
     @classmethod

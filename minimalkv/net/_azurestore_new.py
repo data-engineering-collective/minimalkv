@@ -190,6 +190,13 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
         }
 
     def __eq__(self, other):
+        """
+        Assert that two ``AzureBlockBlobStore``s are equal.
+
+        The container name and other configuration parameters are compared.
+        See :func:`from_url` for details on the connection parameters.
+        Does not compare the contents of the stores.
+        """
         return (
             isinstance(other, AzureBlockBlobStore)
             and self.conn_string == other.conn_string

@@ -98,7 +98,6 @@ good_urls = [
             )
         ),
     ),
-    ("memory://", DictStore()),
 ]
 
 # TODO test wrappers
@@ -146,6 +145,13 @@ def test_creation_wrapper():
     assert isinstance(
         get_store_from_url("memory://#wrap:readonly"),
         ReadOnlyDecorator,
+    )
+
+
+def test_dict_store_creation():
+    assert isinstance(
+        get_store_from_url("memory://"),
+        DictStore,
     )
 
 

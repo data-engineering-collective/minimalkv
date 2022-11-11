@@ -46,9 +46,6 @@ class DictStore(KeyValueStore, CopyMixin):
         """
         return filter(lambda k: k.startswith(prefix), iter(self.d))
 
-    def __eq__(self, other):
-        return self.d is other.d
-
     @classmethod
     def from_url(cls, url: SplitResult, **kwargs) -> "DictStore":
         """

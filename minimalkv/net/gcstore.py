@@ -126,10 +126,11 @@ class GoogleCloudStore(FSSpecStore):
 
     def __eq__(self, other):
         """
-        Assert that two stores are equal.
-        Does not compare the contents of the stores.
+        Assert that two ``GoogleCloudStore``s are equal.
 
-        TODO specify which attributes are compared
+        The bucket name and other configuration parameters are compared.
+        See :func:`from_url` for details on the connection parameters.
+        Does not compare the contents of the stores.
         """
         return (
             isinstance(other, GoogleCloudStore)

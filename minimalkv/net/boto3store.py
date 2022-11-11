@@ -232,8 +232,13 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
             )
 
     def __eq__(self, other):
-        # We cannot compare the credentials here.
-        # To check for equal access rights, both buckets have to be tested.
+        """
+        Assert that two ``Boto3Store``s are equal.
+
+        The bucket name and other configuration parameters are compared.
+        See :func:`from_url` for details on the connection parameters.
+        Does NOT compare the credentials or the contents of the bucket!
+        """
         return (
             isinstance(other, Boto3Store)
             and self.bucket.name == other.bucket.name
