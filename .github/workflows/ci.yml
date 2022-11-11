@@ -23,17 +23,17 @@ jobs:
       SIMPLEKV_CI: 1
     steps:
       - uses: actions/checkout@v2
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          miniforge-variant: Mambaforge
-          use-mamba: true
-          python-version: ${{ matrix.PYTHON_VERSION }}
-          environment-file: environment.yml
+#      - uses: conda-incubator/setup-miniconda@v2
+#        with:
+#          miniforge-variant: Mambaforge
+#          use-mamba: true
+#          python-version: ${{ matrix.PYTHON_VERSION }}
+#          environment-file: environment.yml
       - name: Print URL
         run: |
           echo $ACTIONS_ID_TOKEN_REQUEST_URL
       - id: google_auth
-        if: ${{ env.ACTIONS_ID_TOKEN_REQUEST_URL != '' }}
+        if: env.ACTIONS_ID_TOKEN_REQUEST_URL == ''
         name: 'Authenticate to Google Cloud'
         uses: google-github-actions/auth@v1
         with:
