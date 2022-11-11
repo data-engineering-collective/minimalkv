@@ -31,7 +31,7 @@ jobs:
 #          environment-file: environment.yml
       - name: Check if ID Token generation is enabled
         run: |
-          if [ $ACTIONS_ID_TOKEN_REQUEST_URL == '' ]; then
+          if [[ -z "${ACTIONS_ID_TOKEN_REQUEST_URL}" ]]; then
             echo "ID Token generation is not enabled"
             exit 1
           fi
