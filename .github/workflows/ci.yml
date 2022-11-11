@@ -23,12 +23,12 @@ jobs:
       SIMPLEKV_CI: 1
     steps:
       - uses: actions/checkout@v2
-#      - uses: conda-incubator/setup-miniconda@v2
-#        with:
-#          miniforge-variant: Mambaforge
-#          use-mamba: true
-#          python-version: ${{ matrix.PYTHON_VERSION }}
-#          environment-file: environment.yml
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          miniforge-variant: Mambaforge
+          use-mamba: true
+          python-version: ${{ matrix.PYTHON_VERSION }}
+          environment-file: environment.yml
       - name: Check if ID Token generation is enabled
         id: check-id-token
         run: |
