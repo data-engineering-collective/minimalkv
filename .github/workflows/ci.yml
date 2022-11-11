@@ -29,6 +29,11 @@ jobs:
           use-mamba: true
           python-version: ${{ matrix.PYTHON_VERSION }}
           environment-file: environment.yml
+      # For some reason we can't check for $ACTIONS_ID_TOKEN_REQUEST_URL
+      # from the `if` condition in the next step.
+      # See this commit: https://github.com/simonbohnen/minimalkv/commit/775c74c1b1248245d66c2be69476e18acda9f2fe
+      # and this run: https://github.com/simonbohnen/minimalkv/actions/runs/3444175584/jobs/5746499674
+      # It appears that the variable is not accessible from the env context. 
       - name: Check if ID Token generation is enabled
         id: check-id-token
         run: |
