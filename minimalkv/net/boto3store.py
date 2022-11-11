@@ -122,7 +122,7 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
                 DeprecationWarning,
             )
             object_prefix = object_prefix or prefix
-        self.object_prefix = object_prefix.strip().lstrip("/")
+        self._object_prefix = object_prefix.strip().lstrip("/")
 
         self.url_valid_time = url_valid_time
         self.reduced_redundancy = reduced_redundancy
@@ -144,21 +144,21 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
             DeprecationWarning,
         )
 
-        return self.object_prefix
+        return self._object_prefix
 
     def __new_object(self, name):
-        return self.bucket.Object(self.object_prefix + name)
+        return self.bucket.Object(self._object_prefix + name)
 
     def iter_keys(self, prefix=""):  # noqa D
         with map_boto3_exceptions():
-            prefix_len = len(self.object_prefix)
+            prefix_len = len(self._object_prefix)
             return map(
                 lambda k: k.key[prefix_len:],
-                self.bucket.objects.filter(Prefix=self.object_prefix + prefix),
+                self.bucket.objects.filter(Prefix=self._object_prefix + prefix),
             )
 
     def _delete(self, key):
-        self.bucket.Object(self.object_prefix + key).delete()
+        self.bucket.Object(self._object_prefix + key).delete()
 
     def _get(self, key):
         obj = self.__new_object(key)
@@ -188,7 +188,7 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
     def _copy(self, source, dest):
         obj = self.__new_object(dest)
         parameters = {
-            "CopySource": self.bucket.name + "/" + self.object_prefix + source,
+            "CopySource": self.bucket.name + "/" + self._object_prefix + source,
             "Metadata": self.metadata,
         }
         if self.public:
