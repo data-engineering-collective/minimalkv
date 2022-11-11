@@ -1,6 +1,12 @@
 Changelog
 *********
 
+1.5.1
+=====
+
+* Added ``S3FSStore``. This is a drop-in replacement
+  for the ``Boto3Store`` and will replace it in the next major release.
+
 1.5.0
 =====
 
