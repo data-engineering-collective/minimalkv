@@ -6,8 +6,8 @@ Changelog
 
 * Added concept for closable stores.
 
-  * Stores and Decorators can now be opened using with KeyValueStore as store
-  * Implemented this functionality for baseclasses and the AzureBlockBlobStore
+  * Stores and Decorators can now be opened using ``with KeyValueStore as store``
+  * Implemented this functionality for baseclasses and the ``AzureBlockBlobStore``
 
 1.4.4
 =====
