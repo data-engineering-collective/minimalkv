@@ -117,7 +117,7 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
             import warnings
 
             warnings.warn(
-                "The prefix argument is deprecated and will be removed in a future version. "
+                "The prefix attribute is deprecated and will be removed in the next major release."
                 "Use object_prefix instead.",
                 DeprecationWarning,
             )
