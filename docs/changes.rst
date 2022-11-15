@@ -1,7 +1,7 @@
 Changelog
 *********
 
-1.5.1
+1.6.0
 =====
 
 * Added ``S3FSStore``. This is a drop-in replacement
