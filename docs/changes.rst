@@ -1,6 +1,12 @@
 Changelog
 *********
 
+1.6.0
+=====
+
+* Added ``S3FSStore``. This is a drop-in replacement
+  for the ``Boto3Store`` and will replace it in the next major release.
+
 1.5.0
 =====
 
@@ -12,15 +18,13 @@ Changelog
 1.4.4
 =====
 
-* Keys are not quoted for ``FSSpecStore``\s anymore.
-
+* Keys are not quoted for ``FSSpecStore``s anymore.
   * Thus, e.g. GCS objects whose names include special characters like ``/`` or ``#`` can now be accessed.
 
 1.4.3
 =====
 
 * Bug fixes for Google Cloud Storage:
-
   * Request correct OAuth scope when creating credentials from URL
   * Conform to ``BufferedIOBase`` class by calling ``super()``
 
@@ -113,8 +117,8 @@ Changelog
 
 0.13.0
 ======
-* Add ``iter_prefixes()`` method to iterate over all prefixes currently in the store, in any order.
-  The prefixes are listed up to the given delimiter.
+* Add ``iter_prefixes()`` method to iterate over all prefixes currently in the store, in any order. The
+        prefixes are listed up to the given delimiter.
 
 0.12.0
 ======
@@ -128,7 +132,7 @@ Changelog
 0.11.11
 =======
 
-* Fix file-descriptor leak in ``KeyValueStore._get_file``
+* Fix file-descriptor leak in `KeyValueStore._get_file`
 
 0.11.10
 =======

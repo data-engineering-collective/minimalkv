@@ -1,4 +1,5 @@
 import io
+import warnings
 from typing import IO, TYPE_CHECKING, Iterator, Optional, Union
 
 if TYPE_CHECKING:
@@ -81,7 +82,13 @@ class FSSpecStoreEntry(io.BufferedIOBase):
 class FSSpecStore(KeyValueStore):
     """A KeyValueStore that uses an fsspec AbstractFileSystem to store the key-value pairs."""
 
-    def __init__(self, prefix: str = "", mkdir_prefix: bool = True):
+    def __init__(
+        self,
+        prefix: str = "",
+        mkdir_prefix: bool = True,
+        write_kwargs: Optional[dict] = None,
+        custom_fs: Optional["AbstractFileSystem"] = None,
+    ):
         """
         Initialize an FSSpecStore.
 
@@ -91,12 +98,19 @@ class FSSpecStore(KeyValueStore):
         ----------
         prefix: str, optional
             The prefix to use on the FSSpecStore when storing keys.
-        mkdir_prefix : Boolean
+        mkdir_prefix: bool, optional
             If True, the prefix will be created if it does not exist.
             Analogous to the create_if_missing parameter in AzureBlockBlobStore or GoogleCloudStore.
+        write_kwargs: dict, optional
+            Additional keyword arguments to pass to the fsspec FileSystem when writing files.
+        custom_fs: AbstractFileSystem, optional
+            If given, use this fsspec FileSystem instead of creating a new one.
         """
-        self.prefix = prefix
-        self.mkdir_prefix = mkdir_prefix
+        write_kwargs = write_kwargs or {}
+        self._prefix = prefix
+        self._mkdir_prefix = mkdir_prefix
+        self._write_kwargs = write_kwargs
+        self._custom_fs = custom_fs
 
     @lazy_property
     def _prefix_exists(self) -> Union[None, bool]:
@@ -105,9 +119,39 @@ class FSSpecStore(KeyValueStore):
         # Check if prefix exists.
         # Used by inheriting classes to check if e.g. a bucket exists.
         try:
-            return self._fs.exists(self.prefix)
+            return self._fs.exists(self._prefix)
         except (OSError, RefreshError):
             return None
+
+    @property
+    def mkdir_prefix(self):
+        """
+        Whether to create the prefix if it does not exist.
+
+        .. note:: Deprecated in 2.0.0.
+        """
+        warnings.warn(
+            "The mkdir_prefix attribute is deprecated!"
+            "It will be renamed to _mkdir_prefix in the next release.",
+            DeprecationWarning,
+        )
+
+        return self._mkdir_prefix
+
+    @property
+    def prefix(self):
+        """
+        Get the prefix used on the ``fsspec`` ``FileSystem`` when storing keys.
+
+        .. note:: Deprecated in 2.0.0.
+        """
+        warnings.warn(
+            "The prefix attribute is deprecated!"
+            "It will be renamed to _prefix in the next release.",
+            DeprecationWarning,
+        )
+
+        return self._prefix
 
     def iter_keys(self, prefix: str = "") -> Iterator[str]:
         """Iterate over all keys in the store starting with prefix.
@@ -122,40 +166,54 @@ class FSSpecStore(KeyValueStore):
         IOError
             If there was an error accessing the store.
         """
-        # List files
-        all_files_and_dirs = self._fs.find(f"{self.prefix}", prefix=prefix)
+        # We want to look for files whose path starts with the full prefix.
+        # `find` lists all files in a directory and allows
+        # limiting results to files whose names start with a given prefix.
+        # Thus, we have to split the full path into a directory and a file prefix.
+        full_prefix = f"{self._prefix}{prefix}"
+        # Find last slash in full prefix
+        last_slash = full_prefix.rfind("/")
+        if last_slash == -1:
+            # No slash in full prefix
+            dir_prefix = ""
+            file_prefix = full_prefix
+        else:
+            dir_prefix = full_prefix[: last_slash + 1]
+            file_prefix = full_prefix[last_slash + 1 :]
+
+        all_files_and_dirs = self._fs.find(dir_prefix, prefix=file_prefix)
 
         return map(
-            lambda k: k.replace(f"{self.prefix}", ""),
+            lambda k: k.replace(f"{self._prefix}", ""),
             all_files_and_dirs,
         )
 
     def _delete(self, key: str) -> None:
         try:
-            self._fs.rm_file(f"{self.prefix}{key}")
+            self._fs.rm_file(f"{self._prefix}{key}")
         except FileNotFoundError:
             pass
 
     def _open(self, key: str) -> IO:
         try:
-            return self._fs.open(f"{self.prefix}{key}")
+            return self._fs.open(f"{self._prefix}{key}")
         except FileNotFoundError:
             raise KeyError(key)
 
     # Required to prevent error when credentials are not sufficient for listing objects
     def _get_file(self, key: str, file: IO) -> str:
         try:
-            file.write(self._fs.cat_file(f"{self.prefix}{key}"))
+            file.write(self._fs.cat_file(f"{self._prefix}{key}"))
             return key
         except FileNotFoundError:
             raise KeyError(key)
 
     def _put_file(self, key: str, file: IO) -> str:
-        self._fs.pipe_file(f"{self.prefix}{key}", file.read())
+        self._fs.pipe_file(f"{self._prefix}{key}", file.read(), **self._write_kwargs)
         return key
 
     def _has_key(self, key: str) -> bool:
-        return self._fs.exists(f"{self.prefix}{key}")
+        return self._fs.exists(f"{self._prefix}{key}")
 
     def _create_filesystem(self) -> "AbstractFileSystem":
         # To be implemented by inheriting classes.
@@ -163,10 +221,13 @@ class FSSpecStore(KeyValueStore):
 
     @lazy_property
     def _fs(self) -> "AbstractFileSystem":
-        fs = self._create_filesystem()
+        if self._custom_fs is not None:
+            fs = self._custom_fs
+        else:
+            fs = self._create_filesystem()
 
-        if self.mkdir_prefix and not fs.exists(self.prefix):
-            fs.mkdir(self.prefix)
+        if self._mkdir_prefix and not fs.exists(self._prefix):
+            fs.mkdir(self._prefix)
         return fs
 
     # Skips lazy properties.
