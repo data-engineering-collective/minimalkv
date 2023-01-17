@@ -1,12 +1,19 @@
 Changelog
 *********
 
+1.6.0
+=====
+
+* Added ``S3FSStore``. This is a drop-in replacement
+  for the ``Boto3Store`` and will replace it in the next major release.
+
 1.5.0
 =====
 
 * Added concept for closable stores.
-  * Stores and Decorators can now be opened using with KeyValueStore as store
-  * Implemented this functionality for baseclasses and the AzureBlockBlobStore
+
+  * Stores and Decorators can now be opened using ``with KeyValueStore as store``
+  * Implemented this functionality for baseclasses and the ``AzureBlockBlobStore``
 
 1.4.4
 =====

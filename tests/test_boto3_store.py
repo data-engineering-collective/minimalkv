@@ -2,6 +2,8 @@ import os
 
 import pytest
 
+from minimalkv.net.s3fsstore import S3FSStore
+
 boto3 = pytest.importorskip("boto3")
 from io import BytesIO
 
@@ -41,8 +43,19 @@ class TestBoto3Storage(BasicStore, UrlStore):
         return request.param
 
     @pytest.fixture
-    def store(self, bucket, prefix, reduced_redundancy):
+    def boto3store(self, bucket, prefix, reduced_redundancy):
         return Boto3Store(bucket, prefix, reduced_redundancy=reduced_redundancy)
+
+    @pytest.fixture
+    def s3fsstore(self, bucket, prefix, reduced_redundancy):
+        return S3FSStore(bucket, prefix, reduced_redundancy=reduced_redundancy)
+
+    @pytest.fixture(params=[True, False])
+    def store(self, request, boto3store, s3fsstore):
+        if request.param:
+            return boto3store
+        else:
+            return s3fsstore
 
     # Disable max key length test as it leads to problems with minio
     test_max_key_length = None

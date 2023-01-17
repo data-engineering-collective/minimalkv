@@ -92,14 +92,35 @@ def boto3_bucket_reference(
             endpoint_url += f":{port}"
 
     name = bucket_name or f"testrun-bucket-{uuid()}"
+    # We only set the endpoint url if we're testing against a non-aws host
+    if port != 80:
+        s3_client = boto3.client(
+            "s3",
+            endpoint_url=endpoint_url,
+        )
+    else:
+        s3_client = boto3.client(
+            "s3",
+        )
 
-    s3_resource = boto3.resource(
-        "s3",
-        endpoint_url=endpoint_url,
-        aws_access_key_id=access_key,
-        aws_secret_access_key=secret_key,
-        region_name="us-east-1",
-    )
+    s3_client.create_bucket(Bucket=name)
+
+    if port != 80:
+        s3_resource = boto3.resource(
+            "s3",
+            endpoint_url=endpoint_url,
+            aws_access_key_id=access_key,
+            aws_secret_access_key=secret_key,
+            region_name="us-east-1",
+        )
+    else:
+        s3_resource = boto3.resource(
+            "s3",
+            aws_access_key_id=access_key,
+            aws_secret_access_key=secret_key,
+            region_name="us-east-1",
+        )
+
     bucket = s3_resource.Bucket(name)
     return bucket
 
