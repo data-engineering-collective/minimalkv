@@ -83,6 +83,13 @@ def boto3_bucket_reference(
     port=None,
     is_secure=None,
 ):
+    import os
+
+    # Set environment variables for boto3
+    os.environ["AWS_ACCESS_KEY_ID"] = access_key
+    os.environ["AWS_SECRET_ACCESS_KEY"] = secret_key
+    os.environ["AWS_DEFAULT_REGION"] = "us-east-1"
+
     # Build endpoint host
     endpoint_url = None
     if host:
