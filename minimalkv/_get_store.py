@@ -61,7 +61,7 @@ def get_store_from_url(
     """
     from minimalkv._hstores import (
         HAzureBlockBlobStore,
-        HBoto3Store,
+        HS3FSStore,
         HDictStore,
         HFilesystemStore,
         HGoogleCloudStore,
@@ -70,15 +70,15 @@ def get_store_from_url(
     from minimalkv.memory import DictStore
     from minimalkv.memory.redisstore import RedisStore
     from minimalkv.net.azurestore import AzureBlockBlobStore
-    from minimalkv.net.boto3store import Boto3Store
+    from minimalkv.net.s3fsstore import S3FSStore
     from minimalkv.net.gcstore import GoogleCloudStore
 
     scheme_to_store: Dict[str, Type[KeyValueStore]] = {
         "azure": AzureBlockBlobStore,
         "hazure": HAzureBlockBlobStore,
-        "s3": Boto3Store,
-        "hs3": HBoto3Store,
-        "boto": HBoto3Store,
+        "s3": S3FSStore,
+        "hs3": HS3FSStore,
+        "boto": HS3FSStore,
         "gcs": GoogleCloudStore,
         "hgcs": HGoogleCloudStore,
         "fs": FilesystemStore,
@@ -98,7 +98,11 @@ def get_store_from_url(
     # 2. As the fragment, e.g. "s3://...#wrap:readonly" (new style)
     wrappers = extract_wrappers(parsed_url)
 
-    scheme = parsed_url.getscheme()
+    # Remove wrappers from scheme
+    scheme_parts = parsed_url.getscheme().split("+")
+    # pop off the type of the store
+    scheme = scheme_parts[0]
+
     if scheme not in scheme_to_store:
         raise ValueError(f'Unknown storage type "{scheme}"')
 

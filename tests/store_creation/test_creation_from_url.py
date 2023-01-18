@@ -11,6 +11,9 @@ from minimalkv.memory.redisstore import RedisStore
 from minimalkv.net.azurestore import AzureBlockBlobStore
 from minimalkv.net.boto3store import Boto3Store
 
+# GCS is tested separately in test_creation_gcstore.py
+# Boto, Boto3, and S3FS are tested separately in test_creation_boto3store.py
+
 good_urls = [
     (
         "azure://MYACCOUNT:dead%2Fbeef@1buc-ket1?param1=foo&param2=🍺&eat_more_🍎=1&create_if_missing=true",
@@ -67,19 +70,6 @@ good_urls = [
         FilesystemStore(root="/an/absolute/path"),
     ),
     (
-        "s3://access_key:secret_key@endpoint:1234/bucketname?create_if_missing=false",
-        Boto3Store(
-            bucket=boto3_bucket_reference(
-                access_key="access_key",
-                secret_key="secret_key",
-                host="endpoint",
-                port=1234,
-                bucket_name="bucketname-access_key",
-                is_secure=True,
-            ),
-        ),
-    ),
-    (
         "redis:///2",
         RedisStore(
             redis=Redis(
@@ -121,13 +111,6 @@ def test_get_store_from_url(url, expected):
 
 @pytest.mark.parametrize("url, expected", good_urls)
 def test_compare_store_creation(url, expected):
-    if isinstance(expected, Boto3Store):
-        pytest.skip(
-            """
-            The old store creation method will attempt to create a
-            connection to AWS. This is currently not supported.
-            """
-        )
     store1 = get_store_from_url(url)
     store2 = get_store(**url2dict(url))
     check_store_equal(store1, store2)
