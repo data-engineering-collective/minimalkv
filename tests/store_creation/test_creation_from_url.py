@@ -100,8 +100,6 @@ good_urls = [
     ),
 ]
 
-# TODO test wrappers
-
 bad_urls = [
     (
         "azure://MYACCOUNT:deadb/eef@1buc-ket1?param1=foo&param2=🍺&eat_more_🍎=1&create_if_missing=true",
@@ -141,7 +139,11 @@ def test_bad_url2dict(url, raises):
         get_store_from_url(url)
 
 
-def test_creation_wrapper():
+def test_wrapper_old_style():
+    assert isinstance(get_store_from_url("memory+readonly://"), ReadOnlyDecorator)
+
+
+def test_wrapper_new_style():
     assert isinstance(
         get_store_from_url("memory://#wrap:readonly"),
         ReadOnlyDecorator,
