@@ -1,5 +1,4 @@
 import pytest
-from bucket_manager import boto3_bucket_reference
 from redis.client import Redis, StrictRedis
 
 from minimalkv import url2dict
@@ -9,7 +8,6 @@ from minimalkv.fs import FilesystemStore
 from minimalkv.memory import DictStore
 from minimalkv.memory.redisstore import RedisStore
 from minimalkv.net.azurestore import AzureBlockBlobStore
-from minimalkv.net.boto3store import Boto3Store
 
 # GCS is tested separately in test_creation_gcstore.py
 # Boto, Boto3, and S3FS are tested separately in test_creation_boto3store.py
