@@ -24,7 +24,8 @@ from minimalkv.net.gcstore import GoogleCloudStore
 def gc_credentials():
     # If we have credentials in the environment, we don't need to do anything
     if "GOOGLE_APPLICATION_CREDENTIALS" in os.environ:
-        return None
+        yield None
+        return
 
     # If there are no credentials in the environment, we retrieve them from google_cloud_credentials.ini
     parser = ConfigParser()
