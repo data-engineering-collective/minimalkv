@@ -51,22 +51,6 @@ def gc_credentials():
         del os.environ["STORAGE_EMULATOR_HOST"]
 
 
-# @pytest.fixture(scope="module")
-# def gc_live_credentials_base64():
-#     import base64
-#     from pathlib import Path
-#
-#     path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
-#     if path is None:
-#         path = "/exploration_scripts/nice-road-330220-167c4b1bbd12.json"
-#         # pytest.skip("No credentials found")
-#         # return
-#
-#     json_as_bytes = Path(path).read_bytes()
-#     json_b64_encoded = base64.urlsafe_b64encode(json_as_bytes).decode()
-#     return json_b64_encoded
-
-
 def try_delete_bucket(bucket):
     # normally here we should delete the bucket
     # however the emulator (fake-gcs-server) doesn't currently support bucket deletion.

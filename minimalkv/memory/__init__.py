@@ -55,7 +55,7 @@ class DictStore(KeyValueStore, CopyMixin):
 
         **Notes**:
 
-        If the ``hazure`` scheme is used, an ``HAzureBlockBlobStore`` will be created.
+        If the ``hmemory`` scheme is used, an ``HDictStore`` will be created.
         It supports ``/`` as part of object keys.
         """
         return cls(**kwargs)
@@ -71,7 +71,7 @@ class DictStore(KeyValueStore, CopyMixin):
 
         **Notes**:
 
-        If the ``hazure`` scheme is used, an ``HAzureBlockBlobStore`` will be created.
+        If the ``hmemory`` scheme is used, an ``HDictStore`` will be created.
         It supports ``/`` as part of object keys.
         """
         return DictStore()

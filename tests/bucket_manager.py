@@ -55,9 +55,6 @@ def boto3_bucket(
     is_secure=None,
     **kwargs,
 ):
-    # Credentials where previously set in the environment.
-    # We now set them via boto3.
-
     bucket = boto3_bucket_reference(
         host=host,
         bucket_name=bucket_name,
