@@ -6,9 +6,9 @@ from minimalkv.memory import DictStore
 from minimalkv.memory.redisstore import RedisStore
 from minimalkv.net.azurestore import AzureBlockBlobStore
 from minimalkv.net.boto3store import Boto3Store
-from minimalkv.net.s3fsstore import S3FSStore
 from minimalkv.net.botostore import BotoStore
 from minimalkv.net.gcstore import GoogleCloudStore
+from minimalkv.net.s3fsstore import S3FSStore
 
 
 class HDictStore(ExtendedKeyspaceMixin, DictStore):  # noqa D
@@ -40,8 +40,10 @@ class HBotoStore(ExtendedKeyspaceMixin, BotoStore):  # noqa D
         k = self.bucket.lookup(self.prefix + key)
         return k.size
 
+
 class HS3FSStore(ExtendedKeyspaceMixin, S3FSStore):  # noqa D
     pass
+
 
 class HBoto3Store(ExtendedKeyspaceMixin, Boto3Store):  # noqa D
     pass

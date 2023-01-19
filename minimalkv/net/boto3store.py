@@ -1,15 +1,11 @@
 import io
-import os
 from contextlib import contextmanager
 from shutil import copyfileobj
-from typing import Dict, List, Optional, Union
+from typing import List, Optional, Union
 
-import boto3
 from mypy_boto3_s3.service_resource import Bucket
-from uritools import SplitResult
 
 from minimalkv import CopyMixin, KeyValueStore, UrlMixin
-from minimalkv.url_utils import _get_password, _get_username
 
 
 def _public_readable(grants: List) -> bool:  # TODO: What kind of list

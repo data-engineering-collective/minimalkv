@@ -61,17 +61,17 @@ def get_store_from_url(
     """
     from minimalkv._hstores import (
         HAzureBlockBlobStore,
-        HS3FSStore,
         HDictStore,
         HFilesystemStore,
         HGoogleCloudStore,
+        HS3FSStore,
     )
     from minimalkv.fs import FilesystemStore
     from minimalkv.memory import DictStore
     from minimalkv.memory.redisstore import RedisStore
     from minimalkv.net.azurestore import AzureBlockBlobStore
-    from minimalkv.net.s3fsstore import S3FSStore
     from minimalkv.net.gcstore import GoogleCloudStore
+    from minimalkv.net.s3fsstore import S3FSStore
 
     scheme_to_store: Dict[str, Type[KeyValueStore]] = {
         "azure": AzureBlockBlobStore,
@@ -149,7 +149,7 @@ def extract_wrappers(parsed_url: SplitResult) -> List[str]:
     # split off old-style wrappers, if any:
     parts = parsed_url.getscheme().split("+")
     # pop off the type of the store
-    parts.pop(-1)
+    parts.pop(0)
     old_wrappers = list(reversed(parts))
 
     # find new-style wrappers, if any:
@@ -249,7 +249,7 @@ def get_store(
 
     # split off old-style wrappers, if any:
     parts = type.split("+")
-    type = parts.pop(-1)
+    type = parts.pop(0)
     decorators = list(reversed(parts))
 
     # find new-style wrappers, if any:

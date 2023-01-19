@@ -7,7 +7,7 @@ from uritools import SplitResult
 
 from minimalkv import UrlMixin
 from minimalkv.fsspecstore import FSSpecStore
-from minimalkv.url_utils import _get_username, _get_password
+from minimalkv.url_utils import _get_password, _get_username
 
 try:
     from s3fs import S3FileSystem
@@ -179,13 +179,13 @@ class S3FSStore(FSSpecStore, UrlMixin):  # noqa D
 
         if url_access_key_id is None:
             url_secret_access_key = os.environ.get("AWS_ACCESS_KEY_ID")
+        else:
+            os.environ["AWS_ACCESS_KEY_ID"] = url_access_key_id
 
         if url_secret_access_key is None:
             url_secret_access_key = os.environ.get("AWS_SECRET_ACCESS_KEY")
-
-        # Set environment variables
-        os.environ["AWS_ACCESS_KEY_ID"] = url_access_key_id
-        os.environ["AWS_SECRET_ACCESS_KEY"] = url_secret_access_key
+        else:
+            os.environ["AWS_SECRET_ACCESS_KEY"] = url_secret_access_key
 
         boto3_params = {
             "aws_access_key_id": url_access_key_id,
@@ -234,4 +234,3 @@ class S3FSStore(FSSpecStore, UrlMixin):  # noqa D
         bucket = resource.Bucket(bucket_name)
 
         return cls(bucket)
-
