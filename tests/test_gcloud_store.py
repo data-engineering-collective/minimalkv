@@ -58,6 +58,9 @@ def gc_credentials():
 
 
 def try_delete_bucket(bucket):
+    if bucket is None:
+        return
+
     # normally here we should delete the bucket
     # however the emulator (fake-gcs-server) doesn't currently support bucket deletion.
     # see: https://github.com/fsouza/fake-gcs-server/issues/214
@@ -74,15 +77,11 @@ def try_delete_bucket(bucket):
 
 def get_bucket_from_store(gcstore: GoogleCloudStore) -> Bucket:
     client = get_client_from_store(gcstore)
-    if gcstore.create_if_missing and not client.lookup_bucket(gcstore.bucket_name):
-        bucket = client.create_bucket(
-            bucket_or_name=gcstore.bucket_name,
-            location=gcstore.bucket_creation_location,
-            project=gcstore.project_name,
-        )
-    else:
+    try:
         # will raise an error if bucket not found
         bucket = client.get_bucket(gcstore.bucket_name)
+    except NotFound:
+        bucket = None
 
     return bucket
 
@@ -113,8 +112,10 @@ def dirty_store(gc_credentials):
 
 @pytest.fixture(scope="function")
 def store(dirty_store):
-    for blob in get_bucket_from_store(dirty_store).list_blobs():
-        blob.delete()
+    bucket = get_bucket_from_store(dirty_store)
+    if bucket is not None:
+        for blob in bucket.list_blobs():
+            blob.delete()
 
     dirty_store._fs.invalidate_cache()
 
@@ -184,8 +185,10 @@ class TestExtendedKeysGCStore(TestGoogleCloudStore, ExtendedKeyspaceTests):
 
     @pytest.fixture(scope="function")
     def store(self, dirty_store):
-        for blob in get_bucket_from_store(dirty_store).list_blobs():
-            blob.delete()
+        bucket = get_bucket_from_store(dirty_store)
+        if bucket is not None:
+            for blob in bucket.list_blobs():
+                blob.delete()
         # Invalidate fsspec cache
         dirty_store._fs.invalidate_cache()
         if not os.environ.get("STORAGE_EMULATOR_HOST", None):
