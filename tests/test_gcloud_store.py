@@ -78,6 +78,7 @@ def get_bucket_from_store(gcstore: GoogleCloudStore) -> Bucket:
         bucket = client.create_bucket(
             bucket_or_name=gcstore.bucket_name,
             location=gcstore.bucket_creation_location,
+            project=gcstore.project_name,
         )
     else:
         # will raise an error if bucket not found
