@@ -1,6 +1,14 @@
 Changelog
 *********
 
+1.7.0
+=====
+* Deprecated ``get_store``, ``url2dict``, ``_parse_userinfo``, and ``extract_params``.
+
+  * ``get_store_from_url`` should be used to create stores from a URL
+
+* Added ``from_url`` and ``from_parsed_url`` to each store.
+
 1.6.0
 =====
 
