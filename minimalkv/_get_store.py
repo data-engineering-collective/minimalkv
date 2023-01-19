@@ -4,8 +4,8 @@ from warnings import warn
 
 from uritools import SplitResult, urisplit
 
-from minimalkv import url2dict
 from minimalkv._key_value_store import KeyValueStore
+from minimalkv._old_urls import url2dict
 
 
 def get_store_from_url(
