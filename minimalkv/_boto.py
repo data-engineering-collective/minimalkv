@@ -10,13 +10,23 @@ def _get_s3bucket(
     from boto.s3.connection import S3ResponseError  # type: ignore
     from boto.s3.connection import OrdinaryCallingFormat, S3Connection
 
-    s3con = S3Connection(
-        aws_access_key_id=access_key,
-        aws_secret_access_key=secret_key,
-        host=host,
-        is_secure=False,
-        calling_format=OrdinaryCallingFormat(),
-    )
+    s3_connection_params = {
+        "aws_access_key_id": access_key,
+        "aws_secret_access_key": secret_key,
+        "is_secure": False,
+        "calling_format": OrdinaryCallingFormat(),
+    }
+
+    # Split up the host into host and port.
+    if ":" in host:
+        host, port = host.split(":")
+        s3_connection_params["host"] = host
+        s3_connection_params["port"] = int(port)
+    else:
+        s3_connection_params["host"] = host
+
+    s3con = S3Connection(**s3_connection_params)
+
     # add access key prefix to bucket name, unless explicitly prohibited
     if force_bucket_suffix and not bucket.lower().endswith("-" + access_key.lower()):
         bucket = bucket + "-" + access_key.lower()
