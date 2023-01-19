@@ -1,14 +1,11 @@
 """Implement the AzureBlockBlobStore for `azure-storage-blob~=12`."""
 import io
 from contextlib import contextmanager
-from typing import Dict, Optional
-
-from uritools import SplitResult
+from typing import Optional
 
 from minimalkv._key_value_store import KeyValueStore
-
-from ._azurestore_common import _byte_buffer_md5, _file_md5
-from ._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
+from minimalkv.net._azurestore_common import _byte_buffer_md5, _file_md5
+from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
 
 
 @contextmanager
@@ -107,6 +104,7 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
         with map_azure_exceptions(key, ("BlobNotFound",)):
             blob_client.get_blob_properties()
             return True
+        return False
 
     def iter_keys(self, prefix=None):  # noqa D
         with map_azure_exceptions():
@@ -188,155 +186,6 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
             for key, value in self.__dict__.items()
             if not key.startswith(LAZY_PROPERTY_ATTR_PREFIX) and key not in dont_pickle
         }
-
-    def __eq__(self, other):
-        """
-        Assert that two ``AzureBlockBlobStore``s are equal.
-
-        The container name and other configuration parameters are compared.
-        See :func:`from_url` for details on the connection parameters.
-        Does not compare the contents of the stores.
-        """
-        return (
-            isinstance(other, AzureBlockBlobStore)
-            and self.conn_string == other.conn_string
-            and self.container == other.container
-            and self.public == other.public
-            and self.create_if_missing == other.create_if_missing
-            and self.max_connections == other.max_connections
-            and self.max_block_size == other.max_block_size
-            and self.max_single_put_size == other.max_single_put_size
-            and self.checksum == other.checksum
-        )
-
-    @classmethod
-    def from_url(cls, url: str) -> "AzureBlockBlobStore":
-        """
-        Create an ``AzureBlockBlobStore`` from a URL.
-
-        URl format:
-        ``azure://<account_name>:<account_key>@<container_name>[?<query_args>]``
-
-        **Positional arguments**:
-
-        ``account_name``: The name of the Azure storage account
-
-        ``account_key``: The access key or SAS token of the Azure storage account
-
-        ``container_name``: The name of the container to use
-
-        **Query arguments**:
-
-        ``use_sas``: Use the ``account_key`` as a shared access signature (SAS) token (default: ``False``)
-
-        ``create_if_missing``: Create the container if it does not exist.
-        Has to be ``False`` if ``use_sas`` is set (default: ``True``)
-
-        ``max_connections``: The maximum number of parallel connections to use when uploading
-        or downloading blobs (default: ``2``)
-
-        ``max_single_put_size``: max_single_put_size is the largest size upload supported in a single put call
-
-        ``max_block_size``: maximum block size is maximum size of the blocks (maximum size is <= 100MB)
-
-        ``checksum``: Whether to compute and store MD5 checksums for uploaded blobs (default: ``True``)
-
-        **Notes**:
-
-        If the ``hazure`` scheme is used, an ``HAzureBlockBlobStore`` will be created.
-        It supports ``/`` as part of object keys.
-
-        Parameters
-        ----------
-        url
-            URL to create store from.
-
-        Returns
-        -------
-        store
-            AzureBlockBlobStore created from URL.
-        """
-        from minimalkv import get_store_from_url
-
-        store = get_store_from_url(url, store_cls=cls)
-        if not isinstance(store, cls):
-            raise ValueError(f"Expected {cls}, got {type(store)}")
-        return store
-
-    @classmethod
-    def from_parsed_url(
-        cls, parsed_url: SplitResult, query: Dict[str, str]
-    ) -> "AzureBlockBlobStore":
-        """
-        Build an AzureBlockBlobStore from a parsed URL.
-
-        See :func:`from_url` for details on the expected format of the URL.
-
-        Parameters
-        ----------
-        parsed_url: SplitResult
-            The parsed URL.
-        query: Dict[str, str]
-            Query parameters from the URL.
-
-        Returns
-        -------
-        store : AzureBlockBlobStore
-            The created AzureBlockBlobStore.
-        """
-        use_sas = query.pop("use_sas", False)
-        from minimalkv.url_utils import _get_password, _get_username
-
-        account_name = _get_username(parsed_url)
-        account_key = _get_password(parsed_url)
-
-        if account_key is None or account_name is None:
-            raise ValueError("Missing account name or key in URL")
-
-        # Mandatory parameters
-        params = {
-            "conn_string": _build_conn_string(account_name, account_key, use_sas),
-            "container": parsed_url.gethost(),
-            "public": False,
-        }
-
-        if "create_if_missing" in query:
-            create_if_missing = query.pop("create_if_missing", "").lower() == "true"
-            params["create_if_missing"] = create_if_missing
-
-            if create_if_missing and use_sas:
-                raise Exception(
-                    "create_if_missing is incompatible with the use of SAS tokens."
-                )
-
-        params["max_connections"] = int(query.pop("max_connections", 2))
-        params["max_block_size"] = int(query.pop("max_block_size", 4194304))
-        params["max_single_put_size"] = int(query.pop("max_single_put_size", 67108864))
-        params["checksum"] = query.pop("checksum", "true").lower() == "true"
-
-        return cls(**params)
-
-
-def _build_conn_string(
-    account_name=None,
-    account_key=None,
-    use_sas=False,
-    default_endpoints_protocol=None,
-):
-    protocol = default_endpoints_protocol or "https"
-    if use_sas:
-        return (
-            "DefaultEndpointsProtocol={protocol};AccountName={account_name};"
-            "SharedAccessSignature={shared_access_signature}".format(
-                protocol=protocol,
-                account_name=account_name,
-                shared_access_signature=account_key,
-            )
-        )
-    else:
-        return "DefaultEndpointsProtocol={protocol};AccountName={account_name};AccountKey={account_key}".format(
-            protocol=protocol, account_name=account_name, account_key=account_key
-        )
 
 
 class IOInterface(io.BufferedIOBase):

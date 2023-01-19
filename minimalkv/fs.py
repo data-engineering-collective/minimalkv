@@ -1,10 +1,8 @@
 import os
 import os.path
 import shutil
-from typing import IO, Any, Callable, Dict, Iterator, List, Optional, Union, cast
-from urllib.parse import quote
-
-from uritools import SplitResult
+import urllib.parse
+from typing import IO, Any, Callable, Iterator, List, Optional, Union, cast
 
 from minimalkv._key_value_store import KeyValueStore
 from minimalkv._mixins import CopyMixin, UrlMixin
@@ -143,7 +141,7 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
     def _url_for(self, key: str) -> str:
         full = os.path.abspath(self._build_filename(key))
         parts = full.split(os.sep)
-        location = "/".join(quote(p, safe="") for p in parts)
+        location = "/".join(urllib.parse.quote(p, safe="") for p in parts)
         return "file://" + location
 
     def keys(self, prefix: str = "") -> List[str]:
@@ -221,66 +219,8 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
                 if k.startswith(prefix):
                     yield k
         except OSError:
-            # path does not exist
+            # path does not exists
             pass
-
-    def __eq__(self, other):
-        """
-        Check if two FilesystemStores are equal.
-
-        Returns true if the root path of the stores
-        and the default file permissions are the same.
-        Does not check the contents of the stores.
-        """
-        return (
-            isinstance(other, FilesystemStore)
-            and self.root == other.root
-            and self.perm == other.perm
-        )
-
-    @classmethod
-    def from_url(cls, url: str) -> "FilesystemStore":
-        """Create a FilesystemStore from a URL.
-
-        Parameters
-        ----------
-        url : str
-            URL to create store from. Must start with ``file://``.
-        """
-        from minimalkv import get_store_from_url
-
-        store = get_store_from_url(url, store_cls=cls)
-        if not isinstance(store, cls):
-            raise ValueError(f"Expected {cls}, got {type(store)}")
-        return store
-
-    @classmethod
-    def from_parsed_url(
-        cls, parsed_url: SplitResult, query: Dict[str, str]
-    ) -> "FilesystemStore":
-        """
-        Build a FilesystemStore from a parsed URL.
-
-        See :func:`from_url` for details on the expected format of the URL.
-
-        Parameters
-        ----------
-        parsed_url: SplitResult
-            The parsed URL.
-        query: Dict[str, str]
-            Query parameters from the URL.
-
-        Returns
-        -------
-        store : FilesystemStore
-            The created FilesystemStore.
-        """
-        hostname = parsed_url.gethost() or ""
-        fs_path = hostname + parsed_url.getpath()
-        create_if_missing = query.get("create_if_missing", "true").lower() == "true"
-        if create_if_missing and not os.path.exists(fs_path):
-            os.makedirs(fs_path)
-        return FilesystemStore(fs_path)
 
 
 class WebFilesystemStore(FilesystemStore):
@@ -337,4 +277,4 @@ class WebFilesystemStore(FilesystemStore):
             stem: str = self.url_prefix(self, key)
         else:
             stem = self.url_prefix
-        return stem + quote(rel, safe="")
+        return stem + urllib.parse.quote(rel, safe="")
