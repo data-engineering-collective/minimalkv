@@ -4,6 +4,7 @@ from warnings import warn
 
 from uritools import SplitResult, urisplit
 
+from minimalkv import url2dict
 from minimalkv._key_value_store import KeyValueStore
 
 
@@ -59,36 +60,13 @@ def get_store_from_url(
     json_b64_encoded = base64.urlsafe_b64encode(b).decode()
 
     """
-    from minimalkv._hstores import (
-        HAzureBlockBlobStore,
-        HDictStore,
-        HFilesystemStore,
-        HGoogleCloudStore,
-        HS3FSStore,
-    )
-    from minimalkv.fs import FilesystemStore
-    from minimalkv.memory import DictStore
-    from minimalkv.memory.redisstore import RedisStore
-    from minimalkv.net.azurestore import AzureBlockBlobStore
-    from minimalkv.net.gcstore import GoogleCloudStore
+    from minimalkv._hstores import HS3FSStore
     from minimalkv.net.s3fsstore import S3FSStore
 
     scheme_to_store: Dict[str, Type[KeyValueStore]] = {
-        "azure": AzureBlockBlobStore,
-        "hazure": HAzureBlockBlobStore,
         "s3": S3FSStore,
         "hs3": HS3FSStore,
         "boto": HS3FSStore,
-        "gcs": GoogleCloudStore,
-        "hgcs": HGoogleCloudStore,
-        "fs": FilesystemStore,
-        "file": FilesystemStore,
-        "hfs": HFilesystemStore,
-        "hfile": HFilesystemStore,
-        "filesystem": HFilesystemStore,
-        "memory": DictStore,
-        "hmemory": HDictStore,
-        "redis": RedisStore,
     }
 
     parsed_url = urisplit(url)
@@ -104,7 +82,8 @@ def get_store_from_url(
     scheme = scheme_parts[0]
 
     if scheme not in scheme_to_store:
-        raise ValueError(f'Unknown storage type "{scheme}"')
+        # If we can't find the scheme, we fall back to the old creation methods
+        return get_store(**url2dict(url))
 
     store_cls_from_url = scheme_to_store[scheme]
     if store_cls is not None and store_cls_from_url != store_cls:
