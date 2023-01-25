@@ -1,3 +1,4 @@
+import warnings
 from functools import reduce
 from typing import Any, Dict, List, Optional, Type
 from warnings import warn
@@ -130,6 +131,15 @@ def _extract_wrappers(parsed_url: SplitResult) -> List[str]:
     # pop off the type of the store
     parts.pop(0)
     old_wrappers = list(reversed(parts))
+
+    if old_wrappers:
+        warnings.warn(
+            """
+            Using wrappers as part of the scheme is deprecated. Please specify wrappers as part of the fragment instead,
+            e.g. "s3://...#wrap:readonly+urlencode" instead of "s3+readonly+urlencode://...".
+            """,
+            DeprecationWarning,
+        )
 
     # find new-style wrappers, if any:
     fragment = parsed_url.getfragment()
