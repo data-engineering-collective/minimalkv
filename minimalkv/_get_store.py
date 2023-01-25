@@ -72,9 +72,9 @@ def get_store_from_url(
     parsed_url = urisplit(url)
     # Wrappers can be used to add functionality to a store, e.g. encryption.
     # Wrappers are separated by `+` and can be specified in two ways:
-    # 1. As part of the scheme, e.g. "s3+readonly://..." (old style)
-    # 2. As the fragment, e.g. "s3://...#wrap:readonly" (new style)
-    wrappers = extract_wrappers(parsed_url)
+    # 1. As the fragment, e.g. "s3://...#wrap:readonly"
+    # 2. Deprecated: As part of the scheme, e.g. "s3+readonly://..."
+    wrappers = _extract_wrappers(parsed_url)
 
     # Remove wrappers from scheme
     scheme_parts = parsed_url.getscheme().split("+")
@@ -105,15 +105,15 @@ def get_store_from_url(
     return wrapped_store
 
 
-def extract_wrappers(parsed_url: SplitResult) -> List[str]:
+def _extract_wrappers(parsed_url: SplitResult) -> List[str]:
     """
     Extract wrappers from a parsed URL.
 
     Wrappers allow you to add additional functionality to a store, e.g. encryption.
     Wrappers are specified in the fragment part of the URL, e.g. "s3://...#wrap:readonly+urlencode"
 
-    Wrappers can also be specified as part of the scheme, e.g. "s3+readonly+urlencode://...".
-    This is deprecated and will be removed in a future version.
+    Deprecated: wrappers can also be specified as part of the scheme, e.g. "s3+readonly+urlencode://...".
+    This way of specifying wrappers will be removed in a future version.
 
     Parameters
     ----------
