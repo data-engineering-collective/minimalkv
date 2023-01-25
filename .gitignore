@@ -114,6 +114,3 @@ old/
 
 # Exploratory code
 exploration_scripts/
-
-# terraform
-terraform/.terraform*
