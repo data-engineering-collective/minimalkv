@@ -44,17 +44,12 @@ def url2dict(url: str, raise_on_extra_params: bool = False) -> Dict[str, Any]:
     )
 
     u = urisplit(url)
-
-    query_listdict: Dict[str, List[str]] = u.getquerydict()
-    # We will just use the last occurrence for each key
-    query = {k: v[-1] for k, v in query_listdict.items()}
-
     parsed = dict(
         scheme=u.getscheme(),
         host=u.gethost(),
         port=u.getport(),
         path=u.getpath(),
-        query=query,
+        query=u.getquerydict(),
         userinfo=u.getuserinfo(),
     )
     fragment = u.getfragment()
@@ -69,8 +64,10 @@ def url2dict(url: str, raise_on_extra_params: bool = False) -> Dict[str, Any]:
         wrappers = wrap_spec[-1].partition("wrap:")[2]  # remove the 'wrap:' part
         params["wrap"] = wrappers
 
-    if "create_if_missing" in query:
-        create_if_missing = query.pop("create_if_missing")
+    if "create_if_missing" in parsed["query"]:
+        create_if_missing = parsed["query"].pop("create_if_missing")[
+            -1
+        ]  # use last appearance of key
         params["create_if_missing"] = create_if_missing in TRUEVALUES
 
     # get store-specific parameters:
@@ -106,7 +103,9 @@ def extract_params(scheme, host, port, path, query, userinfo):  # noqa D
         params = {"type": scheme, "bucket_name": host}
         params["credentials"] = base64.urlsafe_b64decode(credentials_b64.encode())
         if "bucket_creation_location" in query:
-            params["bucket_creation_location"] = query.pop("bucket_creation_location")
+            params["bucket_creation_location"] = query.pop("bucket_creation_location")[
+                0
+            ]
         return params
     if scheme in ("fs", "hfs"):
         return {"type": scheme, "path": host + path}
@@ -129,7 +128,7 @@ def extract_params(scheme, host, port, path, query, userinfo):  # noqa D
         if "use_sas" in query:
             params["use_sas"] = True
         if "max_connections" in query:
-            params["max_connections"] = int(query.pop("max_connections"))
+            params["max_connections"] = int(query.pop("max_connections")[-1])
         if "socket_timeout" in query:
             params["socket_timeout"] = query.pop("socket_timeout")
         if "max_block_size" in query:
