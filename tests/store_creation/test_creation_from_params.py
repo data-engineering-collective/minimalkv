@@ -121,7 +121,7 @@ def test_create_store_hfs(mocker):
 
 
 def test_create_store_fs(mocker):
-    mock_fs = mocker.patch("minimalkv._old_store_creation.FilesystemStore")
+    mock_fs = mocker.patch("minimalkv._store_creation.FilesystemStore")
     mock_makedirs = mocker.patch("os.makedirs")
     create_store(
         "fs",
