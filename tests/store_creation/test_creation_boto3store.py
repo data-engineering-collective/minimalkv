@@ -2,7 +2,7 @@ import pytest
 from bucket_manager import boto3_bucket_reference
 
 from minimalkv._get_store import get_store, get_store_from_url
-from minimalkv._old_urls import url2dict
+from minimalkv._urls import url2dict
 from minimalkv.net.s3fsstore import S3FSStore
 
 storage = pytest.importorskip("google.cloud.storage")

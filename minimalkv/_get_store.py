@@ -6,7 +6,7 @@ from warnings import warn
 from uritools import SplitResult, urisplit
 
 from minimalkv._key_value_store import KeyValueStore
-from minimalkv._old_urls import url2dict
+from minimalkv._urls import url2dict
 
 
 def get_store_from_url(
@@ -218,7 +218,7 @@ def get_store(
         DeprecationWarning,
         stacklevel=2,
     )
-    from minimalkv._old_store_creation import create_store
+    from minimalkv._store_creation import create_store
     from minimalkv._store_decoration import decorate_store
 
     # split off old-style wrappers, if any:
