@@ -6,8 +6,8 @@ import boto3
 from uritools import SplitResult
 
 from minimalkv import UrlMixin
+from minimalkv._url_utils import _get_password, _get_username
 from minimalkv.fsspecstore import FSSpecStore
-from minimalkv.url_utils import _get_password, _get_username
 
 try:
     from s3fs import S3FileSystem
