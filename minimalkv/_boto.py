@@ -1,3 +1,6 @@
+from urllib.parse import urlparse
+
+
 def _get_s3bucket(
     host,
     bucket,
@@ -18,12 +21,10 @@ def _get_s3bucket(
     }
 
     # Split up the host into host and port.
-    if ":" in host:
-        host, port = host.split(":")
-        s3_connection_params["host"] = host
-        s3_connection_params["port"] = int(port)
-    else:
-        s3_connection_params["host"] = host
+    parsed_url = urlparse(host)
+    s3_connection_params["host"] = parsed_url.hostname
+    if parsed_url.port is not None:
+        s3_connection_params["port"] = parsed_url.port
 
     s3con = S3Connection(**s3_connection_params)
 
