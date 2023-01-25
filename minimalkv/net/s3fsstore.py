@@ -104,9 +104,12 @@ class S3FSStore(FSSpecStore, UrlMixin):  # noqa D
         )
 
     @classmethod
-    def from_url(cls, url: str) -> "S3FSStore":
+    def _from_parsed_url(
+        cls, parsed_url: SplitResult, query: Dict[str, str]
+    ) -> "S3FSStore":  # noqa D
         """
-        Create an ``S3FSStore`` from a URL.
+        Build an ``S3FSStore`` from a parsed URL.
+        To build an ``S3FSStore`` from a URL, use :func:`get_store_from_url`.
 
         URl format:
         ``s3://access_key_id:secret_access_key@endpoint/bucket[?<query_args>]``
@@ -134,32 +137,6 @@ class S3FSStore(FSSpecStore, UrlMixin):  # noqa D
         **Notes**:
 
         If the scheme is ``hs3``, an ``HS3FSStore`` is returned which allows ``/`` in key names.
-
-        Parameters
-        ----------
-        url
-            URL to create store from.
-
-        Returns
-        -------
-        store
-            S3FSStore created from URL.
-        """
-        from minimalkv import get_store_from_url
-
-        store = get_store_from_url(url, store_cls=cls)
-        if not isinstance(store, cls):
-            raise ValueError(f"Expected {cls}, got {type(store)}")
-        return store
-
-    @classmethod
-    def from_parsed_url(
-        cls, parsed_url: SplitResult, query: Dict[str, str]
-    ) -> "S3FSStore":  # noqa D
-        """
-        Build an S3FSStore from a parsed URL.
-
-        See :func:`from_url` for details on the expected format of the URL.
 
         Parameters
         ----------

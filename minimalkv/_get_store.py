@@ -26,7 +26,7 @@ def get_store_from_url(
     Returns
     -------
     store : KeyValueStore
-        Value Store as described in url.
+        KeyValueStore as described in url.
 
     Notes
     -----
@@ -41,24 +41,9 @@ def get_store_from_url(
 
     Store types and URL forms:
 
-        * DictStore: ``memory://``
-        * RedisStore: ``redis://[[password@]host[:port]][/db]``
-        * FilesystemStore: ``fs://path``
-        * BotoStore ``s3://access_key:secret_key@endpoint/bucket[?create_if_missing=true]``
-        * AzureBlockBlockStorage: ``azure://account_name:account_key@container[?create_if_missing=true]``
-        * AzureBlockBlockStorage (SAS): ``azure://account_name:shared_access_signature@container?use_sas&create_if_missing=false``
-        * AzureBlockBlockStorage (SAS): ``azure://account_name:shared_access_signature@container?use_sas&create_if_missing=false[?max_connections=2&socket_timeout=(20,100)]``
-        * AzureBlockBlockStorage (SAS): ``azure://account_name:shared_access_signature@container?use_sas&create_if_missing=false[?max_connections=2&socket_timeout=(20,100)][?max_block_size=4*1024*1024&max_single_put_size=64*1024*1024]``
-        * GoogleCloudStorage: ``gcs://<base64 encoded credentials JSON>@bucket_name[?create_if_missing=true][&bucket_creation_location=EUROPE-WEST1]``
+        * S3FSStore ``s3://access_key:secret_key@endpoint/bucket[?create_if_missing=true]``
 
-    Get the encoded credentials as string like so:
-
-    .. code-block:: python
-
-    from pathlib import Path
-    import base64
-    json_as_bytes = Path(<path_to_json>).read_bytes()
-    json_b64_encoded = base64.urlsafe_b64encode(b).decode()
+    See the respective store's :func:`_from_parsed_url` function for more details.
 
     """
     from minimalkv._hstores import HS3FSStore
@@ -96,7 +81,7 @@ def get_store_from_url(
     # We will just use the last occurrence for each key
     query = {k: v[-1] for k, v in query_listdict.items()}
 
-    store = store_cls_from_url.from_parsed_url(parsed_url, query)
+    store = store_cls_from_url._from_parsed_url(parsed_url, query)
 
     # apply wrappers/decorators:
     from minimalkv._store_decoration import decorate_store

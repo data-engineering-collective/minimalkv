@@ -465,32 +465,13 @@ class KeyValueStore:
         self.close()
 
     @classmethod
-    def from_url(cls, url: str) -> "KeyValueStore":
-        """Create a Store from a URL.
-
-        Parameters
-        ----------
-        url : str
-            URL to create store from.
-
-        Returns
-        -------
-        store : KeyValueStore
-            Store created from URL.
-        """
-        from minimalkv import get_store_from_url
-
-        store = get_store_from_url(url, store_cls=cls)
-        if not isinstance(store, cls):
-            raise ValueError(f"Expected {cls}, got {type(store)}")
-        return store
-
-    @classmethod
-    def from_parsed_url(
+    def _from_parsed_url(
         cls, parsed_url: SplitResult, query: Dict[str, str]
     ) -> "KeyValueStore":
         """
-        Build a KeyValueStore from a parsed URL.
+        Build a ``KeyValueStore`` from a parsed URL.
+
+        To build a ``KeyValueStore`` from a URL, use :func:`get_store_from_url`.
 
         Parameters
         ----------
