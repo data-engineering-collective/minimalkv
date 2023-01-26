@@ -29,7 +29,7 @@ def test_new_s3fs_creation():
     )
 
     actual = get_store_from_url(S3_URL)
-    assert actual == expected
+    assert s3fsstores_equal(actual, expected)
 
 
 def test_equal_access():
@@ -38,3 +38,24 @@ def test_equal_access():
 
     new_store.put("key", b"value")
     assert old_store.get("key") == b"value"
+
+
+def s3fsstores_equal(store1, store2):
+    """
+    Return whether two ``S3FSStore``s are equal.
+
+    The bucket name and other configuration parameters are compared.
+    See :func:`from_url` for details on the connection parameters.
+    Does NOT compare the credentials or the contents of the bucket!
+    """
+    return (
+        isinstance(store2, S3FSStore)
+        and store1.bucket.name == store2.bucket.name
+        and store1.bucket.meta.client.meta.endpoint_url
+        == store2.bucket.meta.client.meta.endpoint_url
+        and store1.object_prefix == store2.object_prefix
+        and store1.url_valid_time == store2.url_valid_time
+        and store1.reduced_redundancy == store2.reduced_redundancy
+        and store1.public == store2.public
+        and store1.metadata == store2.metadata
+    )

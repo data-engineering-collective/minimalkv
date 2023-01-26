@@ -83,26 +83,6 @@ class S3FSStore(FSSpecStore, UrlMixin):  # noqa D
             f"{self.bucket.name}/{self.object_prefix}{key}", expires=self.url_valid_time
         )
 
-    def __eq__(self, other):
-        """
-        Assert that two ``S3FSStore``s are equal.
-
-        The bucket name and other configuration parameters are compared.
-        See :func:`from_url` for details on the connection parameters.
-        Does NOT compare the credentials or the contents of the bucket!
-        """
-        return (
-            isinstance(other, S3FSStore)
-            and self.bucket.name == other.bucket.name
-            and self.bucket.meta.client.meta.endpoint_url
-            == other.bucket.meta.client.meta.endpoint_url
-            and self.object_prefix == other.object_prefix
-            and self.url_valid_time == other.url_valid_time
-            and self.reduced_redundancy == other.reduced_redundancy
-            and self.public == other.public
-            and self.metadata == other.metadata
-        )
-
     @classmethod
     def _from_parsed_url(
         cls, parsed_url: SplitResult, query: Dict[str, str]
