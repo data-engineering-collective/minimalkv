@@ -88,7 +88,11 @@ def test_bad_url2dict(url, raises):
         url2dict(url)
 
 
-def test_roundtrip():
+def test_wrapper_old_style():
+    assert isinstance(get_store_from_url("memory+readonly://"), ReadOnlyDecorator)
+
+
+def test_wrapper_new_style():
     assert isinstance(
         get_store_from_url("memory://#wrap:readonly"),
         ReadOnlyDecorator,
