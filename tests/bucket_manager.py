@@ -55,6 +55,11 @@ def boto3_bucket(
     is_secure=None,
     **kwargs,
 ):
+    """
+    Create a boto3 bucket.
+
+    The bucket is deleted after the consuming function returns.
+    """
     bucket = boto3_bucket_reference(
         host=host,
         bucket_name=bucket_name,
@@ -80,6 +85,11 @@ def boto3_bucket_reference(
     port=None,
     is_secure=None,
 ):
+    """
+    Create a boto3 bucket reference.
+
+    The bucket is not created.
+    """
     import os
 
     # Set environment variables for boto3
