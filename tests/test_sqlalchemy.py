@@ -55,9 +55,9 @@ class TestExtendedKeyspaceSQLAlchemyStore(TestSQLAlchemyStore, ExtendedKeyspaceT
         class ExtendedKeyspaceStore(ExtendedKeyspaceMixin, SQLAlchemyStore):
             pass
 
-        metadata = MetaData(bind=engine)
+        metadata = MetaData()
         with ExtendedKeyspaceStore(engine, metadata, "minimalkv_test") as store:
             # create table
             store.table.create()
             yield store
-        metadata.drop_all()
+        metadata.drop_all(bind=engine)
