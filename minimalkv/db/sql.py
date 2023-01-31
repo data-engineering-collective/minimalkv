@@ -25,7 +25,7 @@ class SQLAlchemyStore(KeyValueStore, CopyMixin):  # noqa D
         ).scalar()
 
     def _delete(self, key: str) -> None:
-        self.bind.execute(self.table.delete(self.table.c.key == key))
+        self.bind.execute(self.table.delete().where(self.table.c.key == key))
 
     def _get(self, key: str) -> bytes:
         rv = self.bind.execute(
@@ -50,7 +50,7 @@ class SQLAlchemyStore(KeyValueStore, CopyMixin):  # noqa D
                 raise KeyError(source)
 
             # delete the potential existing previous key
-            con.execute(self.table.delete(self.table.c.key == dest))
+            con.execute(self.table.delete().where(self.table.c.key == dest))
             con.execute(
                 self.table.insert(
                     {
@@ -66,7 +66,7 @@ class SQLAlchemyStore(KeyValueStore, CopyMixin):  # noqa D
         con = self.bind.connect()
         with con.begin():
             # delete the old
-            con.execute(self.table.delete(self.table.c.key == key))
+            con.execute(self.table.delete().where(self.table.c.key == key))
 
             # insert new
             con.execute(self.table.insert({"key": key, "value": data}))
