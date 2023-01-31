@@ -123,7 +123,7 @@ def get_store(
 
     # split off old-style wrappers, if any:
     parts = type.split("+")
-    type = parts.pop(-1)
+    type = parts.pop(0)
     decorators = list(reversed(parts))
 
     # find new-style wrappers, if any:

@@ -68,9 +68,12 @@ def url2dict(url: str, raise_on_extra_params: bool = False) -> Dict[str, Any]:
 
 
 def extract_params(scheme, host, port, path, query, userinfo):  # noqa D
-    if scheme in ("memory", "hmemory"):
+    # We want to ignore wrappers here
+    store_type = scheme.split("+")[0]
+
+    if store_type in ("memory", "hmemory"):
         return {}
-    if scheme in ("redis", "hredis"):
+    if store_type in ("redis", "hredis"):
         path = path[1:] if path.startswith("/") else path
         params = {"host": host or "localhost"}
         if port:
@@ -80,18 +83,18 @@ def extract_params(scheme, host, port, path, query, userinfo):  # noqa D
         if path:
             params["db"] = int(path)
         return params
-    if scheme in ("gcs", "hgcs"):
+    if store_type in ("gcs", "hgcs"):
         credentials_b64 = userinfo
-        params = {"type": scheme, "bucket_name": host}
+        params = {"type": store_type, "bucket_name": host}
         params["credentials"] = base64.urlsafe_b64decode(credentials_b64.encode())
         if "bucket_creation_location" in query:
             params["bucket_creation_location"] = query.pop("bucket_creation_location")[
                 0
             ]
         return params
-    if scheme in ("fs", "hfs"):
-        return {"type": scheme, "path": host + path}
-    if scheme in ("s3", "hs3"):
+    if store_type in ("fs", "hfs"):
+        return {"type": store_type, "path": host + path}
+    if store_type in ("s3", "hs3"):
         access_key, secret_key = _parse_userinfo(userinfo)
         params = {
             "host": f"{host}:{port}" if port else host,
@@ -100,7 +103,7 @@ def extract_params(scheme, host, port, path, query, userinfo):  # noqa D
             "bucket": path[1:],
         }
         return params
-    if scheme in ("azure", "hazure"):
+    if store_type in ("azure", "hazure"):
         account_name, account_key = _parse_userinfo(userinfo)
         params = {
             "account_name": account_name,
@@ -119,7 +122,7 @@ def extract_params(scheme, host, port, path, query, userinfo):  # noqa D
             params["max_single_put_size"] = query.pop("max_single_put_size")
         return params
 
-    raise ValueError(f'Unknown storage type "{scheme}"')
+    raise ValueError(f'Unknown storage type "{store_type}"')
 
 
 def _parse_userinfo(userinfo: str) -> List[str]:
