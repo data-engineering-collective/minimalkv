@@ -41,7 +41,7 @@ class TestSQLAlchemyStore(BasicStore):
 
     @pytest.fixture
     def store(self, engine):
-        metadata = MetaData(bind=engine)
+        metadata = MetaData()
         with SQLAlchemyStore(engine, metadata, "minimalkv_test") as store:
             # create table
             store.table.create()
