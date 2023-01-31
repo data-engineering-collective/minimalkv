@@ -56,7 +56,10 @@ def bytestring_key(request):
 
 
 # maximum length key
-@pytest.fixture(params=["a" * 250])
+# 230 is chosen because the fake-gcs-server stores the objects in the filesystem
+# and appends a hash for uniqueness. The hash is roughly 15 bytes long, and the maximum filename length is 255.
+# The maximum object name length for live S3 and GCS is 1024 bytes.
+@pytest.fixture(params=["a" * 230])
 def max_key(request):
     return request.param
 
