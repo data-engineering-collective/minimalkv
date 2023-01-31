@@ -44,9 +44,9 @@ class TestSQLAlchemyStore(BasicStore):
         metadata = MetaData()
         with SQLAlchemyStore(engine, metadata, "minimalkv_test") as store:
             # create table
-            store.table.create()
+            metadata.create_all(engine)
             yield store
-        metadata.drop_all()
+        metadata.drop_all(engine)
 
 
 class TestExtendedKeyspaceSQLAlchemyStore(TestSQLAlchemyStore, ExtendedKeyspaceTests):
