@@ -1,6 +1,5 @@
 from functools import reduce
 from typing import Any, Dict, List, Optional, Type
-from warnings import warn
 
 from uritools import SplitResult, urisplit
 
@@ -208,14 +207,6 @@ def get_store(
         Key value store of type ``type`` as described in ``kwargs`` parameters.
 
     """
-    warn(
-        """
-        get_store will be removed in the next major release.
-        If you want to create a KeyValueStore from a URL, use get_store_from_url.
-        """,
-        DeprecationWarning,
-        stacklevel=2,
-    )
     from minimalkv._store_creation import create_store
     from minimalkv._store_decoration import decorate_store
 
