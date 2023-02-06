@@ -1,9 +1,7 @@
 import io
 from contextlib import contextmanager
 from shutil import copyfileobj
-from typing import List, Optional, Union
-
-from mypy_boto3_s3.service_resource import Bucket
+from typing import List, Optional
 
 from minimalkv import CopyMixin, KeyValueStore, UrlMixin
 
@@ -98,7 +96,7 @@ class Boto3SimpleKeyFile(io.RawIOBase):  # noqa D
 class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
     def __init__(
         self,
-        bucket: Union[str, Bucket],
+        bucket,
         prefix: Optional[str] = None,
         object_prefix="",
         url_valid_time=0,
