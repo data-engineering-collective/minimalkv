@@ -1,6 +1,11 @@
 Changelog
 *********
 
+1.6.1
+=====
+
+* Made the SQLAlchemyStore compatible with SQLAlchemy 2.0.
+
 1.6.0
 =====
 
