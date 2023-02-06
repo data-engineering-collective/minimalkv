@@ -65,9 +65,7 @@ def get_store_from_url(
 
     parsed_url = urisplit(url)
     # Wrappers can be used to add functionality to a store, e.g. encryption.
-    # Wrappers are separated by `+` and can be specified in two ways:
-    # 1. As the fragment, e.g. "s3://...#wrap:readonly"
-    # 2. Deprecated: As part of the scheme, e.g. "s3+readonly://..."
+    # See the documentation of _extract_wrappers for details.
     wrappers = _extract_wrappers(parsed_url)
 
     # Remove wrappers from scheme
@@ -104,10 +102,11 @@ def _extract_wrappers(parsed_url: SplitResult) -> List[str]:
     Extract wrappers from a parsed URL.
 
     Wrappers allow you to add additional functionality to a store, e.g. encryption.
-    Wrappers are specified in the fragment part of the URL, e.g. "s3://...#wrap:readonly+urlencode"
+    They can be specified in two ways:
+    1. As the fragment part of the URL, e.g. "s3://...#wrap:readonly+urlencode"
+    2. As part of the scheme, e.g. "s3+readonly+urlencode://..."
 
-    Deprecated: wrappers can also be specified as part of the scheme, e.g. "s3+readonly+urlencode://...".
-    This way of specifying wrappers will be removed in a future version.
+    The two methods cannot be mixed in the same URL.
 
     Parameters
     ----------
@@ -119,31 +118,31 @@ def _extract_wrappers(parsed_url: SplitResult) -> List[str]:
     wrappers: List[str]
         The list of wrappers.
     """
-    # split off old-style wrappers, if any:
+    # Find wrappers in scheme, looking like this: "s3+readonly+urlencode://..."
     parts = parsed_url.getscheme().split("+")
     # pop off the type of the store
     parts.pop(0)
-    old_wrappers = list(reversed(parts))
+    scheme_wrappers = list(reversed(parts))
 
-    # find new-style wrappers, if any:
+    # Find fragment wrappers, looking like this: "s3://...#wrap:readonly+urlencode"
     fragment = parsed_url.getfragment()
     fragments = fragment.split("#") if fragment else []
     wrap_spec = list(filter(lambda s: s.startswith("wrap:"), fragments))
     if wrap_spec:
-        fragment_wrappers = wrap_spec[-1].partition("wrap:")[
+        fragment_without_wrap = wrap_spec[-1].partition("wrap:")[
             2
         ]  # remove the 'wrap:' part
-        new_wrappers = list(fragment_wrappers.split("+"))
+        fragment_wrappers = list(fragment_without_wrap.split("+"))
     else:
-        new_wrappers = []
+        fragment_wrappers = []
 
     # can't have both:
-    if old_wrappers and new_wrappers:
+    if scheme_wrappers and fragment_wrappers:
         raise ValueError(
-            "Adding store wrappers via store type as well as via wrap parameter are not allowed. Preferably use wrap."
+            "Adding store wrappers via both the scheme and the fragment is not allowed."
         )
 
-    return old_wrappers + new_wrappers
+    return scheme_wrappers + fragment_wrappers
 
 
 def get_store(
