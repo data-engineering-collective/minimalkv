@@ -2,6 +2,7 @@ from io import BytesIO
 from typing import IO, Iterator
 
 from sqlalchemy import Column, LargeBinary, String, Table, exists, select
+from sqlalchemy.orm import Session
 
 from minimalkv import CopyMixin, KeyValueStore
 
@@ -20,67 +21,70 @@ class SQLAlchemyStore(KeyValueStore, CopyMixin):  # noqa D
         )
 
     def _has_key(self, key: str) -> bool:
-        return self.bind.execute(
-            select([exists().where(self.table.c.key == key)])
-        ).scalar()
+        with Session(self.bind) as session:
+            return session.query(exists().where(self.table.c.key == key)).scalar()
 
     def _delete(self, key: str) -> None:
-        self.bind.execute(self.table.delete(self.table.c.key == key))
+        with Session(self.bind) as session:
+            session.execute(self.table.delete().where(self.table.c.key == key))
+            session.commit()
 
     def _get(self, key: str) -> bytes:
-        rv = self.bind.execute(
-            select([self.table.c.value], self.table.c.key == key).limit(1)
-        ).scalar()
+        with Session(self.bind) as session:
+            stmt = select(self.table.c.value).where(self.table.c.key == key)
+            rv = session.execute(stmt).scalar()
 
-        if not rv:
-            raise KeyError(key)
+            if not rv:
+                raise KeyError(key)
 
-        return rv
+            return rv
 
     def _open(self, key: str) -> IO:
         return BytesIO(self._get(key))
 
     def _copy(self, source: str, dest: str):
-        con = self.bind.connect()
-        with con.begin():
-            data = self.bind.execute(
-                select([self.table.c.value], self.table.c.key == source).limit(1)
-            ).scalar()
-            if not data:
-                raise KeyError(source)
+        with Session(self.bind) as session:
+            # Find data at source key
+            data_to_copy = self._get(source)
 
             # delete the potential existing previous key
-            con.execute(self.table.delete(self.table.c.key == dest))
-            con.execute(
-                self.table.insert(
+            self.delete(dest)
+
+            # insert new
+            session.execute(
+                self.table.insert().values(
                     {
                         "key": dest,
+                        "value": data_to_copy,
+                    }
+                )
+            )
+            session.commit()
+        return dest
+
+    def _put(self, key: str, data: bytes) -> str:
+        with Session(self.bind) as session:
+            # delete the old
+            session.execute(self.table.delete().where(self.table.c.key == key))
+
+            # insert new
+            session.execute(
+                self.table.insert().values(
+                    {
+                        "key": key,
                         "value": data,
                     }
                 )
             )
-        con.close()
-        return dest
-
-    def _put(self, key: str, data: bytes) -> str:
-        con = self.bind.connect()
-        with con.begin():
-            # delete the old
-            con.execute(self.table.delete(self.table.c.key == key))
-
-            # insert new
-            con.execute(self.table.insert({"key": key, "value": data}))
-
-            # commit happens here
-
-        con.close()
+            session.commit()
         return key
 
     def _put_file(self, key: str, file: IO) -> str:
         return self._put(key, file.read())
 
     def iter_keys(self, prefix: str = "") -> Iterator[str]:  # noqa D
-        query = select([self.table.c.key])
-        if prefix != "":
-            query = query.where(self.table.c.key.like(prefix + "%"))
-        return map(lambda v: str(v[0]), self.bind.execute(query))
+        with Session(self.bind) as session:
+            query = select(self.table.c.key)
+            if prefix != "":
+                query = query.where(self.table.c.key.like(prefix + "%"))
+            return map(lambda v: str(v[0]), session.execute(query))

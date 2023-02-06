@@ -1,6 +1,6 @@
 services:
   gcs:
-    image: simonbohnen/fake-gcs-server
+    image: fsouza/fake-gcs-server
     container_name: fake-gcs-server
     ports:
     - 4443:4443

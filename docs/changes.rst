@@ -9,6 +9,8 @@ Changelog
 
 * Added ``from_url`` and ``from_parsed_url`` to each store.
 
+* Made the SQLAlchemyStore compatible with SQLAlchemy 2.0.
+
 1.6.0
 =====
 
