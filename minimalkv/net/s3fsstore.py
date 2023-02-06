@@ -168,7 +168,7 @@ class S3FSStore(FSSpecStore, UrlMixin):  # noqa D
 
         bucket_name = parsed_url.getpath().lstrip("/")
 
-        resource = boto3.resource("s3", **boto3_params)
+        resource = boto3.resource("s3", **boto3_params)  # type: ignore
 
         force_bucket_suffix = query.get("force_bucket_suffix", "true").lower() == "true"
         if force_bucket_suffix:

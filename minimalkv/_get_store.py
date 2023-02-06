@@ -40,6 +40,15 @@ def get_store_from_url(
 
     Store types and URL forms:
 
+        * DictStore: ``memory://``
+        * RedisStore: ``redis://[[password@]host[:port]][/db]``
+        * FilesystemStore: ``fs://path``
+        * BotoStore ``s3://access_key:secret_key@endpoint/bucket[?create_if_missing=true]``
+        * AzureBlockBlockStorage: ``azure://account_name:account_key@container[?create_if_missing=true]``
+        * AzureBlockBlockStorage (SAS): ``azure://account_name:shared_access_signature@container?use_sas&create_if_missing=false``
+        * AzureBlockBlockStorage (SAS): ``azure://account_name:shared_access_signature@container?use_sas&create_if_missing=false[?max_connections=2&socket_timeout=(20,100)]``
+        * AzureBlockBlockStorage (SAS): ``azure://account_name:shared_access_signature@container?use_sas&create_if_missing=false[?max_connections=2&socket_timeout=(20,100)][?max_block_size=4*1024*1024&max_single_put_size=64*1024*1024]``
+        * GoogleCloudStorage: ``gcs://<base64 encoded credentials JSON>@bucket_name[?create_if_missing=true][&bucket_creation_location=EUROPE-WEST1]``
         * S3FSStore ``s3://access_key:secret_key@endpoint/bucket[?create_if_missing=true]``
 
     See the respective store's :func:`_from_parsed_url` function for more details.
