@@ -127,7 +127,7 @@ def _extract_wrappers(parsed_url: SplitResult) -> List[str]:
     # Find fragment wrappers, looking like this: "s3://...#wrap:readonly+urlencode"
     fragment = parsed_url.getfragment()
     fragments = fragment.split("#") if fragment else []
-    wrap_spec = list(filter(lambda s: s.startswith("wrap:"), fragments))
+    wrap_spec = [s for s in fragments if s.startswith("wrap:")]
     if wrap_spec:
         fragment_without_wrap = wrap_spec[-1].partition("wrap:")[
             2
