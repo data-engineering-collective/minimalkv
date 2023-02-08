@@ -27,6 +27,7 @@ repos:
         - types-setuptools
         - types-redis
         - types-boto
+        - boto3-stubs
  - repo: https://github.com/Quantco/pre-commit-mirrors-pyupgrade
    rev: 3.1.0
    hooks:

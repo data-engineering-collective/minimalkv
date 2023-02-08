@@ -1,6 +1,7 @@
 import os
 import os.path
 from typing import TYPE_CHECKING, Any, Dict
+from warnings import warn
 
 from minimalkv.fs import FilesystemStore
 
@@ -10,6 +11,14 @@ if TYPE_CHECKING:
 
 def create_store(type: str, params: Dict[str, Any]) -> "KeyValueStore":
     """Create store of type ``type`` with ``params``."""
+    warn(
+        """
+        create_store will be removed in the next major release.
+        If you want to create a KeyValueStore from a URL, use get_store_from_url.
+        """,
+        DeprecationWarning,
+        stacklevel=2,
+    )
     # TODO: More detailed docstring
     if type in ("azure", "hazure"):
         return _create_store_azure(type, params)

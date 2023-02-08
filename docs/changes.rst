@@ -1,8 +1,13 @@
 Changelog
 *********
 
-1.6.1
+1.7.0
 =====
+* Deprecated ``get_store``, ``url2dict``, and ``extract_params``.
+
+  * ``get_store_from_url`` should be used to create stores from a URL
+
+* Added ``from_url`` and ``from_parsed_url`` to each store.
 
 * Made the SQLAlchemyStore compatible with SQLAlchemy 2.0.
 

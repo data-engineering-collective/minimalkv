@@ -103,10 +103,11 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
         reduced_redundancy=False,
         public=False,
         metadata=None,
+        create_if_missing=False,
     ):
-        if isinstance(bucket, str):
-            import boto3
+        import boto3
 
+        if isinstance(bucket, str):
             s3_resource = boto3.resource("s3")
             bucket = s3_resource.Bucket(bucket)
             if bucket not in s3_resource.buckets.all():
@@ -245,3 +246,23 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
                 Params={"Bucket": self.bucket.name, "Key": key},
                 ExpiresIn=self.url_valid_time,
             )
+
+    def __eq__(self, other):
+        """
+        Assert that two ``Boto3Store``s are equal.
+
+        The bucket name and other configuration parameters are compared.
+        See :func:`from_url` for details on the connection parameters.
+        Does NOT compare the credentials or the contents of the bucket!
+        """
+        return (
+            isinstance(other, Boto3Store)
+            and self.bucket.name == other.bucket.name
+            and self.bucket.meta.client.meta.endpoint_url
+            == other.bucket.meta.client.meta.endpoint_url
+            and self._object_prefix == other._object_prefix
+            and self.url_valid_time == other.url_valid_time
+            and self.reduced_redundancy == other.reduced_redundancy
+            and self.public == other.public
+            and self.metadata == other.metadata
+        )

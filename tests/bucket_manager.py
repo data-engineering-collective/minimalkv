@@ -2,6 +2,7 @@ from configparser import ConfigParser
 from contextlib import contextmanager
 from uuid import uuid4 as uuid
 
+import boto3
 import pytest
 
 boto = pytest.importorskip("boto")
@@ -54,9 +55,42 @@ def boto3_bucket(
     is_secure=None,
     **kwargs,
 ):
-    import os
+    """
+    Create a boto3 bucket.
 
-    import boto3
+    The bucket is deleted after the consuming function returns.
+    """
+    bucket = boto3_bucket_reference(
+        host=host,
+        bucket_name=bucket_name,
+        port=port,
+        is_secure=is_secure,
+        access_key=access_key,
+        secret_key=secret_key,
+    )
+    bucket.create()
+
+    yield bucket
+
+    for key in bucket.objects.all():
+        key.delete()
+    bucket.delete()
+
+
+def boto3_bucket_reference(
+    access_key=None,
+    secret_key=None,
+    host=None,
+    bucket_name=None,
+    port=None,
+    is_secure=None,
+):
+    """
+    Create a boto3 bucket reference.
+
+    The bucket is not created.
+    """
+    import os
 
     # Set environment variables for boto3
     os.environ["AWS_ACCESS_KEY_ID"] = access_key
@@ -74,34 +108,23 @@ def boto3_bucket(
     name = bucket_name or f"testrun-bucket-{uuid()}"
     # We only set the endpoint url if we're testing against a non-aws host
     if port != 80:
-        s3_client = boto3.client(
-            "s3",
-            endpoint_url=endpoint_url,
-        )
-    else:
-        s3_client = boto3.client(
-            "s3",
-        )
-
-    s3_client.create_bucket(Bucket=name)
-
-    if port != 80:
         s3_resource = boto3.resource(
             "s3",
             endpoint_url=endpoint_url,
+            aws_access_key_id=access_key,
+            aws_secret_access_key=secret_key,
+            region_name="us-east-1",
         )
     else:
         s3_resource = boto3.resource(
             "s3",
+            aws_access_key_id=access_key,
+            aws_secret_access_key=secret_key,
+            region_name="us-east-1",
         )
 
     bucket = s3_resource.Bucket(name)
-
-    yield bucket
-
-    for key in bucket.objects.all():
-        key.delete()
-    bucket.delete()
+    return bucket
 
 
 def load_boto_credentials():

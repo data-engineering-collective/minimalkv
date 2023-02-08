@@ -110,5 +110,7 @@ Pipfile.lock
 
 # minimalkv
 store/
+old/
+
 # Exploratory code
-exp.py
+exploration_scripts/

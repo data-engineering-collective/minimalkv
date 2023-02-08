@@ -1,6 +1,8 @@
 from io import BytesIO
 from types import TracebackType
-from typing import IO, Iterable, Iterator, List, Optional, Type, Union
+from typing import IO, Dict, Iterable, Iterator, List, Optional, Type, Union
+
+from uritools import SplitResult
 
 from minimalkv._constants import VALID_KEY_RE
 from minimalkv._mixins import UrlMixin
@@ -98,7 +100,7 @@ class KeyValueStore:
         implement a specialized function if data needs to be written to disk or streamed.
 
         If ``file`` is a string, contents of ``key`` are written to a newly created file
-        with the filename ``file``. Otherwise the data will be written using the
+        with the filename ``file``. Otherwise, the data will be written using the
         ``write`` method of ``file``.
 
         Parameters
@@ -461,6 +463,29 @@ class KeyValueStore:
         :param exc_tb: Traceback of optional exception encountered in context manager
         """
         self.close()
+
+    @classmethod
+    def _from_parsed_url(
+        cls, parsed_url: SplitResult, query: Dict[str, str]
+    ) -> "KeyValueStore":
+        """
+        Build a ``KeyValueStore`` from a parsed URL.
+
+        To build a ``KeyValueStore`` from a URL, use :func:`get_store_from_url`.
+
+        Parameters
+        ----------
+        parsed_url: SplitResult
+            The parsed URL.
+        query: Dict[str, str]
+            Query parameters from the URL.
+
+        Returns
+        -------
+        store : KeyValueStore
+            The created KeyValueStore.
+        """
+        raise NotImplementedError
 
 
 class UrlKeyValueStore(UrlMixin, KeyValueStore):
