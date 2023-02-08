@@ -1,5 +1,6 @@
 import base64
 from typing import Any, Dict, List
+from warnings import warn
 
 from uritools import urisplit
 
@@ -32,8 +33,16 @@ def url2dict(url: str, raise_on_extra_params: bool = False) -> Dict[str, Any]:
         ``azure://account_name:shared_access_signature@container?use_sas&create_if_missing=false[?max_connections=2&socket_timeout=(20,100)]``
         ``azure://account_name:shared_access_signature@container?use_sas&create_if_missing=false[?max_connections=2&socket_timeout=(20,100)][?max_block_size=4*1024*1024&max_single_put_size=64*1024*1024]``
         ``gcs://<base64 encoded credentialsJSON>@bucket_name[?create_if_missing=true][?bucket_creation_location=EUROPE-WEST1]``
-
     """
+    warn(
+        """
+        url2dict will be removed in the next major release.
+        If you want to create a KeyValueStore from a URL, use get_store_from_url.
+        """,
+        DeprecationWarning,
+        stacklevel=2,
+    )
+
     u = urisplit(url)
     parsed = dict(
         scheme=u.getscheme(),
@@ -68,6 +77,15 @@ def url2dict(url: str, raise_on_extra_params: bool = False) -> Dict[str, Any]:
 
 
 def extract_params(scheme, host, port, path, query, userinfo):  # noqa D
+    warn(
+        """
+        extract_params will be removed in the next major release.
+        If you want to create a KeyValueStore from a URL, use get_store_from_url.
+        """,
+        DeprecationWarning,
+        stacklevel=2,
+    )
+
     # We want to ignore wrappers here
     store_type = scheme.split("+")[0]
 
@@ -126,7 +144,7 @@ def extract_params(scheme, host, port, path, query, userinfo):  # noqa D
 
 
 def _parse_userinfo(userinfo: str) -> List[str]:
-    """Try to split the URL's userinfo into fields separated by :.
+    """Try to split the URL's userinfo into fields separated by `:`.
 
     The user info is the part between ``://`` and ``@``. If anything looks wrong, remind
     the user to percent-encode values.
@@ -140,8 +158,15 @@ def _parse_userinfo(userinfo: str) -> List[str]:
     -------
     parts: list of str
         URL-encoded user-info split at ``:``.
-
     """
+    warn(
+        """
+        _parse_userinfo will be removed in the next major release.
+        If you want to create a KeyValueStore from a URL, use get_store_from_url.
+        """,
+        DeprecationWarning,
+        stacklevel=2,
+    )
     if hasattr(userinfo, "split"):
         parts = userinfo.split(":", 1)
 

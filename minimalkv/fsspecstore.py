@@ -2,12 +2,13 @@ import io
 import warnings
 from typing import IO, TYPE_CHECKING, Iterator, Optional, Union
 
+from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
+
 if TYPE_CHECKING:
     from fsspec import AbstractFileSystem
     from fsspec.spec import AbstractBufferedFile
 
 from minimalkv import KeyValueStore
-from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
 
 # The complete path of the key is structured as follows:
 # /Users/simon/data/mykvstore/file1
