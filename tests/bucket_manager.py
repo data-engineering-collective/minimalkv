@@ -154,13 +154,9 @@ def load_boto_credentials():
         yield {
             "access_key": parser.get(section, "access_key"),
             "secret_key": parser.get(section, "secret_key"),
-            "connect_func": parser.get(section, "connect_func"),
             "host": parser.get(section, "host"),
             "is_secure": parser.getboolean(section, "is_secure"),
             "port": parser.getint(section, "port"),
-            "ordinary_calling_format": parser.getboolean(
-                section, "ordinary_calling_format"
-            ),
         }
 
 
