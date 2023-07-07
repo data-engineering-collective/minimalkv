@@ -71,7 +71,6 @@ class S3FSStore(FSSpecStore, UrlMixin):  # noqa D
                 anon=False,
                 client_kwargs={
                     "endpoint_url": self.endpoint_url,
-                    "verify": False,
                 },
             )
         else:
