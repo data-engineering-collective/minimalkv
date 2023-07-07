@@ -32,12 +32,11 @@ class S3FSStore(FSSpecStore, UrlMixin):  # noqa D
         reduced_redundancy=False,
         public=False,
         metadata=None,
-        endpoint_url=None,
     ):
         if isinstance(bucket, str):
             import boto3
 
-            s3_resource = boto3.resource("s3", endpoint_url=endpoint_url)
+            s3_resource = boto3.resource("s3")
             bucket = s3_resource.Bucket(bucket)
             if bucket not in s3_resource.buckets.all():
                 raise ValueError("invalid s3 bucket name")
