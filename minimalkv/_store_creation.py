@@ -103,20 +103,22 @@ def _create_store_azure(type, params):
 
 def _create_store_hs3(type, params):
     # TODO: Docstring with required params.
-    from minimalkv._hstores import HBotoStore
+    raise NotImplementedError
+    # from minimalkv._hstores import HBotoStore
 
-    from ._boto import _get_s3bucket
+    # from ._boto import _get_s3bucket
 
-    return HBotoStore(_get_s3bucket(**params))
+    # return HBotoStore(_get_s3bucket(**params))
 
 
 def _create_store_s3(type, params):
     # TODO: Docstring with required params.
-    from minimalkv.net.botostore import BotoStore
+    raise NotImplementedError
+    # from minimalkv.net.botostore import BotoStore
 
-    from ._boto import _get_s3bucket
+    # from ._boto import _get_s3bucket
 
-    return BotoStore(_get_s3bucket(**params))
+    # return BotoStore(_get_s3bucket(**params))
 
 
 def _create_store_hfs(type, params):
