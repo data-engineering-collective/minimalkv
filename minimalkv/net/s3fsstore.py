@@ -32,6 +32,7 @@ class S3FSStore(FSSpecStore, UrlMixin):  # noqa D
         reduced_redundancy=False,
         public=False,
         metadata=None,
+        verify=True,
     ):
         if isinstance(bucket, str):
             import boto3
@@ -47,6 +48,7 @@ class S3FSStore(FSSpecStore, UrlMixin):  # noqa D
         self.reduced_redundancy = reduced_redundancy
         self.public = public
         self.metadata = metadata or {}
+        self.verify = verify
 
         # Get endpoint URL
         self.endpoint_url = self.bucket.meta.client.meta.endpoint_url
@@ -71,6 +73,7 @@ class S3FSStore(FSSpecStore, UrlMixin):  # noqa D
                 anon=False,
                 client_kwargs={
                     "endpoint_url": self.endpoint_url,
+                    "verify": self.verify,
                 },
             )
         else:
@@ -190,4 +193,6 @@ class S3FSStore(FSSpecStore, UrlMixin):  # noqa D
         # The bucket will be created in the `create_filesystem` method if it doesn't exist.
         bucket = resource.Bucket(bucket_name)
 
-        return cls(bucket)
+        verify = query.get("verify", "true").lower() == "true"
+
+        return cls(bucket, verify=verify)
