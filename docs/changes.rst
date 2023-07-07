@@ -3,7 +3,7 @@ Changelog
 
 2.0.0
 =====
-* Removed ``get_store``, ``url2dict``, and ``extract_params``.
+* Removed ``get_store``, ``url2dict``, ``extract_params``, and ``create_store``.
 
   * ``get_store_from_url`` should be used to create stores from a URL.
 

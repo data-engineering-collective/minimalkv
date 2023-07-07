@@ -8,7 +8,6 @@ from minimalkv._constants import (
 from minimalkv._get_store import get_store_from_url
 from minimalkv._key_value_store import KeyValueStore, UrlKeyValueStore
 from minimalkv._mixins import CopyMixin, TimeToLiveMixin, UrlMixin
-from minimalkv._store_creation import create_store
 from minimalkv._store_decoration import decorate_store
 
 try:
@@ -20,7 +19,6 @@ except Exception:  # pragma: no cover
 
 __all__ = [
     "CopyMixin",
-    "create_store",
     "decorate_store",
     "FOREVER",
     "get_store_from_url",
