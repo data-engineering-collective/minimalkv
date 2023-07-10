@@ -52,13 +52,16 @@ def get_store_from_url(
     See the respective store's :func:`_from_parsed_url` function for more details.
 
     """
-    from minimalkv._hstores import HS3FSStore
+    from minimalkv._hstores import HFilesystemStore, HS3FSStore
+    from minimalkv.fs import FilesystemStore
     from minimalkv.net.s3fsstore import S3FSStore
 
     scheme_to_store: Dict[str, Type[KeyValueStore]] = {
         "s3": S3FSStore,
         "hs3": HS3FSStore,
         "boto": HS3FSStore,
+        "fs": FilesystemStore,
+        "hfs": HFilesystemStore,
     }
 
     parsed_url = urisplit(url)
