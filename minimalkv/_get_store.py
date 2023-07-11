@@ -4,7 +4,6 @@ from typing import Any, Dict, List, Optional, Type
 from uritools import SplitResult, urisplit
 
 from minimalkv._key_value_store import KeyValueStore
-from minimalkv._urls import url2dict
 
 
 def get_store_from_url(
@@ -73,8 +72,8 @@ def get_store_from_url(
     scheme = scheme_parts[0]
 
     if scheme not in scheme_to_store:
-        # If we can't find the scheme, we fall back to the old creation methods
-        return get_store(**url2dict(url))
+        # If we can't find the scheme, we fail hard.
+        raise NotImplementedError(scheme)
 
     store_cls_from_url = scheme_to_store[scheme]
     if store_cls is not None and store_cls_from_url != store_cls:
