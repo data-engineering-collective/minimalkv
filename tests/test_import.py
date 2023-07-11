@@ -2,7 +2,7 @@ from unittest import mock
 
 optional_dependencies = [
     "azure",
-    "boto",
+    "boto3",
     "dulwich",
     "fsspec",
     "gcsfs",

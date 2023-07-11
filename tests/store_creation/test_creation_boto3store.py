@@ -1,11 +1,7 @@
-import pytest
 from bucket_manager import boto3_bucket_reference
 
-from minimalkv._get_store import get_store, get_store_from_url
-from minimalkv._urls import url2dict
+from minimalkv._get_store import get_store_from_url
 from minimalkv.net.s3fsstore import S3FSStore
-
-storage = pytest.importorskip("google.cloud.storage")
 
 S3_URL = "s3://minio:miniostorage@127.0.0.1:9000/bucketname?create_if_missing=true&is_secure=false"
 
@@ -30,14 +26,6 @@ def test_new_s3fs_creation():
 
     actual = get_store_from_url(S3_URL)
     assert s3fsstores_equal(actual, expected)
-
-
-def test_equal_access():
-    new_store = get_store_from_url(S3_URL)
-    old_store = get_store(**url2dict(S3_URL))
-
-    new_store.put("key", b"value")
-    assert old_store.get("key") == b"value"
 
 
 def s3fsstores_equal(store1, store2):

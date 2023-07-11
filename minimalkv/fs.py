@@ -2,7 +2,9 @@ import os
 import os.path
 import shutil
 import urllib.parse
-from typing import IO, Any, Callable, Iterator, List, Optional, Union, cast
+from typing import IO, Any, Callable, Dict, Iterator, List, Optional, Union, cast
+
+from uritools import SplitResult
 
 from minimalkv._key_value_store import KeyValueStore
 from minimalkv._mixins import CopyMixin, UrlMixin
@@ -221,6 +223,15 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
         except OSError:
             # path does not exists
             pass
+
+    @classmethod
+    def _from_parsed_url(
+        cls, parsed_url: SplitResult, query: Dict[str, str]
+    ) -> "FilesystemStore":  # noqa D
+        path = parsed_url.host + parsed_url.path
+        if query["create_if_missing"] and not os.path.exists(path):
+            os.makedirs(path)
+        return cls(path)
 
 
 class WebFilesystemStore(FilesystemStore):

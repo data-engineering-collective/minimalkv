@@ -4,7 +4,6 @@ channels:
   - nodefaults
 dependencies:
   - azure-storage-blob
-  - boto
   - boto3
   - docker-compose
   - dulwich
