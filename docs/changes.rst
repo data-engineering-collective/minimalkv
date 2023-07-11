@@ -1,6 +1,11 @@
 Changelog
 *********
 
+1.8.0
+=====
+* Implemented the ``_from_parsed_url`` for the following stores:
+  * ``DictStore`` and ``HDictStore``
+
 1.7.0
 =====
 * Deprecated ``get_store``, ``url2dict``, and ``extract_params``.
