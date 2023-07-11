@@ -1,6 +1,8 @@
 from io import BytesIO
 from typing import Dict, Iterator, Optional
 
+from uritools import SplitResult
+
 from minimalkv import CopyMixin, KeyValueStore
 
 
@@ -43,3 +45,9 @@ class DictStore(KeyValueStore, CopyMixin):
 
         """
         return filter(lambda k: k.startswith(prefix), iter(self.d))
+
+    @classmethod
+    def _from_parsed_url(
+        cls, parsed_url: SplitResult, query: Dict[str, str]
+    ) -> "DictStore":
+        return cls()
