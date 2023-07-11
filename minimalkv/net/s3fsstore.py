@@ -66,17 +66,14 @@ class S3FSStore(FSSpecStore, UrlMixin):  # noqa D
         if not has_s3fs:
             raise ImportError("Cannot find optional dependency s3fs.")
 
-        if "127.0.0.1" in self.endpoint_url:
-            return S3FileSystem(
-                anon=False,
-                client_kwargs={
-                    "endpoint_url": self.endpoint_url,
-                },
-            )
-        else:
-            return S3FileSystem(
-                anon=False,
-            )
+        client_kwargs = {}
+        if self.endpoint_url:
+            client_kwargs["endpoint_url"] = self.endpoint_url
+
+        return S3FileSystem(
+            anon=False,
+            client_kwargs=client_kwargs,
+        )
 
     def _url_for(self, key) -> str:
         return self._fs.url(
