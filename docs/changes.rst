@@ -1,6 +1,10 @@
 Changelog
 *********
 
+1.8.0
+=====
+* Fixed the behaviour of ``S3FSStore`` when providing a custom endpoint.
+
 1.7.0
 =====
 * Deprecated ``get_store``, ``url2dict``, and ``extract_params``.
