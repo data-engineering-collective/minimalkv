@@ -7,7 +7,7 @@ from minimalkv.net.s3fsstore import S3FSStore
 
 storage = pytest.importorskip("google.cloud.storage")
 
-S3_URL = "s3://minio:miniostorage@127.0.0.1:9000/bucketname?create_if_missing=true&is_secure=false&verify=False"
+S3_URL = "s3://minio:miniostorage@127.0.0.1:9000/bucketname?create_if_missing=true&is_secure=false&verify=false"
 
 """
 When using the `s3` scheme in a URL, the new store creation returns an `S3FSStore`.
