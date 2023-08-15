@@ -5,6 +5,8 @@ Changelog
 =====
 * Implemented the ``_from_parsed_url`` for the following stores:
   * ``DictStore`` and ``HDictStore``
+* Fixed the behaviour of ``S3FSStore`` when providing a custom endpoint.
+* Added ``verify`` constructor argument to ``S3FSStore`` that disables SSL verification. Use it in an URI as ``?verify=false``.
 
 1.7.0
 =====
