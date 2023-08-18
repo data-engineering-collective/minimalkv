@@ -50,7 +50,7 @@ def _create_store_gcs(store_type, params):
     from minimalkv._hstores import HGoogleCloudStore
     from minimalkv.net.gcstore import GoogleCloudStore
 
-    if type(params["credentials"]) == bytes:
+    if type(params["credentials"]) is bytes:
         account_info = json.loads(params["credentials"].decode())
         params["credentials"] = Credentials.from_service_account_info(
             account_info,

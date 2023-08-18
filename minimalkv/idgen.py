@@ -40,7 +40,6 @@ class HashDecorator(StoreDecorator):
     """
 
     def __init__(self, decorated_store, hashfunc=hashlib.sha1, template="{}"):
-
         self.hashfunc = hashfunc
         self._template = template
         super().__init__(decorated_store)

@@ -36,7 +36,6 @@ def map_boto3_exceptions(key=None, exc_pass=()):
 
 
 class Boto3SimpleKeyFile(io.RawIOBase):  # noqa D
-
     # see: https://alexwlchan.net/2019/02/working-with-large-s3-objects/
     # author: Alex Chan, license: MIT
     def __init__(self, s3_object):
