@@ -87,7 +87,7 @@ def get_bucket_from_store(gcstore: GoogleCloudStore) -> Bucket:
 
 
 def get_client_from_store(gcstore: GoogleCloudStore) -> Client:
-    if type(gcstore._credentials) == str:
+    if type(gcstore._credentials) is str:
         client = Client.from_service_account_json(gcstore._credentials)
     else:
         client = Client(credentials=gcstore._credentials, project=gcstore.project_name)
@@ -99,7 +99,7 @@ def get_client_from_store(gcstore: GoogleCloudStore) -> Client:
 def dirty_store(gc_credentials):
     uuid = str(uuid4())
     # if we have a credentials.json that specifies the project name, else we pick one
-    if type(gc_credentials) == AnonymousCredentials:
+    if isinstance(gc_credentials, AnonymousCredentials):
         project_name: Optional[str] = "testing"
     else:
         project_name = None
@@ -169,7 +169,7 @@ class TestExtendedKeysGCStore(TestGoogleCloudStore, ExtendedKeyspaceTests):
         # instead of the regular one
         uuid = str(uuid4())
         # if we have a credentials.json that specifies the project name, else we pick one
-        if type(gc_credentials) == AnonymousCredentials:
+        if isinstance(gc_credentials, AnonymousCredentials):
             project_name: Optional[str] = "testing"
         else:
             project_name = None

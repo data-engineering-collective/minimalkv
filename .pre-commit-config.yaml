@@ -1,23 +1,23 @@
 repos:
  - repo: https://github.com/Quantco/pre-commit-mirrors-black
-   rev: 22.10.0
+   rev: 23.7.0
    hooks:
      - id: black-conda
        args:
          - --safe
          - --target-version=py38
  - repo: https://github.com/Quantco/pre-commit-mirrors-flake8
-   rev: 5.0.4
+   rev: 6.1.0
    hooks:
     - id: flake8-conda
       additional_dependencies: [-c, conda-forge, flake8-docstrings=1.5.0, flake8-rst-docstrings=0.0.14]
  - repo: https://github.com/Quantco/pre-commit-mirrors-isort
-   rev: 5.10.1
+   rev: 5.12.0
    hooks:
     - id: isort-conda
       additional_dependencies: [-c, conda-forge, toml=0.10.2]
  - repo: https://github.com/Quantco/pre-commit-mirrors-mypy
-   rev: "0.982"
+   rev: "1.5.1"
    hooks:
     - id: mypy-conda
       additional_dependencies:
@@ -29,7 +29,7 @@ repos:
         - types-boto
         - boto3-stubs
  - repo: https://github.com/Quantco/pre-commit-mirrors-pyupgrade
-   rev: 3.1.0
+   rev: 3.10.1
    hooks:
     - id: pyupgrade-conda
       args:

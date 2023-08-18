@@ -21,7 +21,6 @@ class MongoStore(KeyValueStore):
     """
 
     def __init__(self, db, collection):
-
         self.db = db
         self.collection = collection
 
