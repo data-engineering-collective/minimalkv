@@ -2,7 +2,6 @@ import os
 import warnings
 from typing import Dict
 
-import boto3
 from uritools import SplitResult
 
 from minimalkv import UrlMixin
@@ -129,6 +128,7 @@ class S3FSStore(FSSpecStore, UrlMixin):  # noqa D
         store : S3FSStore
             The created S3FSStore.
         """
+        import boto3
 
         url_access_key_id = _get_username(parsed_url)
         url_secret_access_key = _get_password(parsed_url)
