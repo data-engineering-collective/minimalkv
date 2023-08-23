@@ -1,6 +1,10 @@
 Changelog
 *********
 
+1.8.1
+=====
+* Drop `pkg_resources` and use `importlib.metadata` to access package version string.
+
 1.8.0
 =====
 * Fixed the behaviour of ``S3FSStore`` when providing a custom endpoint.
