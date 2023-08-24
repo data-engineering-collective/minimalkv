@@ -6,6 +6,7 @@ Changelog
 * Drop `pkg_resources` and use `importlib.metadata` to access package version string.
 * Add missing `region_name` in `s3fs` store creation to set required location contraint
   during bucket creation.
+
 1.8.0
 =====
 * Fixed the behaviour of ``S3FSStore`` when providing a custom endpoint.
