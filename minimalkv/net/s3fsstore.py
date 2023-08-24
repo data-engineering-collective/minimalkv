@@ -32,6 +32,7 @@ class S3FSStore(FSSpecStore, UrlMixin):  # noqa D
         public=False,
         metadata=None,
         verify=True,
+        region_name=None,
     ):
         if isinstance(bucket, str):
             import boto3
@@ -48,6 +49,7 @@ class S3FSStore(FSSpecStore, UrlMixin):  # noqa D
         self.public = public
         self.metadata = metadata or {}
         self.verify = verify
+        self.region_name = region_name
 
         # Get endpoint URL
         self.endpoint_url = self.bucket.meta.client.meta.endpoint_url
@@ -70,7 +72,8 @@ class S3FSStore(FSSpecStore, UrlMixin):  # noqa D
         client_kwargs = {"verify": self.verify}
         if self.endpoint_url:
             client_kwargs["endpoint_url"] = self.endpoint_url
-
+        if self.region_name:
+            client_kwargs["region_name"] = self.region_name
         return S3FileSystem(
             anon=False,
             client_kwargs=client_kwargs,
@@ -112,6 +115,8 @@ class S3FSStore(FSSpecStore, UrlMixin):  # noqa D
         ``create_if_missing`` (default: ``True`` ): If set, creates the bucket if it does not exist;
          otherwise, try to retrieve the bucket and fail with an ``IOError``.
 
+        ``region_name`` (default: ``None``): If set the AWS region name is applied as location
+        constraint during bucket creation.
         **Notes**:
 
         If the scheme is ``hs3``, an ``HS3FSStore`` is returned which allows ``/`` in key names.
@@ -187,8 +192,10 @@ class S3FSStore(FSSpecStore, UrlMixin):  # noqa D
 
         # We only create a reference to the bucket here.
         # The bucket will be created in the `create_filesystem` method if it doesn't exist.
+        region_name = query.get("region_name")
+
         bucket = resource.Bucket(bucket_name)
 
         verify = query.get("verify", "true").lower() == "true"
 
-        return cls(bucket, verify=verify)
+        return cls(bucket, verify=verify, region_name=region_name)
