@@ -22,7 +22,7 @@ jobs:
     env:
       SIMPLEKV_CI: 1
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Conda env
         uses: mamba-org/setup-micromamba@2b72821d5ad7f6da3c003a3684ce341bf187b46f
         with:
