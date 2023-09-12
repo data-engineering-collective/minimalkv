@@ -22,7 +22,12 @@ jobs:
     env:
       SIMPLEKV_CI: 1
     steps:
-      - uses: actions/checkout@v4
+      - name: Harden Runner
+        uses: step-security/harden-runner@8ca2b8b2ece13480cda6dacd3511b49857a23c09 # v2.5.1
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
       - name: Set up Conda env
         uses: mamba-org/setup-micromamba@2b72821d5ad7f6da3c003a3684ce341bf187b46f
         with:
@@ -46,7 +51,7 @@ jobs:
       - id: google_auth
         if: steps.check-id-token.outcome == 'success'
         name: 'Authenticate to Google Cloud'
-        uses: google-github-actions/auth@v1
+        uses: google-github-actions/auth@35b0e87d162680511bf346c299f71c9c5c379033 # v1.1.1
         with:
           workload_identity_provider: 'projects/498651197656/locations/global/workloadIdentityPools/qc-minimalkv-gh-actions-pool/providers/github-actions-provider'
           service_account: 'sa-github-actions@qc-minimalkv.iam.gserviceaccount.com'
@@ -62,11 +67,11 @@ jobs:
           python -m build
       - name: Publish package
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags') && matrix.PYTHON_VERSION == '3.10'
-        uses: pypa/gh-action-pypi-publish@v1.8.10
+        uses: pypa/gh-action-pypi-publish@b7f401de30cb6434a1e19f805ff006643653240e # v1.8.10
         with:
           user: __token__
           password: ${{ secrets.pypi_password }}
-      - uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@eaaf4bedf32dbdc6b720b63067d99c4d77d6047d # v3.1.4
         with:
           file: ./coverage.xml
 
@@ -76,15 +81,20 @@ jobs:
     env:
       PRE_COMMIT_USE_MICROMAMBA: 1
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@8ca2b8b2ece13480cda6dacd3511b49857a23c09 # v2.5.1
+        with:
+          egress-policy: audit
+
       - name: Checkout branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
       - name: Set up micromamba
         uses: mamba-org/setup-micromamba@2b72821d5ad7f6da3c003a3684ce341bf187b46f
       - name: Add micromamba to GITHUB_PATH
         run: echo "${HOME}/micromamba-bin" >> "$GITHUB_PATH"
       - name: Install Python 3.10
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@61a6322f88396a6271a6ee3565807d608ecaddd1 # v4.7.0
         with:
           python-version: "3.10"
       - name: Run pre-commit checks
-        uses: pre-commit/action@v3.0.0
+        uses: pre-commit/action@646c83fcd040023954eafda54b4db0192ce70507 # v3.0.0
