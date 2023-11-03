@@ -1,5 +1,6 @@
 import inspect
 import os
+import re
 import sys
 
 from sphinx.ext import apidoc
@@ -12,6 +13,37 @@ html_theme = "alabaster"
 __location__ = os.path.join(
     os.getcwd(), os.path.dirname(inspect.getfile(inspect.currentframe()))  # type: ignore
 )
+
+
+def simplify_version(version):
+    """
+    Simplifies the version string to only include the major.minor.patch components.
+
+    Example:
+    '1.8.2.post0+g476bc9e.d20231103' -> '1.8.2'
+    """
+    match = re.match(r"^(\d+\.\d+\.\d+)(?:\.post\d+)?", version)
+    return match.group(1) if match else version
+
+
+try:
+    import minimalkv
+
+    version = simplify_version(minimalkv.__version__)
+except ImportError:
+    import pkg_resources
+
+    version = simplify_version(pkg_resources.get_distribution("minimalkv").version)
+
+print(f"Building docs for version: {version}")
+
+# The version info is fetched programmatically. It acts as replacement for
+# |version| and |release|, it is also used in various other places throughout
+# the built documents.
+#
+# major.minor.patch
+
+release = version
 
 # Generate module references
 output_dir = os.path.abspath(os.path.join(__location__, "../docs/_rst"))
@@ -37,14 +69,6 @@ master_doc = "index"
 project = "minimalkv"
 copyright = "2011-2021, The minimalkv contributors"
 
-# The version info for the project you're documenting, acts as replacement for
-# |version| and |release|, also used in various other places throughout the
-# built documents.
-#
-# The short X.Y version.
-version = "0.14.1"
-# The full version, including alpha/beta/rc tags.
-release = "0.14.1"
 
 exclude_trees = ["_build"]
 
