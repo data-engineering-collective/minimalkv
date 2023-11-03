@@ -20,8 +20,7 @@ class FSSpecStoreEntry(io.BufferedIOBase):
     """A file-like object for reading from an entry in an FSSpecStore."""
 
     def __init__(self, file: "AbstractBufferedFile"):
-        """
-        Initialize an FSSpecStoreEntry.
+        """Initialize an FSSpecStoreEntry.
 
         Parameters
         ----------
@@ -32,8 +31,7 @@ class FSSpecStoreEntry(io.BufferedIOBase):
         self._file = file
 
     def seek(self, loc: int, whence: int = 0) -> int:
-        """
-        Set current file location.
+        """Set current file location.
 
         Parameters
         ----------
@@ -46,9 +44,9 @@ class FSSpecStoreEntry(io.BufferedIOBase):
             raise ValueError("I/O operation on closed file.")
         try:
             return self._file.seek(loc, whence)
-        except ValueError:
+        except ValueError as e:
             # Map ValueError to IOError
-            raise OSError
+            raise OSError from e
 
     def tell(self) -> int:
         """Return the current offset as int. Always >= 0."""
@@ -90,8 +88,7 @@ class FSSpecStore(KeyValueStore):
         write_kwargs: Optional[dict] = None,
         custom_fs: Optional["AbstractFileSystem"] = None,
     ):
-        """
-        Initialize an FSSpecStore.
+        """Initialize an FSSpecStore.
 
         The underlying fsspec FileSystem is created when the store is used for the first time.
 
@@ -126,8 +123,7 @@ class FSSpecStore(KeyValueStore):
 
     @property
     def mkdir_prefix(self):
-        """
-        Whether to create the prefix if it does not exist.
+        """Whether to create the prefix if it does not exist.
 
         .. note:: Deprecated in 2.0.0.
         """
@@ -135,14 +131,14 @@ class FSSpecStore(KeyValueStore):
             "The mkdir_prefix attribute is deprecated!"
             "It will be renamed to _mkdir_prefix in the next release.",
             DeprecationWarning,
+            stacklevel=2,
         )
 
         return self._mkdir_prefix
 
     @property
     def prefix(self):
-        """
-        Get the prefix used on the ``fsspec`` ``FileSystem`` when storing keys.
+        """Get the prefix used on the ``fsspec`` ``FileSystem`` when storing keys.
 
         .. note:: Deprecated in 2.0.0.
         """
@@ -150,6 +146,7 @@ class FSSpecStore(KeyValueStore):
             "The prefix attribute is deprecated!"
             "It will be renamed to _prefix in the next release.",
             DeprecationWarning,
+            stacklevel=2,
         )
 
         return self._prefix
@@ -184,10 +181,7 @@ class FSSpecStore(KeyValueStore):
 
         all_files_and_dirs = self._fs.find(dir_prefix, prefix=file_prefix)
 
-        return map(
-            lambda k: k.replace(f"{self._prefix}", ""),
-            all_files_and_dirs,
-        )
+        return (k.replace(f"{self._prefix}", "") for k in all_files_and_dirs)
 
     def _delete(self, key: str) -> None:
         try:
@@ -198,16 +192,16 @@ class FSSpecStore(KeyValueStore):
     def _open(self, key: str) -> IO:
         try:
             return self._fs.open(f"{self._prefix}{key}")
-        except FileNotFoundError:
-            raise KeyError(key)
+        except FileNotFoundError as e:
+            raise KeyError(key) from e
 
     # Required to prevent error when credentials are not sufficient for listing objects
     def _get_file(self, key: str, file: IO) -> str:
         try:
             file.write(self._fs.cat_file(f"{self._prefix}{key}"))
             return key
-        except FileNotFoundError:
-            raise KeyError(key)
+        except FileNotFoundError as e:
+            raise KeyError(key) from e
 
     def _put_file(self, key: str, file: IO) -> str:
         self._fs.pipe_file(f"{self._prefix}{key}", file.read(), **self._write_kwargs)

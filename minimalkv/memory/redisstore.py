@@ -40,9 +40,7 @@ class RedisStore(TimeToLiveMixin, KeyValueStore):
         IOError
             If there was an error accessing the store.
         """
-        return list(
-            map(lambda b: b.decode(), self.redis.keys(pattern=re.escape(prefix) + "*"))
-        )
+        return [b.decode() for b in self.redis.keys(pattern=re.escape(prefix) + "*")]
 
     def iter_keys(self, prefix="") -> Iterator[str]:
         """Iterate over all keys in the store starting with prefix.

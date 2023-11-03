@@ -128,7 +128,7 @@ class HMACDecorator(StoreDecorator):
             try:
                 f = open(file, "wb")
             except OSError as e:
-                raise OSError(f"Error opening {file} for writing: {e!r}")
+                raise OSError(f"Error opening {file} for writing: {e!r}") from e
 
             # file is open, now we call ourself again with a proper file
             try:

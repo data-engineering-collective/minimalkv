@@ -10,8 +10,7 @@ from minimalkv._urls import url2dict
 def get_store_from_url(
     url: str, store_cls: Optional[Type[KeyValueStore]] = None
 ) -> KeyValueStore:
-    """
-    Take a URL and return a minimalkv store according to the parameters in the URL.
+    """Take a URL and return a minimalkv store according to the parameters in the URL.
 
     Parameters
     ----------
@@ -97,8 +96,7 @@ def get_store_from_url(
 
 
 def _extract_wrappers(parsed_url: SplitResult) -> List[str]:
-    """
-    Extract wrappers from a parsed URL.
+    """Extract wrappers from a parsed URL.
 
     Wrappers allow you to add additional functionality to a store, e.g. encryption.
     They can be specified in two ways:

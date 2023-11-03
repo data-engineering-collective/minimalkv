@@ -13,11 +13,11 @@ def map_boto_exceptions(key=None, exc_pass=()):
         yield
     except StorageResponseError as e:
         if e.code == "NoSuchKey":
-            raise KeyError(key)
-        raise OSError(str(e))
+            raise KeyError(key) from e
+        raise OSError(str(e)) from e
     except (BotoClientError, BotoServerError) as e:
         if e.__class__.__name__ not in exc_pass:
-            raise OSError(str(e))
+            raise OSError(str(e)) from e
 
 
 class BotoStore(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
@@ -46,8 +46,7 @@ class BotoStore(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
         return k
 
     def __upload_args(self) -> Dict[str, str]:
-        """
-        Generate a dictionary of arguments to pass to ``set_content_from`` functions.
+        """Generate a dictionary of arguments to pass to ``set_content_from`` functions.
 
         This allows us to save API calls by passing the necessary parameters on with the
         upload.
@@ -76,9 +75,7 @@ class BotoStore(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
         """
         with map_boto_exceptions():
             prefix_len = len(self.prefix)
-            return map(
-                lambda k: k.name[prefix_len:], self.bucket.list(self.prefix + prefix)
-            )
+            return (k.name[prefix_len:] for k in self.bucket.list(self.prefix + prefix))
 
     def _has_key(self, key: str) -> bool:
         with map_boto_exceptions(key=key):
@@ -91,7 +88,7 @@ class BotoStore(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
             self.bucket.delete_key(self.prefix + key)
         except StorageResponseError as e:
             if e.code != "NoSuchKey":
-                raise OSError(str(e))
+                raise OSError(str(e)) from e
 
     def _get(self, key: str) -> bytes:
         k = self.__new_key(key)

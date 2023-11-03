@@ -20,8 +20,8 @@ def map_azure_exceptions(key=None, error_codes_pass=()):
         if error_code is not None and error_code in error_codes_pass:
             return
         if error_code == "BlobNotFound":
-            raise KeyError(key)
-        raise OSError(str(ex))
+            raise KeyError(key) from ex
+        raise OSError(str(ex)) from ex
 
 
 class AzureBlockBlobStore(KeyValueStore):  # noqa D

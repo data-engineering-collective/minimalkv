@@ -431,12 +431,12 @@ class TTLStore:
     def test_advertises_ttl_features(self, store):
         assert store.ttl_support is True
         assert hasattr(store, "ttl_support")
-        assert getattr(store, "ttl_support") is True
+        assert store.ttl_support is True
 
     def test_advertises_ttl_features_through_decorator(self, dstore):
         assert dstore.ttl_support is True
         assert hasattr(dstore, "ttl_support")
-        assert getattr(dstore, "ttl_support") is True
+        assert dstore.ttl_support is True
 
     def test_can_pass_ttl_through_decorator(self, dstore, key, value):
         dstore.put(key, value, ttl_secs=10)

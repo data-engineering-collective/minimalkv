@@ -172,8 +172,8 @@ class GitCommitStore(KeyValueStore):
             fn = self.subdir + "/" + key
             _, blob_id = tree.lookup_path(self.repo.__getitem__, fn.encode("ascii"))
             blob = self.repo[blob_id]
-        except KeyError:
-            raise KeyError(key)
+        except KeyError as e:
+            raise KeyError(key) from e
 
         return blob.data
 

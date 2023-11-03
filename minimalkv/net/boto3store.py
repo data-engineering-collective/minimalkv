@@ -31,8 +31,8 @@ def map_boto3_exceptions(key=None, exc_pass=()):
     except ClientError as ex:
         code = ex.response["Error"]["Code"]
         if code == "404" or code == "NoSuchKey":
-            raise KeyError(key)
-        raise OSError(str(ex))
+            raise KeyError(key) from ex
+        raise OSError(str(ex)) from ex
 
 
 class Boto3SimpleKeyFile(io.RawIOBase):  # noqa D
@@ -120,6 +120,7 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
                 "The prefix attribute is deprecated and will be removed in the next major release."
                 "Use object_prefix instead.",
                 DeprecationWarning,
+                stacklevel=2,
             )
             object_prefix = object_prefix or prefix
         self._object_prefix = object_prefix.strip().lstrip("/")
@@ -131,8 +132,7 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
 
     @property
     def prefix(self) -> str:
-        """
-        Get the prefix used for all keys in this store.
+        """Get the prefix used for all keys in this store.
 
         .. note:: Deprecated in 2.0.0, use :attr:`object_prefix` instead.
         """
@@ -142,6 +142,7 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
             "The `prefix` attribute is deprecated and will be removed in the next major release."
             "Use `object_prefix` instead.",
             DeprecationWarning,
+            stacklevel=2,
         )
 
         return self._object_prefix
@@ -152,9 +153,9 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
     def iter_keys(self, prefix=""):  # noqa D
         with map_boto3_exceptions():
             prefix_len = len(self._object_prefix)
-            return map(
-                lambda k: k.key[prefix_len:],
-                self.bucket.objects.filter(Prefix=self._object_prefix + prefix),
+            return (
+                k.key[prefix_len:]
+                for k in self.bucket.objects.filter(Prefix=self._object_prefix + prefix)
             )
 
     def _delete(self, key):
@@ -247,8 +248,7 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
             )
 
     def __eq__(self, other):
-        """
-        Assert that two ``Boto3Store``s are equal.
+        """Assert that two ``Boto3Store``s are equal.
 
         The bucket name and other configuration parameters are compared.
         See :func:`from_url` for details on the connection parameters.

@@ -22,14 +22,14 @@ def map_azure_exceptions(key=None, exc_pass=()):
         if ex.__class__.__name__ not in exc_pass:
             s = str(ex)
             if s.startswith("The specified container does not exist."):
-                raise OSError(s)
-            raise KeyError(key)
+                raise OSError(s) from ex
+            raise KeyError(key) from ex
     except AzureHttpError as ex:
         if ex.__class__.__name__ not in exc_pass:
-            raise OSError(str(ex))
+            raise OSError(str(ex)) from ex
     except AzureException as ex:
         if ex.__class__.__name__ not in exc_pass:
-            raise OSError(str(ex))
+            raise OSError(str(ex)) from ex
 
 
 class AzureBlockBlobStore(KeyValueStore):  # noqa D

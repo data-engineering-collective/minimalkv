@@ -35,5 +35,5 @@ def _get_s3bucket(
             if create_if_missing:
                 return s3con.create_bucket(bucket)
             else:
-                raise OSError(f"Bucket {bucket} does not exist")
+                raise OSError(f"Bucket {bucket} does not exist") from ex
         raise

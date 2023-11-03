@@ -44,14 +44,14 @@ def url2dict(url: str, raise_on_extra_params: bool = False) -> Dict[str, Any]:
     )
 
     u = urisplit(url)
-    parsed = dict(
-        scheme=u.getscheme(),
-        host=u.gethost(),
-        port=u.getport(),
-        path=u.getpath(),
-        query=u.getquerydict(),
-        userinfo=u.getuserinfo(),
-    )
+    parsed = {
+        "scheme": u.getscheme(),
+        "host": u.gethost(),
+        "port": u.getport(),
+        "path": u.getpath(),
+        "query": u.getquerydict(),
+        "userinfo": u.getuserinfo(),
+    }
     fragment = u.getfragment()
 
     params = {"type": parsed["scheme"]}

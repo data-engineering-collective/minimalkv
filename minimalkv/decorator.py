@@ -139,8 +139,7 @@ class KeyTransformingDecorator(StoreDecorator):  # noqa D
 
 
 class PrefixDecorator(KeyTransformingDecorator):
-    """
-    Prefixes any key with a string before passing it on the decorated store.
+    """Prefixes any key with a string before passing it on the decorated store.
 
     Automatically strips the prefix upon key retrieval.
 
