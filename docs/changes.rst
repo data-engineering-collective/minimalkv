@@ -1,6 +1,14 @@
 Changelog
 *********
 
+1.8.2
+=====
+* Include Python 3.12 in CI
+* Migrate setup.cfg and setup.py into pyproject.toml
+* Port to ruff
+* Include pre-commit autoupdate workflow
+* Determine version in ``docs/conf.py`` automatically
+
 1.8.1
 =====
 * Drop `pkg_resources` and use `importlib.metadata` to access package version string.
