@@ -1,9 +1,12 @@
 import inspect
 import os
-import re
 import sys
 
 from sphinx.ext import apidoc
+
+from minimalkv import __version__ as version
+
+release = version
 
 sys.path.append("../")
 
@@ -14,36 +17,6 @@ __location__ = os.path.join(
     os.getcwd(), os.path.dirname(inspect.getfile(inspect.currentframe()))  # type: ignore
 )
 
-
-def simplify_version(version):
-    """
-    Simplifies the version string to only include the major.minor.patch components.
-
-    Example:
-    '1.8.2.post0+g476bc9e.d20231103' -> '1.8.2'
-    """
-    match = re.match(r"^(\d+\.\d+\.\d+)(?:\.post\d+)?", version)
-    return match.group(1) if match else version
-
-
-try:
-    import minimalkv
-
-    version = simplify_version(minimalkv.__version__)
-except ImportError:
-    import pkg_resources
-
-    version = simplify_version(pkg_resources.get_distribution("minimalkv").version)
-
-print(f"Building docs for version: {version}")
-
-# The version info is fetched programmatically. It acts as replacement for
-# |version| and |release|, it is also used in various other places throughout
-# the built documents.
-#
-# major.minor.patch
-
-release = version
 
 # Generate module references
 output_dir = os.path.abspath(os.path.join(__location__, "../docs/_rst"))
