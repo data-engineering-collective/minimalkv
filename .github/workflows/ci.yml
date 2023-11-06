@@ -6,12 +6,12 @@ jobs:
     name: Unit tests - ${{ matrix.PYTHON_VERSION }}
     runs-on: ubuntu-latest
     permissions:
-      contents: 'read'
-      id-token: 'write'
+      contents: "read"
+      id-token: "write"
     strategy:
       fail-fast: false
       matrix:
-        PYTHON_VERSION: ["3.8", "3.9", "3.10", "3.11"]
+        PYTHON_VERSION: ["3.8", "3.9", "3.10", "3.11", "3.12"]
     services:
       postgres:
         image: postgres:11
@@ -45,12 +45,12 @@ jobs:
         continue-on-error: true
       - id: google_auth
         if: steps.check-id-token.outcome == 'success'
-        name: 'Authenticate to Google Cloud'
+        name: "Authenticate to Google Cloud"
         uses: google-github-actions/auth@v1
         with:
-          workload_identity_provider: 'projects/498651197656/locations/global/workloadIdentityPools/qc-minimalkv-gh-actions-pool/providers/github-actions-provider'
-          service_account: 'sa-github-actions@qc-minimalkv.iam.gserviceaccount.com'
-          token_format: 'access_token'
+          workload_identity_provider: "projects/498651197656/locations/global/workloadIdentityPools/qc-minimalkv-gh-actions-pool/providers/github-actions-provider"
+          service_account: "sa-github-actions@qc-minimalkv.iam.gserviceaccount.com"
+          token_format: "access_token"
       - name: Run the unittests
         shell: bash -x -l {0}
         run: |

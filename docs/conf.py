@@ -4,14 +4,20 @@ import sys
 
 from sphinx.ext import apidoc
 
+from minimalkv import __version__ as version
+
+release = version
+
 sys.path.append("../")
 
 package = "minimalkv"
 html_theme = "alabaster"
 
 __location__ = os.path.join(
-    os.getcwd(), os.path.dirname(inspect.getfile(inspect.currentframe()))  # type: ignore
+    os.getcwd(),
+    os.path.dirname(inspect.getfile(inspect.currentframe())),  # type: ignore
 )
+
 
 # Generate module references
 output_dir = os.path.abspath(os.path.join(__location__, "../docs/_rst"))
@@ -37,14 +43,6 @@ master_doc = "index"
 project = "minimalkv"
 copyright = "2011-2021, The minimalkv contributors"
 
-# The version info for the project you're documenting, acts as replacement for
-# |version| and |release|, also used in various other places throughout the
-# built documents.
-#
-# The short X.Y version.
-version = "0.14.1"
-# The full version, including alpha/beta/rc tags.
-release = "0.14.1"
 
 exclude_trees = ["_build"]
 

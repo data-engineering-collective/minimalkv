@@ -3,9 +3,11 @@ import stat
 import tempfile
 from io import BytesIO
 from unittest.mock import Mock
-from urllib.parse import quote as url_quote
-from urllib.parse import unquote as url_unquote
-from urllib.parse import urlparse
+from urllib.parse import (
+    quote as url_quote,
+    unquote as url_unquote,
+    urlparse,
+)
 
 import pytest
 from basic_store import BasicStore

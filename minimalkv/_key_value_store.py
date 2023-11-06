@@ -12,8 +12,7 @@ key_type = str
 
 
 class KeyValueStore:
-    """
-    Class to access a key-value store.
+    """Class to access a key-value store.
 
     Supported keys are ascii-strings containing alphanumeric characters or symbols out
     of ``minimalkv._constants.VALID_NON_NUM`` of length not greater than 250. Values
@@ -141,8 +140,7 @@ class KeyValueStore:
         raise NotImplementedError
 
     def iter_prefixes(self, delimiter: str, prefix: str = "") -> Iterator[str]:
-        """
-        Iterate over unique prefixes in the store up to delimiter, starting with prefix.
+        """Iterate over unique prefixes in the store up to delimiter, starting with prefix.
 
         If ``prefix`` contains ``delimiter``, return the prefix up to the first
         occurence of delimiter after the prefix.
@@ -468,8 +466,7 @@ class KeyValueStore:
     def _from_parsed_url(
         cls, parsed_url: SplitResult, query: Dict[str, str]
     ) -> "KeyValueStore":
-        """
-        Build a ``KeyValueStore`` from a parsed URL.
+        """Build a ``KeyValueStore`` from a parsed URL.
 
         To build a ``KeyValueStore`` from a URL, use :func:`get_store_from_url`.
 

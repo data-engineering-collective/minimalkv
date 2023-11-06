@@ -88,8 +88,8 @@ class S3FSStore(FSSpecStore, UrlMixin):  # noqa D
     def _from_parsed_url(
         cls, parsed_url: SplitResult, query: Dict[str, str]
     ) -> "S3FSStore":  # noqa D
-        """
-        Build an ``S3FSStore`` from a parsed URL.
+        """Build an ``S3FSStore`` from a parsed URL.
+
         To build an ``S3FSStore`` from a URL, use :func:`get_store_from_url`.
 
         URl format:

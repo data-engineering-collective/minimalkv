@@ -42,8 +42,7 @@ def test_equal_access():
 
 
 def s3fsstores_equal(store1, store2):
-    """
-    Return whether two ``S3FSStore``s are equal.
+    """Return whether two ``S3FSStore``s are equal.
 
     The bucket name and other configuration parameters are compared.
     See :func:`from_url` for details on the connection parameters.

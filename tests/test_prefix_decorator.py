@@ -48,7 +48,7 @@ class TestPrefixDecorator(BasicStore):
 
     def test_put_sets_prefix(self, store, prefix, key, value):
         full_key = prefix + key
-        key == store.put(key, value)
+        assert key == store.put(key, value)
 
         assert store._dstore.get(full_key) == value
 
@@ -57,7 +57,7 @@ class TestPrefixDecorator(BasicStore):
 
     def test_put_file_sets_prefix(self, store, prefix, key, value):
         full_key = prefix + key
-        key == store.put_file(key, BytesIO(value))
+        assert key == store.put_file(key, BytesIO(value))
 
         assert store._dstore.get(full_key) == value
 

@@ -34,8 +34,8 @@ class MongoStore(KeyValueStore):
         try:
             item = next(self.db[self.collection].find({"_id": key}))
             return pickle.loads(item["v"])
-        except StopIteration:
-            raise KeyError(key)
+        except StopIteration as e:
+            raise KeyError(key) from e
 
     def _open(self, key: str) -> IO:
         return BytesIO(self._get(key))

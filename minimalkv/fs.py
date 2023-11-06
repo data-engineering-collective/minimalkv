@@ -82,7 +82,7 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
             return f
         except OSError as e:
             if 2 == e.errno:
-                raise KeyError(key)
+                raise KeyError(key) from e
             else:
                 raise
 
@@ -97,7 +97,7 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
             return dest
         except OSError as e:
             if 2 == e.errno:
-                raise KeyError(source)
+                raise KeyError(source) from e
             else:
                 raise
 
@@ -155,7 +155,7 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
         """
         root = os.path.abspath(self.root)
         result = []
-        for dp, dn, fn in os.walk(root):
+        for dp, _, fn in os.walk(root):
             for f in fn:
                 key = os.path.join(dp, f)[len(root) + 1 :]
                 if key.startswith(prefix):
@@ -174,8 +174,7 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
         return iter(self.keys(prefix))
 
     def iter_prefixes(self, delimiter: str, prefix: str = "") -> Iterator[str]:
-        """
-        Iterate over unique prefixes in the store up to delimiter, starting with prefix.
+        """Iterate over unique prefixes in the store up to delimiter, starting with prefix.
 
         If ``prefix`` contains ``delimiter``, return the prefix up to the first
         occurence of delimiter after the prefix.
@@ -224,8 +223,7 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
 
 
 class WebFilesystemStore(FilesystemStore):
-    """
-    FilesystemStore supporting generating URLS for web applications.
+    """FilesystemStore supporting generating URLS for web applications.
 
     The most common use is to make the ``root`` directory of the filesystem store
     available through a webserver.

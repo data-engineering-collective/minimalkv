@@ -87,4 +87,4 @@ class SQLAlchemyStore(KeyValueStore, CopyMixin):  # noqa D
             query = select(self.table.c.key)
             if prefix != "":
                 query = query.where(self.table.c.key.like(prefix + "%"))
-            return map(lambda v: str(v[0]), session.execute(query))
+            return (str(v[0]) for v in session.execute(query))

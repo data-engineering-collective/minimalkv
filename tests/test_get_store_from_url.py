@@ -2,8 +2,10 @@ from typing import Callable
 
 import pytest
 
-from minimalkv._get_store import get_store
-from minimalkv._get_store import get_store_from_url as get_store_from_url_new
+from minimalkv._get_store import (
+    get_store,
+    get_store_from_url as get_store_from_url_new,
+)
 from minimalkv._hstores import HDictStore
 from minimalkv._key_value_store import KeyValueStore
 from minimalkv._urls import url2dict

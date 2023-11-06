@@ -87,7 +87,7 @@ def get_bucket_from_store(gcstore: GoogleCloudStore) -> Bucket:
 
 
 def get_client_from_store(gcstore: GoogleCloudStore) -> Client:
-    if type(gcstore._credentials) is str:
+    if isinstance(gcstore._credentials, str):
         client = Client.from_service_account_json(gcstore._credentials)
     else:
         client = Client(credentials=gcstore._credentials, project=gcstore.project_name)

@@ -42,7 +42,8 @@ class GoogleCloudStore(FSSpecStore):
 
                     This was caused by the following error:
                     {error}
-                    """
+                    """,
+                    stacklevel=2,
                 )
 
         self._credentials = credentials
