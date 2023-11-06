@@ -14,7 +14,8 @@ package = "minimalkv"
 html_theme = "alabaster"
 
 __location__ = os.path.join(
-    os.getcwd(), os.path.dirname(inspect.getfile(inspect.currentframe()))  # type: ignore
+    os.getcwd(),
+    os.path.dirname(inspect.getfile(inspect.currentframe())),  # type: ignore
 )
 
 

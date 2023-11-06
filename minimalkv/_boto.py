@@ -7,8 +7,11 @@ def _get_s3bucket(
     create_if_missing=True,
 ):
     # TODO: Write docstring.
-    from boto.s3.connection import S3ResponseError  # type: ignore
-    from boto.s3.connection import OrdinaryCallingFormat, S3Connection
+    from boto.s3.connection import (  # type: ignore
+        OrdinaryCallingFormat,
+        S3Connection,
+        S3ResponseError,
+    )
 
     s3_connection_params = {
         "aws_access_key_id": access_key,
