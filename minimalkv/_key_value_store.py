@@ -1,6 +1,6 @@
 from io import BytesIO
 from types import TracebackType
-from typing import IO, Dict, Iterator, List, Optional, Type, Union
+from typing import BinaryIO, Dict, Iterator, List, Optional, Type, Union
 
 from uritools import SplitResult
 
@@ -92,7 +92,7 @@ class KeyValueStore:
         self._check_valid_key(key)
         return self._get(key)
 
-    def get_file(self, key: str, file: Union[str, IO]) -> str:
+    def get_file(self, key: str, file: Union[str, BinaryIO]) -> str:
         """Write data at key to file.
 
         Like :meth:`~mininmalkv.KeyValueStore.put_file`, this method allows backends to
@@ -106,7 +106,7 @@ class KeyValueStore:
         ----------
         key : str
             The key to be read.
-        file : file-like or str
+        file : BinaryIO or str
             Output filename or file-like object with a ``write`` method.
 
         Raises
@@ -188,7 +188,7 @@ class KeyValueStore:
         """
         return list(self.iter_keys(prefix))
 
-    def open(self, key: str) -> IO:
+    def open(self, key: str) -> BinaryIO:
         """Open record at key.
 
         Parameters
@@ -198,7 +198,7 @@ class KeyValueStore:
 
         Returns
         -------
-        file: file-like
+        file: BinaryIO
             Read-only file-like object for reading data at key.
 
         Raises
@@ -240,7 +240,7 @@ class KeyValueStore:
             raise OSError("Provided data is not of type bytes")
         return self._put(key, data)
 
-    def put_file(self, key: str, file: Union[str, IO]) -> str:
+    def put_file(self, key: str, file: Union[str, BinaryIO]) -> str:
         """Store contents of file at key.
 
         Store data from a file into key. ``file`` can be a string, which will be
@@ -253,7 +253,7 @@ class KeyValueStore:
         ----------
         key : str
             Key where to store data in file.
-        file : file-like or str
+        file : BinaryIO or str
             A filename or a file-like object with a read method.
 
         Returns
@@ -313,14 +313,14 @@ class KeyValueStore:
 
         return buf.getvalue()
 
-    def _get_file(self, key: str, file: IO) -> str:
+    def _get_file(self, key: str, file: BinaryIO) -> str:
         """Write data at key to file-like object file.
 
         Parameters
         ----------
         key : str
             Key of data to be written to file.
-        file : file-like
+        file : BinaryIO
             File-like object with a *write* method to be written.
         """
         bufsize = 1024 * 1024
@@ -365,7 +365,7 @@ class KeyValueStore:
         """
         return key in self.keys()
 
-    def _open(self, key: str) -> IO:
+    def _open(self, key: str) -> BinaryIO:
         """Open record at key.
 
         Parameters
@@ -375,7 +375,7 @@ class KeyValueStore:
 
         Returns
         -------
-        file: file-like
+        file: BinaryIO
             Opened file.
         """
         raise NotImplementedError
@@ -398,14 +398,14 @@ class KeyValueStore:
         """
         return self._put_file(key, BytesIO(data))
 
-    def _put_file(self, key: str, file: IO) -> str:
+    def _put_file(self, key: str, file: BinaryIO) -> str:
         """Store data from file-like object at key.
 
         Parameters
         ----------
         key : str
             Key at which to store contents of file.
-        file : file-like
+        file : BinaryIO
             File-like object to store data from.
 
         Returns

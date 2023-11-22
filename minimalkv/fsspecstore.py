@@ -1,6 +1,6 @@
 import io
 import warnings
-from typing import IO, TYPE_CHECKING, Iterator, Optional, Union
+from typing import TYPE_CHECKING, BinaryIO, Iterator, Optional, Union
 
 from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
 
@@ -189,21 +189,21 @@ class FSSpecStore(KeyValueStore):
         except FileNotFoundError:
             pass
 
-    def _open(self, key: str) -> IO:
+    def _open(self, key: str) -> BinaryIO:
         try:
             return self._fs.open(f"{self._prefix}{key}")
         except FileNotFoundError as e:
             raise KeyError(key) from e
 
     # Required to prevent error when credentials are not sufficient for listing objects
-    def _get_file(self, key: str, file: IO) -> str:
+    def _get_file(self, key: str, file: BinaryIO) -> str:
         try:
             file.write(self._fs.cat_file(f"{self._prefix}{key}"))
             return key
         except FileNotFoundError as e:
             raise KeyError(key) from e
 
-    def _put_file(self, key: str, file: IO) -> str:
+    def _put_file(self, key: str, file: BinaryIO) -> str:
         self._fs.pipe_file(f"{self._prefix}{key}", file.read(), **self._write_kwargs)
         return key
 

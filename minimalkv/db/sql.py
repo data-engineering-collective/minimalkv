@@ -1,5 +1,5 @@
 from io import BytesIO
-from typing import IO, Iterator
+from typing import BinaryIO, Iterator
 
 from sqlalchemy import Column, LargeBinary, String, Table, exists, select
 from sqlalchemy.orm import Session
@@ -39,7 +39,7 @@ class SQLAlchemyStore(KeyValueStore, CopyMixin):  # noqa D
 
             return rv
 
-    def _open(self, key: str) -> IO:
+    def _open(self, key: str) -> BinaryIO:
         return BytesIO(self._get(key))
 
     def _copy(self, source: str, dest: str):
@@ -79,7 +79,7 @@ class SQLAlchemyStore(KeyValueStore, CopyMixin):  # noqa D
             session.commit()
         return key
 
-    def _put_file(self, key: str, file: IO) -> str:
+    def _put_file(self, key: str, file: BinaryIO) -> str:
         return self._put(key, file.read())
 
     def iter_keys(self, prefix: str = "") -> Iterator[str]:  # noqa D

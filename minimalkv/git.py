@@ -1,7 +1,7 @@
 import re
 import time
 from io import BytesIO
-from typing import IO, Iterator, List, Optional, Union
+from typing import BinaryIO, Iterator, List, Optional, Union
 
 from dulwich.objects import Blob, Commit, Tree
 from dulwich.repo import Repo
@@ -197,10 +197,10 @@ class GitCommitStore(KeyValueStore):
                 if o.path.decode("ascii").startswith(prefix):
                     yield o.path.decode("ascii")
 
-    def _open(self, key: str) -> IO:
+    def _open(self, key: str) -> BinaryIO:
         return BytesIO(self._get(key))
 
-    def _put_file(self, key: str, file: IO) -> str:
+    def _put_file(self, key: str, file: BinaryIO) -> str:
         # FIXME: it may be worth to try to move large files directly into the
         #        store here
         return self._put(key, file.read())

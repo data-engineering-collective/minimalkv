@@ -1,5 +1,5 @@
 from io import BytesIO
-from typing import IO, Callable, Optional, Union
+from typing import BinaryIO, Callable, Optional, Union
 
 from minimalkv._constants import FOREVER, NOT_SET, VALID_KEY_RE_EXTENDED
 
@@ -161,7 +161,7 @@ class TimeToLiveMixin:
     def put_file(
         self,
         key: str,
-        file: Union[str, IO],
+        file: Union[str, BinaryIO],
         ttl_secs: Optional[Union[float, int, str]] = None,
     ) -> str:
         """Store contents of file at key.
@@ -181,7 +181,7 @@ class TimeToLiveMixin:
         ----------
         key : str
             Key where to store data in file.
-        file : file-like or str
+        file : BinaryIO or str
             A filename or an object with a read method.
         ttl_secs : str or numeric or None, optional, default = None
             Number of seconds until the key expires.
@@ -232,7 +232,10 @@ class TimeToLiveMixin:
         return self._put_file(key, BytesIO(data), ttl_secs)
 
     def _put_file(
-        self, key: str, file: IO, ttl_secs: Optional[Union[str, float, int]] = None
+        self,
+        key: str,
+        file: BinaryIO,
+        ttl_secs: Optional[Union[str, float, int]] = None,
     ):
         """Store contents of file at key.
 
@@ -240,7 +243,7 @@ class TimeToLiveMixin:
         ----------
         key : str
             Key under which data should be stored.
-        file : file-like
+        file : BinaryIO
             File-like object with a ``read`` method.
         ttl_secs : str or numeric or None, optional, default = None
             Number of seconds until the key expires.

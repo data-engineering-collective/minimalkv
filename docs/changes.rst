@@ -4,6 +4,7 @@ Changelog
 1.8.4
 =====
 * Removing invalid BSD-3 Clause license classifier.
+* Changed generic `IO` type to `BinaryIO`.
 
 1.8.3
 =====
