@@ -1,5 +1,5 @@
 from types import TracebackType
-from typing import Iterable, Optional, Type
+from typing import Iterable, Iterator, Optional, Type
 from urllib.parse import quote_plus, unquote_plus
 
 from minimalkv._key_value_store import KeyValueStore
@@ -36,7 +36,7 @@ class StoreDecorator:
     def __contains__(self, key: str) -> bool:  # noqa D
         return self._dstore.__contains__(key)
 
-    def __iter__(self) -> Iterable[str]:  # noqa D
+    def __iter__(self) -> Iterator[str]:  # noqa D
         return self._dstore.__iter__()
 
     def close(self):
@@ -80,7 +80,7 @@ class KeyTransformingDecorator(StoreDecorator):  # noqa D
     def __contains__(self, key: str) -> bool:  # noqa D
         return self._map_key(key) in self._dstore
 
-    def __iter__(self) -> Iterable[str]:  # noqa D
+    def __iter__(self) -> Iterator[str]:  # noqa D
         return self.iter_keys()
 
     def delete(self, key: str):  # noqa D
@@ -92,7 +92,7 @@ class KeyTransformingDecorator(StoreDecorator):  # noqa D
     def get_file(self, key: str, *args, **kwargs):  # noqa D
         return self._dstore.get_file(self._map_key(key), *args, **kwargs)
 
-    def iter_keys(self, prefix: str = "") -> Iterable[str]:  # noqa D
+    def iter_keys(self, prefix: str = "") -> Iterator[str]:  # noqa D
         return (
             self._unmap_key(k)
             for k in self._dstore.iter_keys(self._map_key_prefix(prefix))

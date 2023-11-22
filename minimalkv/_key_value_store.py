@@ -1,6 +1,6 @@
 from io import BytesIO
 from types import TracebackType
-from typing import IO, Dict, Iterable, Iterator, List, Optional, Type, Union
+from typing import IO, Dict, Iterator, List, Optional, Type, Union
 
 from uritools import SplitResult
 
@@ -37,7 +37,7 @@ class KeyValueStore:
         self._check_valid_key(key)
         return self._has_key(key)
 
-    def __iter__(self) -> Iterable[str]:
+    def __iter__(self) -> Iterator[str]:
         """Iterate over all keys in the store.
 
         Raises
