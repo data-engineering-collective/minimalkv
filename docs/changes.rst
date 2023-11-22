@@ -1,6 +1,10 @@
 Changelog
 *********
 
+1.8.3
+=====
+* Changed `__iter__` return type to `Iterator`.
+
 1.8.2
 =====
 * Include Python 3.12 in CI
