@@ -13,7 +13,6 @@ readme = "README.rst"
 authors = [{name = "Data Engineering Collective", email = "minimalkv@uwekorn.com"}]
 classifiers = [
     "License :: OSI Approved :: BSD License",
-    "License :: OSI Approved :: BSD-3 Clause",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
