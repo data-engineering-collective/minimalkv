@@ -1,6 +1,10 @@
 Changelog
 *********
 
+1.8.4
+=====
+* Removing invalid BSD-3 Clause license classifier.
+
 1.8.3
 =====
 * Changed `__iter__` return type to `Iterator`.
