@@ -1,7 +1,7 @@
 import pickle
 import re
 from io import BytesIO
-from typing import IO, Iterator
+from typing import BinaryIO, Iterator
 
 from bson.binary import Binary
 
@@ -37,7 +37,7 @@ class MongoStore(KeyValueStore):
         except StopIteration as e:
             raise KeyError(key) from e
 
-    def _open(self, key: str) -> IO:
+    def _open(self, key: str) -> BinaryIO:
         return BytesIO(self._get(key))
 
     def _put(self, key: str, value: bytes) -> str:
@@ -46,7 +46,7 @@ class MongoStore(KeyValueStore):
         )
         return key
 
-    def _put_file(self, key: str, file: IO) -> str:
+    def _put_file(self, key: str, file: BinaryIO) -> str:
         return self._put(key, file.read())
 
     def iter_keys(self, prefix: str = "") -> Iterator[str]:

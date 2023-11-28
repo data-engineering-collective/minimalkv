@@ -17,7 +17,7 @@ import hashlib
 import os
 import tempfile
 import uuid
-from typing import IO, Optional, Union
+from typing import BinaryIO, Optional, Union
 
 from minimalkv.decorator import StoreDecorator
 
@@ -71,7 +71,7 @@ class HashDecorator(StoreDecorator):
 
         return self._dstore.put(key, data, *args, **kwargs)  # type: ignore
 
-    def put_file(self, key: Optional[str], file: Union[str, IO], *args, **kwargs):
+    def put_file(self, key: Optional[str], file: Union[str, BinaryIO], *args, **kwargs):
         """Store contents of file at key.
 
         Store data from a file into key. ``file`` can be a string, which will be
@@ -85,7 +85,7 @@ class HashDecorator(StoreDecorator):
         key : str or None
             Key where to store data in file. If None, the hash of data is
             used.
-        file : file-like or str
+        file : BinaryIO or str
             A filename or a file-like object with a read method.
 
         Returns
@@ -198,7 +198,7 @@ class UUIDDecorator(StoreDecorator):
 
         return self._dstore.put(self._template.format(key), data, *args, **kwargs)  # type: ignore
 
-    def put_file(self, key: Optional[str], file: Union[str, IO], *args, **kwargs):
+    def put_file(self, key: Optional[str], file: Union[str, BinaryIO], *args, **kwargs):
         """Store contents of file at key.
 
         Store data from a file into key. ``file`` can be a string, which will be
@@ -211,7 +211,7 @@ class UUIDDecorator(StoreDecorator):
         ----------
         key : str or None
             The key under which the data is to be stored. If None, a uuid is generated.
-        file : file-like or str
+        file : BinaryIO or str
             A filename or a file-like object with a read method.
 
         Returns

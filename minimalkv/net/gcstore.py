@@ -1,6 +1,6 @@
 import json
 import warnings
-from typing import IO, cast
+from typing import BinaryIO, cast
 
 from minimalkv.fsspecstore import FSSpecStore, FSSpecStoreEntry
 
@@ -65,14 +65,14 @@ class GoogleCloudStore(FSSpecStore):
             default_location=self.bucket_creation_location,
         )
 
-    def _open(self, key: str) -> IO:
+    def _open(self, key: str) -> BinaryIO:
         from google.cloud.exceptions import NotFound
 
         if self._prefix_exists is False:
             raise NotFound(f"Could not find bucket: {self.bucket_name}")
-        return cast(IO, FSSpecStoreEntry(super()._open(key)))
+        return cast(BinaryIO, FSSpecStoreEntry(super()._open(key)))
 
-    def _get_file(self, key: str, file: IO) -> str:
+    def _get_file(self, key: str, file: BinaryIO) -> str:
         from google.cloud.exceptions import NotFound
 
         if self._prefix_exists is False:

@@ -1,5 +1,5 @@
 from contextlib import contextmanager
-from typing import IO, Dict, Iterator, cast
+from typing import BinaryIO, Dict, Iterator, cast
 
 from minimalkv import CopyMixin, KeyValueStore, UrlMixin
 
@@ -95,7 +95,7 @@ class BotoStore(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
         with map_boto_exceptions(key=key):
             return k.get_contents_as_string()
 
-    def _get_file(self, key: str, file: IO) -> str:
+    def _get_file(self, key: str, file: BinaryIO) -> str:
         k = self.__new_key(key)
         with map_boto_exceptions(key=key):
             return k.get_contents_to_file(file)
@@ -105,7 +105,7 @@ class BotoStore(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
         with map_boto_exceptions(key=key):
             return k.get_contents_to_filename(filename)
 
-    def _open(self, key: str) -> IO:
+    def _open(self, key: str) -> BinaryIO:
         from boto.s3.keyfile import KeyFile
 
         class SimpleKeyFile(KeyFile):  # noqa D
@@ -124,7 +124,7 @@ class BotoStore(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
 
         k = self.__new_key(key)
         with map_boto_exceptions(key=key):
-            return cast(IO, SimpleKeyFile(k))
+            return cast(BinaryIO, SimpleKeyFile(k))
 
     def _copy(self, source: str, dest: str) -> None:
         if not self._has_key(source):
@@ -140,7 +140,7 @@ class BotoStore(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
             k.set_contents_from_string(data, **self.__upload_args())
             return key
 
-    def _put_file(self, key: str, file: IO) -> str:
+    def _put_file(self, key: str, file: BinaryIO) -> str:
         k = self.__new_key(key)
         with map_boto_exceptions(key=key):
             k.set_contents_from_file(file, **self.__upload_args())

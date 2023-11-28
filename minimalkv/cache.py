@@ -1,4 +1,4 @@
-from typing import IO, Union
+from typing import BinaryIO, Union
 
 from minimalkv._key_value_store import KeyValueStore
 from minimalkv.decorator import StoreDecorator
@@ -81,7 +81,7 @@ class CacheDecorator(StoreDecorator):
             # cache error, ignore completely and return from backend
             return self._dstore.get(key)
 
-    def get_file(self, key: str, file: Union[str, IO]) -> str:
+    def get_file(self, key: str, file: Union[str, BinaryIO]) -> str:
         """Write data at key to file.
 
         If a cache miss occurs, the value is retrieved, stored in the cache and
@@ -98,7 +98,7 @@ class CacheDecorator(StoreDecorator):
         ----------
         key : str
             The key to be read.
-        file : file-like or str
+        file : BinaryIO or str
             Output filename or file-like object with a ``write`` method.
 
         """
@@ -114,7 +114,7 @@ class CacheDecorator(StoreDecorator):
         # if an IOError occured, file pointer may be dirty - cannot proceed
         # safely
 
-    def open(self, key: str) -> IO:
+    def open(self, key: str) -> BinaryIO:
         """Open record at key.
 
         If a cache miss occurs, the value is retrieved, stored in the cache,
@@ -133,7 +133,7 @@ class CacheDecorator(StoreDecorator):
 
         Returns
         -------
-        file: file-like
+        file: BinaryIO
             Read-only file-like object for reading data at key.
 
         """
@@ -205,7 +205,7 @@ class CacheDecorator(StoreDecorator):
         finally:
             self.cache.delete(key)
 
-    def put_file(self, key: str, file: Union[str, IO]) -> str:
+    def put_file(self, key: str, file: Union[str, BinaryIO]) -> str:
         """Store contents of file at key.
 
         Will store the value in the backing store. Afterwards delete the (original)
@@ -215,7 +215,7 @@ class CacheDecorator(StoreDecorator):
         ----------
         key : str
             Key where to store data in file.
-        file : file-like or str
+        file : BinaryIO or str
             A filename or a file-like object with a read method.
 
         Returns
