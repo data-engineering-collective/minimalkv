@@ -1,7 +1,7 @@
 import io
 from contextlib import contextmanager
 from shutil import copyfileobj
-from typing import List, Optional
+from typing import Iterator, List, Optional
 
 from minimalkv import CopyMixin, KeyValueStore, UrlMixin
 
@@ -46,13 +46,13 @@ class Boto3SimpleKeyFile(io.RawIOBase):  # noqa D
         return f"<{type(self).__name__} s3_object={self.s3_object!r} >"
 
     @property
-    def size(self):  # noqa D
+    def size(self) -> int:  # noqa D
         return self.s3_object.content_length
 
-    def tell(self):  # noqa D
+    def tell(self) -> int:  # noqa D
         return self.position
 
-    def seek(self, offset, whence=io.SEEK_SET):  # noqa D
+    def seek(self, offset: int, whence=io.SEEK_SET) -> int:  # noqa D
         if whence == io.SEEK_SET:
             self.position = offset
         elif whence == io.SEEK_CUR:
@@ -67,7 +67,7 @@ class Boto3SimpleKeyFile(io.RawIOBase):  # noqa D
 
         return self.position
 
-    def seekable(self):  # noqa D
+    def seekable(self) -> bool:  # noqa D
         return True
 
     def read(self, size=-1):  # noqa D
@@ -88,7 +88,7 @@ class Boto3SimpleKeyFile(io.RawIOBase):  # noqa D
 
         return self.s3_object.get(Range=range_header)["Body"].read()
 
-    def readable(self):  # noqa D
+    def readable(self) -> bool:  # noqa D
         return True
 
 
@@ -97,10 +97,10 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
         self,
         bucket,
         prefix: Optional[str] = None,
-        object_prefix="",
-        url_valid_time=0,
-        reduced_redundancy=False,
-        public=False,
+        object_prefix: str = "",
+        url_valid_time: int = 0,
+        reduced_redundancy: bool = False,
+        public: bool = False,
         metadata=None,
         create_if_missing=False,
     ):
@@ -150,7 +150,7 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
     def __new_object(self, name):
         return self.bucket.Object(self._object_prefix + name)
 
-    def iter_keys(self, prefix=""):  # noqa D
+    def iter_keys(self, prefix: str = "") -> Iterator[str]:  # noqa D
         with map_boto3_exceptions():
             prefix_len = len(self._object_prefix)
             return (
@@ -158,35 +158,35 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
                 for k in self.bucket.objects.filter(Prefix=self._object_prefix + prefix)
             )
 
-    def _delete(self, key):
+    def _delete(self, key: str) -> None:
         self.bucket.Object(self._object_prefix + key).delete()
 
-    def _get(self, key):
+    def _get(self, key: str) -> bytes:
         obj = self.__new_object(key)
         with map_boto3_exceptions(key=key):
             obj = obj.get()
             return obj["Body"].read()
 
-    def _get_file(self, key, file):
+    def _get_file(self, key: str, file):
         obj = self.__new_object(key)
         with map_boto3_exceptions(key=key):
             obj = obj.get()
             return copyfileobj(obj["Body"], file)
 
-    def _get_filename(self, key, filename):
+    def _get_filename(self, key: str, filename):
         obj = self.__new_object(key)
         with map_boto3_exceptions(key=key):
             obj = obj.get()
             with open(filename, "wb") as file:
                 return copyfileobj(obj["Body"], file)
 
-    def _open(self, key):
+    def _open(self, key: str):
         obj = self.__new_object(key)
         with map_boto3_exceptions(key=key):
             obj.load()
             return Boto3SimpleKeyFile(obj)
 
-    def _copy(self, source, dest):
+    def _copy(self, source: str, dest: str) -> None:
         obj = self.__new_object(dest)
         parameters = {
             "CopySource": self.bucket.name + "/" + self._object_prefix + source,
@@ -200,7 +200,7 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
             self.__new_object(source).load()
             obj.copy_from(**parameters)
 
-    def _put(self, key, data):
+    def _put(self, key: str, data) -> str:
         obj = self.__new_object(key)
         parameters = {"Body": data, "Metadata": self.metadata}
         if self.public:
@@ -211,14 +211,14 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
             obj.put(**parameters)
         return key
 
-    def _put_file(self, key, file):
+    def _put_file(self, key: str, file) -> str:
         return self._put(key, file)
 
-    def _put_filename(self, key, filename):
+    def _put_filename(self, key: str, filename) -> str:
         with open(filename, "rb") as file:
             return self._put(key, file)
 
-    def _url_for(self, key):
+    def _url_for(self, key: str) -> str:
         import boto3
         import botocore.client
         import botocore.exceptions

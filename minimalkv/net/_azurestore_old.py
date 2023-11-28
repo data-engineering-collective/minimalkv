@@ -61,7 +61,7 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
     # azure.storage.blob.BlockBlobService does not support pickling.
     @lazy_property
     def block_blob_service(self):  # noqa D
-        from azure.storage.blob import BlockBlobService, PublicAccess
+        from azure.storage.blob import BlockBlobService, PublicAccess  # type: ignore
 
         block_blob_service = BlockBlobService(
             connection_string=self.conn_string,

@@ -1,5 +1,5 @@
 try:
-    from azure.storage.blob import BlockBlobService  # noqa: F401
+    from azure.storage.blob import BlockBlobService  # type: ignore  # noqa: F401
 
     from ._azurestore_old import AzureBlockBlobStore
 except ImportError:
