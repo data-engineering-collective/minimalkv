@@ -60,6 +60,9 @@ jobs:
             do sleep 3; done
           pytest -n auto --dist loadfile -rs --cov=minimalkv --cov-report=xml
           python -m build
+      - name: Typecheck the codebase
+        shell: bash -x -l {0}
+        run: mypy minimalkv
       - name: Publish package
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags') && matrix.PYTHON_VERSION == '3.10'
         uses: pypa/gh-action-pypi-publish@v1.8.10
