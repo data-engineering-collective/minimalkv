@@ -1,6 +1,11 @@
 Changelog
 *********
 
+1.8.6
+=====
+* We undeprecated ``url2dict`` and ``extract_params`` as these functions turned
+  out to be useful in downstream projects.
+
 1.8.5
 =====
 * Changed generic `IO` type to `BinaryIO`.
