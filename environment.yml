@@ -6,7 +6,6 @@ dependencies:
   - azure-storage-blob
   - boto
   - boto3
-  - docker-compose
   - dulwich
   - fsspec
   - gcsfs>=2022.10.0
