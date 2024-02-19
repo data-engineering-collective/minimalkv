@@ -12,14 +12,16 @@ services:
       - 10000:10000
     command: azurite-blob --blobHost 0.0.0.0 --loose
   minio:
-    image: minio/minio
+    build:
+      context: tests/minio-container
+      dockerfile: Dockerfile
     container_name: minio
     ports:
       - 9000:9000
+      - 9001:9001  # Debugging over Web GUI if needed
     environment:
       MINIO_ACCESS_KEY: minio
       MINIO_SECRET_KEY: miniostorage
-    command: server /data
   mongodb:
     image: mongo
     container_name: mongodb
