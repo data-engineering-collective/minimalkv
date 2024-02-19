@@ -77,7 +77,7 @@ class S3FSStore(FSSpecStore, UrlMixin):  # noqa D
         return S3FileSystem(
             anon=False,
             client_kwargs=client_kwargs,
-            use_ssl=False,
+            use_ssl=False,  # FIXME: This should be settable via the store URL
         )
 
     def _url_for(self, key) -> str:

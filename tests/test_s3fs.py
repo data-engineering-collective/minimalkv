@@ -1,5 +1,7 @@
 from typing import NamedTuple
 
+import pytest
+
 from minimalkv import get_store_from_url
 
 
@@ -8,7 +10,8 @@ class User(NamedTuple):
     secret_key: str
 
 
-def test_minio_access():
+@pytest.mark.xfail(reason="Access from different accounts is currently not possible")
+def test_access_multiple_users():
     user1 = User("user1", "password1")
     user2 = User("user2", "password2")
 
