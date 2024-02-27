@@ -1,6 +1,11 @@
 Changelog
 *********
 
+1.8.7
+=====
+* Add `session_token` url param that can be set when creating a `[h]s3://` store
+  via `get_store_from_url`.
+
 1.8.6
 =====
 * We undeprecated ``url2dict`` and ``extract_params`` as these functions turned
