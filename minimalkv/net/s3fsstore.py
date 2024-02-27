@@ -159,6 +159,9 @@ class S3FSStore(FSSpecStore, UrlMixin):  # noqa D
         `AWS_SECRET_ACCESS_KEY`, and `AWS_SESSION_TOKEN`. If these variables are not set,
         the search for credentials will be delegated to boto(core).
 
+        Positional arguments should be encoded by `urllib.parse.quote_plus`
+        if they contain special characters e.g. "/".
+
         Parameters
         ----------
         parsed_url: SplitResult
