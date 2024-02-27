@@ -1,7 +1,7 @@
 Changelog
 *********
 
-1.8.7
+1.9.0
 =====
 * Add `session_token` url param that can be set when creating a `[h]s3://` store
   via `get_store_from_url`.
