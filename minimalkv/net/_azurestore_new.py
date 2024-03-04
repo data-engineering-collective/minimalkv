@@ -1,4 +1,5 @@
 """Implement the AzureBlockBlobStore for `azure-storage-blob~=12`."""
+
 import io
 from contextlib import contextmanager
 from typing import Optional
