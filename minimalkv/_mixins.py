@@ -1,7 +1,14 @@
+import abc
+import re
 from io import BytesIO
 from typing import BinaryIO, Callable, Optional, Union
 
-from minimalkv._constants import FOREVER, NOT_SET, VALID_KEY_RE_EXTENDED
+from minimalkv._constants import (
+    FOREVER,
+    NOT_SET,
+    VALID_KEY_RE_COLON_EXTENDED,
+    VALID_KEY_RE_EXTENDED,
+)
 
 
 class UrlMixin:
@@ -387,7 +394,7 @@ class CopyMixin:
         return dest
 
 
-class ExtendedKeyspaceMixin:
+class ExtendedKeyspaceMixinBase:
     """A mixin to extend the keyspace to allow slashes and spaces in keynames.
 
     Attention: A single / is NOT allowed.
@@ -396,6 +403,18 @@ class ExtendedKeyspaceMixin:
     Note: This Mixin is unsupported and might not work correctly with all backends.
 
     """
+
+    @property
+    @abc.abstractmethod
+    def VALID_KEY_RE(self) -> re.Pattern:
+        """Method returning a compiled regular expression to validate the key.
+
+        Returns
+        -------
+        re.Pattern:
+            Expression to validate against
+        """
+        raise NotImplementedError("Implement this property in child classes")
 
     def _check_valid_key(self, key: Optional[str]) -> None:
         """Check if a key is valid and raises a ValueError if its not.
@@ -412,5 +431,17 @@ class ExtendedKeyspaceMixin:
         if key is not None:
             if not isinstance(key, str):
                 raise ValueError("%r is not a valid key type" % key)
-            elif not VALID_KEY_RE_EXTENDED.match(key) or key == "/":
+            elif not self.VALID_KEY_RE.match(key) or key == "/":
                 raise ValueError("%r contains illegal characters" % key)
+
+
+class ExtendedKeyspaceMixin(ExtendedKeyspaceMixinBase):
+    @property
+    def VALID_KEY_RE(self) -> re.Pattern:
+        return VALID_KEY_RE_EXTENDED
+
+
+class ExtendedKeyspaceMixinColon(ExtendedKeyspaceMixinBase):
+    @property
+    def VALID_KEY_RE(self) -> re.Pattern:
+        return VALID_KEY_RE_COLON_EXTENDED

@@ -5,6 +5,7 @@ Changelog
 =====
 * Add `session_token` url param that can be set when creating a `[h]s3://` store
   via `get_store_from_url`.
+* Allow colons in filenames for `HAzureBlockBlobStore`
 
 1.8.6
 =====

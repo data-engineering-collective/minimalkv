@@ -7,7 +7,7 @@ import pytest
 from basic_store import BasicStore, OpenSeekTellStore
 from conftest import ExtendedKeyspaceTests
 
-from minimalkv._mixins import ExtendedKeyspaceMixin
+from minimalkv._hstores import HAzureBlockBlobStore
 from minimalkv.net.azurestore import AzureBlockBlobStore
 
 asb = pytest.importorskip("azure.storage.blob")
@@ -86,10 +86,7 @@ class TestExtendedKeysAzureStorage(TestAzureStorage, ExtendedKeyspaceTests):
             pytest.skip("Compatibility issues with azurite and azure-storage-blob<12")
         container = str(uuid())
 
-        class ExtendedKeysStore(ExtendedKeyspaceMixin, AzureBlockBlobStore):
-            pass
-
-        with ExtendedKeysStore(
+        with HAzureBlockBlobStore(
             conn_string=conn_string, container=container, public=False
         ) as store:
             yield store
@@ -137,6 +134,18 @@ def test_azure_dangling_port_explicit_close_multi():
     store.close()
     store.close()
     store.close()
+
+
+@pytest.mark.filterwarnings("error")
+def test_azure_colon_compatibility():
+    container = str(uuid())
+    conn_string = get_azure_conn_string()
+    with HAzureBlockBlobStore(conn_string=conn_string, container=container) as store:
+        if not hasattr(store, "blob_container_client"):
+            # This test only runs for azurestore_new
+            return
+        store.put("Test:file", b"Test data")
+        assert store.get("Test:file") == b"Test data"
 
 
 def test_azure_setgetstate():

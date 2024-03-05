@@ -17,3 +17,11 @@ VALID_KEY_REGEXP_EXTENDED = "^[%s0-9a-zA-Z]+$" % re.escape(VALID_NON_NUM_EXTENDE
 Allowed are all alphanumeric characters, as well as ``!"`#$%&'()+,-.<=>?@[]^_{}~/``. and spaces"""
 VALID_KEY_RE_EXTENDED = re.compile(VALID_KEY_REGEXP_EXTENDED)
 """A compiled version of :data:`~minimalkv._constants.VALID_KEY_REGEXP_EXTENDED`."""
+
+VALID_KEY_REGEXP_COLON_EXTENDED = "^[%s0-9a-zA-Z:]+$" % re.escape(
+    VALID_NON_NUM_EXTENDED
+)
+"""This regular expression is the same as :data:`~minimalkv._constants.VALID_KEY_REGEXP_EXTENDED`
+but also allows a colon."""
+VALID_KEY_RE_COLON_EXTENDED = re.compile(VALID_KEY_REGEXP_COLON_EXTENDED)
+"""A compiled version of :data:`~minimalkv._constants.VALID_KEY_REGEXP_COLON_EXTENDED`."""

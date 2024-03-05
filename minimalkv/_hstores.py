@@ -1,6 +1,6 @@
 import os
 
-from minimalkv._mixins import ExtendedKeyspaceMixin
+from minimalkv._mixins import ExtendedKeyspaceMixin, ExtendedKeyspaceMixinColon
 from minimalkv.fs import FilesystemStore
 from minimalkv.memory import DictStore
 from minimalkv.memory.redisstore import RedisStore
@@ -19,7 +19,7 @@ class HRedisStore(ExtendedKeyspaceMixin, RedisStore):  # noqa D
     pass
 
 
-class HAzureBlockBlobStore(ExtendedKeyspaceMixin, AzureBlockBlobStore):  # noqa D
+class HAzureBlockBlobStore(ExtendedKeyspaceMixinColon, AzureBlockBlobStore):  # noqa D
     pass
 
 
