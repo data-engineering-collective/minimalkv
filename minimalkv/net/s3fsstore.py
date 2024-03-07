@@ -101,11 +101,13 @@ class S3FSStore(FSSpecStore, UrlMixin):  # noqa D
                 token=self.credentials.session_token,
                 anon=False,
                 client_kwargs=client_kwargs,
+                use_ssl=self.verify,  # Needed for minimal docker minio setup
             )
 
         return S3FileSystem(
             anon=False,
             client_kwargs=client_kwargs,
+            use_ssl=self.verify,
         )
 
     def _url_for(self, key) -> str:
