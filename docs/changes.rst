@@ -6,6 +6,7 @@ Changelog
 * Add a real AWS integration test for S3FSStore
 * Add minio test for S3FSStore
 * `verify` url param that can be passed to url when creating a `[h]s3://` store now really controls SSL verifaction
+* Refactor tests to not skip Boto3Store / S3FSStore tests anymore if `boto` is unavailible
 
 1.9.0
 =====
