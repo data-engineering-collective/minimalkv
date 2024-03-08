@@ -9,7 +9,9 @@ from minimalkv._store_creation import create_store
 from minimalkv._urls import url2dict
 from minimalkv.net.gcstore import GoogleCloudStore
 
-storage = pytest.importorskip("google.cloud.storage")
+storage = pytest.importorskip(
+    "google.cloud.storage", reason="'google.cloud.storage' is not available"
+)
 from google.auth.credentials import AnonymousCredentials
 from google.auth.exceptions import RefreshError
 

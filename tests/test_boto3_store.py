@@ -2,9 +2,9 @@ import os
 
 import pytest
 
-from minimalkv.net.s3fsstore import S3FSStore
+from minimalkv.net.s3fsstore import Credentials, S3FSStore
 
-boto3 = pytest.importorskip("boto3")
+boto3 = pytest.importorskip("boto3", reason="'boto3' is not available")
 from io import BytesIO
 
 from basic_store import BasicStore
@@ -44,11 +44,23 @@ class TestBoto3Storage(BasicStore, UrlStore):
 
     @pytest.fixture
     def boto3store(self, bucket, prefix, reduced_redundancy):
-        return Boto3Store(bucket, prefix, reduced_redundancy=reduced_redundancy)
+        return Boto3Store(
+            bucket, object_prefix=prefix, reduced_redundancy=reduced_redundancy
+        )
 
     @pytest.fixture
-    def s3fsstore(self, bucket, prefix, reduced_redundancy):
-        return S3FSStore(bucket, prefix, reduced_redundancy=reduced_redundancy)
+    def s3fsstore(self, bucket, credentials, prefix, reduced_redundancy):
+        minio_credentials = Credentials(
+            access_key_id=credentials["access_key"],
+            secret_access_key=credentials["secret_key"],
+            session_token=credentials.get("session_token", None),
+        )
+        return S3FSStore(
+            bucket,
+            credentials=minio_credentials,
+            object_prefix=prefix,
+            reduced_redundancy=reduced_redundancy,
+        )
 
     @pytest.fixture(params=[True, False])
     def store(self, request, boto3store, s3fsstore):
@@ -88,5 +100,5 @@ class TestExtendedKeyspaceBoto3Store(TestBoto3Storage, ExtendedKeyspaceTests):
             pass
 
         return ExtendedKeyspaceStore(
-            bucket, prefix, reduced_redundancy=reduced_redundancy
+            bucket, object_prefix=prefix, reduced_redundancy=reduced_redundancy
         )

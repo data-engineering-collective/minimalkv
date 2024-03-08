@@ -49,7 +49,9 @@ class BasicStore:
 
     def test_store_and_copy(self, store, key, key2, value):
         if not isinstance(store, CopyMixin):
-            pytest.skip()
+            pytest.skip(
+                "'test_store_and_copy' can only be tested with stores that use the 'CopyMixin' mixin."
+            )
         store.put(key, value)
         assert store.get(key) == value
         store.copy(key, key2)
@@ -58,7 +60,9 @@ class BasicStore:
 
     def test_store_and_copy_overwrite(self, store, key, key2, value, value2):
         if not isinstance(store, CopyMixin):
-            pytest.skip()
+            pytest.skip(
+                "'test_store_and_copy_overwrite' can only be tested with stores that use the 'CopyMixin' mixin."
+            )
         store.put(key, value)
         store.put(key2, value2)
         assert store.get(key) == value
@@ -80,7 +84,9 @@ class BasicStore:
 
     def test_key_error_on_nonexistant_copy(self, store, key, key2):
         if not isinstance(store, CopyMixin):
-            pytest.skip()
+            pytest.skip(
+                "'test_key_error_on_nonexistant_copy' can only be tested with stores that use the 'CopyMixin' mixin."
+            )
         with pytest.raises(KeyError):
             store.copy(key, key2)
 
@@ -102,7 +108,9 @@ class BasicStore:
 
     def test_exception_on_invalid_key_copy(self, store, invalid_key, key):
         if not isinstance(store, CopyMixin):
-            pytest.skip()
+            pytest.skip(
+                "'test_exception_on_invalid_key_copy' can only be tested with stores that use the 'CopyMixin' mixin."
+            )
         with pytest.raises(ValueError):
             store.copy(invalid_key, key)
         with pytest.raises(ValueError):

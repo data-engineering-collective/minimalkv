@@ -1,17 +1,55 @@
 import os
+from contextlib import contextmanager
 
 import pytest
 
-boto = pytest.importorskip("boto")
+boto = pytest.importorskip("boto", reason="'boto' is not available")
 from io import BytesIO
 
 from basic_store import BasicStore
-from bucket_manager import boto_bucket, boto_credentials
+from bucket_manager import boto_credentials, uuid
 from conftest import ExtendedKeyspaceTests
 from url_store import UrlStore
 
 from minimalkv._mixins import ExtendedKeyspaceMixin
 from minimalkv.net.botostore import BotoStore
+
+
+@contextmanager
+def boto_bucket(
+    access_key,
+    secret_key,
+    host,
+    connect_func="connect_s3",
+    ordinary_calling_format=False,
+    bucket_name=None,
+    port=None,
+    is_secure=True,
+):
+    if ordinary_calling_format:
+        from boto.s3.connection import OrdinaryCallingFormat
+
+        conn = getattr(boto, connect_func)(
+            access_key,
+            secret_key,
+            host=host,
+            calling_format=OrdinaryCallingFormat(),
+            port=port,
+            is_secure=is_secure,
+        )
+    else:
+        conn = getattr(boto, connect_func)(
+            access_key, secret_key, host=host, port=port, is_secure=is_secure
+        )
+
+    name = bucket_name or f"testrun-bucket-{uuid()}"
+    bucket = conn.create_bucket(name)
+
+    yield bucket
+
+    for key in bucket.list():
+        key.delete()
+    bucket.delete()
 
 
 @pytest.fixture(

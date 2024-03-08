@@ -1,6 +1,8 @@
 import pytest
 
-storage = pytest.importorskip("google.cloud.storage")
+storage = pytest.importorskip(
+    "google.cloud.storage", reason="'google.cloud.storage' is not available"
+)
 
 import os
 import pickle

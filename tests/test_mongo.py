@@ -4,7 +4,7 @@ from uuid import uuid4 as uuid
 
 import pytest
 
-pymongo = pytest.importorskip("pymongo")
+pymongo = pytest.importorskip("pymongo", reason="'pymongo' is not available")
 
 from basic_store import BasicStore
 from conftest import ExtendedKeyspaceTests
