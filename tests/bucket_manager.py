@@ -5,45 +5,6 @@ from uuid import uuid4 as uuid
 import boto3
 import pytest
 
-boto = pytest.importorskip("boto")
-
-
-@contextmanager
-def boto_bucket(
-    access_key,
-    secret_key,
-    host,
-    connect_func="connect_s3",
-    ordinary_calling_format=False,
-    bucket_name=None,
-    port=None,
-    is_secure=True,
-):
-    if ordinary_calling_format:
-        from boto.s3.connection import OrdinaryCallingFormat
-
-        conn = getattr(boto, connect_func)(
-            access_key,
-            secret_key,
-            host=host,
-            calling_format=OrdinaryCallingFormat(),
-            port=port,
-            is_secure=is_secure,
-        )
-    else:
-        conn = getattr(boto, connect_func)(
-            access_key, secret_key, host=host, port=port, is_secure=is_secure
-        )
-
-    name = bucket_name or f"testrun-bucket-{uuid()}"
-    bucket = conn.create_bucket(name)
-
-    yield bucket
-
-    for key in bucket.list():
-        key.delete()
-    bucket.delete()
-
 
 @contextmanager
 def boto3_bucket(

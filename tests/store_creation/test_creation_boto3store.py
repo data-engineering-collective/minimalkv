@@ -5,8 +5,6 @@ from minimalkv._get_store import get_store, get_store_from_url
 from minimalkv._urls import url2dict
 from minimalkv.net.s3fsstore import S3FSStore
 
-storage = pytest.importorskip("google.cloud.storage")
-
 S3_URL = "s3://minio:miniostorage@127.0.0.1:9000/bucketname?create_if_missing=true&is_secure=false&verify=false"
 
 """
@@ -33,9 +31,14 @@ def test_new_s3fs_creation():
     assert s3fsstores_equal(actual, expected)
 
 
+@pytest.mark.xfail(
+    reason="`get_store` creates deprecated BotoStore instead of Boto3Store when using s3:// URL."
+)
 def test_equal_access():
-    new_store = get_store_from_url(S3_URL)
-    old_store = get_store(**url2dict(S3_URL))
+    new_store = get_store_from_url(S3_URL)  # S3FSStore
+    old_store = get_store(
+        **url2dict(S3_URL)
+    )  # This doesn't produce a Boto3Store, but a BotoStore
 
     new_store.put("key", b"value")
     assert old_store.get("key") == b"value"

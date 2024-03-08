@@ -2,7 +2,7 @@
 
 import pytest
 
-sqlalchemy = pytest.importorskip("sqlalchemy")
+sqlalchemy = pytest.importorskip("sqlalchemy", reason="'sqlalchemy' is not available")
 from basic_store import BasicStore
 from conftest import ExtendedKeyspaceTests
 from sqlalchemy import MetaData, create_engine
@@ -31,7 +31,7 @@ class TestSQLAlchemyStore(BasicStore):
     def engine(self, request):
         module_name, dsn = request.param
         # check module is available
-        pytest.importorskip(module_name)
+        pytest.importorskip(module_name, reason=f"{module_name} is not available")
         engine = create_engine(dsn, poolclass=StaticPool)
         try:
             engine.connect()

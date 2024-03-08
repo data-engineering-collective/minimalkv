@@ -6,7 +6,7 @@ from conftest import ExtendedKeyspaceTests
 
 from minimalkv._mixins import ExtendedKeyspaceMixin
 
-redis = pytest.importorskip("redis")
+redis = pytest.importorskip("redis", reason="'redis' is not available")
 
 from redis import StrictRedis
 from redis.exceptions import ConnectionError

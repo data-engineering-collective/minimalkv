@@ -26,20 +26,29 @@ def aws_credentials() -> Tuple[str, str, Union[str, None]]:
         secret_key = aws_credentials.secret_key
         session_token = aws_credentials.token
     else:
-        access_key = os.environ.get("AWS_ACCESS_KEY_ID", None)
-        secret_key = os.environ.get("AWS_SECRET_ACCESS_KEY", None)
-        session_token = os.environ.get("AWS_SESSION_TOKEN", None)
+        # Don't look for AWS_ versions, they might be overwritten by test_boto3_store.py
+        access_key = os.environ.get("ACCESS_KEY_ID", None)
+        secret_key = os.environ.get("SECRET_ACCESS_KEY", None)
+        session_token = os.environ.get("SESSION_TOKEN", None)
 
     if not (access_key and secret_key):
-        msg = (
-            f"No s3 credentials available. Set '{env_var_name}' env variable to "
-            "provide a valid AWS profile or set 'AWS_ACCESS_KEY_ID' and "
-            "'AWS_SECRET_ACCESS_KEY' and optional 'AWS_SESSION_TOKEN'."
-        )
+        msg = "No s3 credentials available. "
 
         if "CI_IN_FORK" not in os.environ or os.environ["CI_IN_FORK"].lower() == "true":
             # We skip if the variable is not set at all (local development)
-            # or if it is explicitely set to "true".q
+            # or if it is explicitely set to "true".
+
+            if "CI_IN_FORK" in os.environ:
+                msg += "Skipping, because you (or the CI) set 'CI_IN_FORK=true'."
+            else:
+                # If running
+                msg += (
+                    "If you want to execute this integration test, "
+                    f"set '{env_var_name}' env variable to "
+                    "provide a valid AWS profile or set 'ACCESS_KEY_ID' and "
+                    "'SECRET_ACCESS_KEY' and optional 'SESSION_TOKEN'."
+                )
+
             pytest.skip(reason=msg)
 
         # If in CI of base repo and credentials couldn't be acquired, fail test
@@ -94,6 +103,10 @@ def test_s3fs_aws_integration(
     - delete()
     """
     access_key, secret_key, session_token = aws_credentials
+
+    print(
+        f"Testing with access_key: {access_key}, secret_key: {secret_key}, session_token: {session_token}"
+    )
 
     bucket = get_store_from_url(
         get_s3_url(access_key, secret_key, session_token, ci_bucket_name, ci_s3_point)

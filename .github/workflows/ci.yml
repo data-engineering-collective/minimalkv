@@ -60,15 +60,26 @@ jobs:
         # We set an env variable according to the result of the check
         # to only allow skipping of aws integration test when in fork.
         # When being run in the base repo, the aws integration test should always be executed.
+      - name: Remap AWS Environment Variables
+        if: steps.check-id-token.outcome == 'success'
+        run: |
+          echo "ACCESS_KEY_ID=${{ env.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
+          echo "SECRET_ACCESS_KEY=${{ env.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+          echo "SESSION_TOKEN=${{ env.AWS_SESSION_TOKEN }}" >> $GITHUB_ENV
+        # This is a work around as long as S3FSStore has the side effect of setting env variables
+        # to provide authentication. This can savely be removed as soon as this side effect is gone
       - name: Check whether the workflow runs in a fork
         run: echo "CI_IN_FORK=${{ github.event.pull_request && github.repository != github.event.pull_request.head.repo.full_name }}" >> $GITHUB_ENV
-      - name: Run the unittests
+      - name: "Run setup: install package & start docker container"
         shell: bash -x -l {0}
         run: |
           pip install --no-deps .
           docker-compose up -d
           while ! docker exec mysql mysqladmin status -h 127.0.0.1 -u minimalkv_test --password=minimalkv_test; \
             do sleep 3; done
+      - name: Run the unittests
+        shell: bash -l {0}
+        run: |
           pytest -n auto --dist loadfile -rs --cov=minimalkv --cov-report=xml
       - name: Build the package
         shell: bash -x -l {0}

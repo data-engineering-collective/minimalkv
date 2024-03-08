@@ -1,7 +1,8 @@
 import pytest
 
-boto = pytest.importorskip("boto")
-from bucket_manager import boto_bucket, boto_credentials
+boto = pytest.importorskip("boto", reason="'boto' is not available")
+from bucket_manager import boto_credentials
+from test_boto_store import boto_bucket
 
 
 @pytest.fixture(
