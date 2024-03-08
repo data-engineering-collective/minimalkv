@@ -1,6 +1,12 @@
 Changelog
 *********
 
+1.9.1
+=====
+* Add a real AWS integration test for S3FSStore
+* Add minio test for S3FSStore
+* `verify` url param that can be passed to url when creating a `[h]s3://` store now really controls SSL verifaction
+
 1.9.0
 =====
 * Add `session_token` url param that can be set when creating a `[h]s3://` store
