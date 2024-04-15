@@ -24,5 +24,5 @@ https://minimalkv.readthedocs.io.
 
 License
 -------
-minimalkv is `MIT licensed
-<http://www.opensource.org/licenses/mit-license.php>`_.
+minimalkv is licensed under the terms of the `BSD-3-Clause
+<https://opensource.org/license/bsd-3-clause>`_ license.
