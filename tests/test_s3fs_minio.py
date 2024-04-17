@@ -46,8 +46,6 @@ def test_example_interaction():
     - get()
     - delete()
     """
-    # TODO: Replace w/ testing strategy as done in `test_boto3_store.py`
-
     bucket = user1.get_store_from_config()
 
     new_filename = "some-non-existing-file"
@@ -71,7 +69,7 @@ def clean_env(monkeypatch):
     yield
 
 
-def test_no_env_side_effects(clean_env):
+def test_no_env_side_effects():
     pre_env_state = os.environ.copy()
 
     bucket = user1.get_store_from_config()
