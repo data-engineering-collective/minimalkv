@@ -36,3 +36,5 @@ dependencies:
   - types-redis
   - types-boto
   - boto3-stubs
+  # Development dependencies
+  - docker-compose
