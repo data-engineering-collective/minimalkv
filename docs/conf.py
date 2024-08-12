@@ -48,10 +48,10 @@ exclude_trees = ["_build"]
 
 pygments_style = "sphinx"
 
-intersphinx_mapping = {
-    "http://docs.python.org/": None,
-    "http://docs.pythonboto.org/en/latest/": None,
-    "http://sendapatch.se/projects/pylibmc/": None,
-    "http://www.sqlalchemy.org/docs/": None,
-    "http://redis-py.readthedocs.org/en/latest/": None,
-}
+# intersphinx_mapping = {
+#    "http://docs.python.org/": None,
+#    "http://docs.pythonboto.org/en/latest/": None,
+#    "http://sendapatch.se/projects/pylibmc/": None,
+#    "http://www.sqlalchemy.org/docs/": None,
+#    "http://redis-py.readthedocs.org/en/latest/": None,
+# }
