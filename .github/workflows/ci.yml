@@ -24,7 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up Conda env
-        uses: mamba-org/setup-micromamba@f8b8a1e23a26f60a44c853292711bacfd3eac822
+        uses: mamba-org/setup-micromamba@617811f69075e3fd3ae68ca64220ad065877f246
         with:
           environment-file: environment.yml
           cache-environment: true
@@ -90,7 +90,7 @@ jobs:
         run: mypy minimalkv
       - name: Publish package
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags') && matrix.PYTHON_VERSION == '3.10'
-        uses: pypa/gh-action-pypi-publish@v1.10.2
+        uses: pypa/gh-action-pypi-publish@v1.10.3
         with:
           user: __token__
           password: ${{ secrets.pypi_password }}
@@ -107,7 +107,7 @@ jobs:
       - name: Checkout branch
         uses: actions/checkout@v4
       - name: Set up micromamba
-        uses: mamba-org/setup-micromamba@f8b8a1e23a26f60a44c853292711bacfd3eac822
+        uses: mamba-org/setup-micromamba@617811f69075e3fd3ae68ca64220ad065877f246
       - name: Add micromamba to GITHUB_PATH
         run: echo "${HOME}/micromamba-bin" >> "$GITHUB_PATH"
       - name: Install Python 3.10
