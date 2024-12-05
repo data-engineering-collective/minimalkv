@@ -98,7 +98,7 @@ class BasicStore:
         with pytest.raises(KeyError):
             store.get_file(key, BytesIO())
 
-    def test_key_error_on_nonexistant_get_filename(self, store, key):
+    def test_key_error_on_nonexistant_get_filename(self, store, key, tmp_path):
         with pytest.raises(KeyError):
             store.get_file(key, "/dev/null")
 

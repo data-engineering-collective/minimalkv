@@ -1,12 +1,12 @@
 repos:
  # Run ruff first because autofix behaviour is enabled
  - repo: https://github.com/Quantco/pre-commit-mirrors-ruff
-   rev: "0.7.2"
+   rev: "0.8.0"
    hooks:
     - id: ruff-conda
     - id: ruff-format-conda
  - repo: https://github.com/Quantco/pre-commit-mirrors-mypy
-   rev: "1.10.1"
+   rev: "1.13.0"
    hooks:
     - id: mypy-conda
       additional_dependencies:
@@ -18,7 +18,7 @@ repos:
         - types-boto
         - boto3-stubs
  - repo: https://github.com/Quantco/pre-commit-mirrors-pyupgrade
-   rev: 3.15.2
+   rev: 3.19.0
    hooks:
     - id: pyupgrade-conda
       args:
