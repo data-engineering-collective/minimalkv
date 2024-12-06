@@ -1,10 +1,11 @@
 import os
+import time
 from random import randint
 from typing import Union
 from urllib.parse import quote_plus
 
 import pytest
-from boto3 import Session
+from boto3 import Session, client
 
 from minimalkv import get_store_from_url
 
@@ -123,3 +124,58 @@ def test_s3fs_aws_integration(
 
     bucket.delete(new_filename)
     assert new_filename not in bucket.keys()
+
+
+def assume_role(credentials):
+    access_key, secret_key, session_token = credentials
+    sts_client = client(
+        "sts",
+        aws_access_key_id=access_key,
+        aws_secret_access_key=secret_key,
+        aws_session_token=session_token,
+    )
+
+    params = {
+        "RoleArn": "arn:aws:iam::211125346859:role/S3MinimalKvAccessRole",
+        "RoleSessionName": "assumed-session",
+        "DurationSeconds": 900,
+    }
+
+    response = sts_client.assume_role(**params)
+
+    print(response)
+
+    credentials = response["Credentials"]
+    return (
+        credentials["AccessKeyId"],
+        credentials["SecretAccessKey"],
+        credentials["SessionToken"],
+    )
+
+
+@pytest.mark.xfail(reason="Demonstrate failure because of expired credentials.")
+def test_sts(
+    test_id,
+    aws_credentials: Tuple[str, str, Union[str, None]],
+    ci_bucket_name,
+    ci_s3_point,
+):
+    """
+    In an enterprise environment, we usually have static sts credentials that can be used to assume a role with necessary permissions.
+
+    This demonstrates the need for a mechanism to refresh credentials, because we don't want
+    to keep track from the outside when the short-term credentials (via assume role) expire.
+    Instead, this should be handled by the store itself.
+
+    Downside: The test takes 15 minutes, as this is the minimum duration for a role.
+    """
+    access_key, secret_key, session_token = assume_role(aws_credentials)
+    bucket = get_store_from_url(
+        get_s3_url(access_key, secret_key, session_token, ci_bucket_name, ci_s3_point)
+    )
+
+    bucket.iter_keys()
+
+    time.sleep(60 * 15 + 10)
+
+    bucket.iter_keys()  # no assert as this will raise if the credentials are expired
