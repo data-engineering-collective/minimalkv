@@ -20,7 +20,7 @@ jobs:
         run: pixi run pre-commit-run --color=always --show-diff-on-failure
 
   unittest:
-    name: Unit tests - ${{ matrix.PYTHON_VERSION }}
+    name: Unit tests - ${{ matrix.environment }}
     runs-on: ubuntu-latest
     permissions:
       contents: "read"
