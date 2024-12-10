@@ -1,6 +1,6 @@
 import os
 import os.path
-from typing import TYPE_CHECKING, Any, Dict
+from typing import TYPE_CHECKING, Any
 from warnings import warn
 
 from minimalkv.fs import FilesystemStore
@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from minimalkv._key_value_store import KeyValueStore
 
 
-def create_store(type: str, params: Dict[str, Any]) -> "KeyValueStore":
+def create_store(type: str, params: dict[str, Any]) -> "KeyValueStore":
     """Create store of type ``type`` with ``params``."""
     warn(
         """

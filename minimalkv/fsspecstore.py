@@ -1,6 +1,7 @@
 import io
 import warnings
-from typing import TYPE_CHECKING, BinaryIO, Iterator, Optional, Union
+from collections.abc import Iterator
+from typing import TYPE_CHECKING, BinaryIO, Optional, Union
 
 from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
 

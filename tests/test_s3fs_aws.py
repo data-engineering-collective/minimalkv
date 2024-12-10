@@ -1,6 +1,6 @@
 import os
 from random import randint
-from typing import Tuple, Union
+from typing import Union
 from urllib.parse import quote_plus
 
 import pytest
@@ -10,7 +10,7 @@ from minimalkv import get_store_from_url
 
 
 @pytest.fixture()
-def aws_credentials() -> Tuple[str, str, Union[str, None]]:
+def aws_credentials() -> tuple[str, str, Union[str, None]]:
     env_var_name = "AWS_PROFILE"
     profile_name = os.environ.get(env_var_name, None)
 
@@ -90,7 +90,7 @@ def test_id() -> str:
 
 def test_s3fs_aws_integration(
     test_id,
-    aws_credentials: Tuple[str, str, Union[str, None]],
+    aws_credentials: tuple[str, str, Union[str, None]],
     ci_bucket_name,
     ci_s3_point,
 ):

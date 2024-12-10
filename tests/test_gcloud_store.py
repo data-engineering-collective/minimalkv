@@ -7,8 +7,9 @@ storage = pytest.importorskip(
 import os
 import pickle
 import time
+from collections.abc import Generator
 from configparser import ConfigParser
-from typing import Any, Generator, Optional, Union
+from typing import Any, Optional, Union
 from uuid import uuid4
 
 from basic_store import BasicStore, OpenSeekTellStore
