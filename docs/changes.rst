@@ -1,10 +1,14 @@
 Changelog
 *********
 
+
+1.10.1
+======
+* Add option to pass STS credentials to ``s3://`` store by setting the ``is_sts_credentials=true`` url param and passing role params via ``sts_assume_role__*``, e.g. ``sts_assume_role__RoleArn=...``.
+
 1.9.2
 =====
 * Port setup to use the OSS QuantCo copier template (`copier template https://github.com/Quantco/copier-template-python-open-source`_) and (`pixi https://pixi.sh`_) as environment manager.
-
 
 1.9.1
 =====
