@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 import re
+from collections.abc import Iterator
 from io import BytesIO
-from typing import TYPE_CHECKING, BinaryIO, Iterator, List, Optional, Union
+from typing import TYPE_CHECKING, BinaryIO, Optional, Union
 
 if TYPE_CHECKING:
     from redis import StrictRedis
@@ -27,7 +28,7 @@ class RedisStore(TimeToLiveMixin, KeyValueStore):
     def _delete(self, key: str) -> int:
         return self.redis.delete(key)
 
-    def keys(self, prefix: str = "") -> List[str]:
+    def keys(self, prefix: str = "") -> list[str]:
         """List all keys in the store starting with prefix.
 
         Parameters

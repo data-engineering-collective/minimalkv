@@ -29,7 +29,6 @@ jobs:
       fail-fast: false
       matrix:
         environment:
-          - py38 # TODO: drop
           - py39
           - py310
           - py311
@@ -111,8 +110,8 @@ jobs:
       - name: Set up pixi
         uses: prefix-dev/setup-pixi@ba3bb36eb2066252b2363392b7739741bb777659 # v0.8.1
         with:
-          environments: py38 # as in pyproject.toml
+          environments: py39 # as in pyproject.toml
       - name: Install repository
-        run: pixi run -e py38 postinstall
+        run: pixi run -e py39 postinstall
       - name: Run mypy
-        run: pixi run -e py38 mypy minimalkv
+        run: pixi run -e py39 mypy minimalkv

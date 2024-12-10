@@ -1,12 +1,13 @@
 import io
+from collections.abc import Iterator
 from contextlib import contextmanager
 from shutil import copyfileobj
-from typing import Iterator, List, Optional
+from typing import Optional
 
 from minimalkv import CopyMixin, KeyValueStore, UrlMixin
 
 
-def _public_readable(grants: List) -> bool:  # TODO: What kind of list
+def _public_readable(grants: list) -> bool:  # TODO: What kind of list
     """Take a list of grants from an ACL and check if they allow public read access."""
     for grant in grants:
         # see: https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html

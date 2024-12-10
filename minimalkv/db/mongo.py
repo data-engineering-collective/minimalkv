@@ -1,7 +1,8 @@
 import pickle
 import re
+from collections.abc import Iterator
 from io import BytesIO
-from typing import BinaryIO, Iterator
+from typing import BinaryIO
 
 from bson.binary import Binary
 

@@ -1,7 +1,8 @@
 import re
 import time
+from collections.abc import Iterator
 from io import BytesIO
-from typing import BinaryIO, Iterator, List, Optional, Union
+from typing import BinaryIO, Optional, Union
 
 from dulwich.objects import Blob, Commit, Tree
 from dulwich.repo import Repo
@@ -13,9 +14,9 @@ from minimalkv._key_value_store import KeyValueStore
 def _on_tree(
     repo: Repo,
     tree: Tree,
-    components: List[bytes],
+    components: list[bytes],
     obj: Optional[Union[Blob, Tree]],
-) -> List[Tree]:
+) -> list[Tree]:
     """Mount an object on a tree, using the given path components.
 
     Parameters
@@ -106,10 +107,10 @@ class GitCommitStore(KeyValueStore):
         self.subdir = re.sub("#/+#", "/", subdir.decode("ascii").strip("/"))
 
     @property
-    def _subdir_components(self) -> List[bytes]:
+    def _subdir_components(self) -> list[bytes]:
         return [c.encode("ascii") for c in self.subdir.split("/")]
 
-    def _key_components(self, key: str) -> List[bytes]:
+    def _key_components(self, key: str) -> list[bytes]:
         return [c.encode("ascii") for c in key.split("/")]
 
     @property
