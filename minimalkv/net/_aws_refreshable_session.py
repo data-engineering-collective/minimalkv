@@ -60,7 +60,7 @@ class RefreshableAssumeRoleProvider(CredentialProvider):
 
     def create_refresh(self):
         async def _refresh() -> Dict:
-            logger.debug("Refreshing credentials")
+            logger.info("Refreshing credentials")
             sts_client = self.sts_session.create_client("sts")
             refresh = create_assume_role_refresher(sts_client, self._assume_role_params)
 
@@ -71,7 +71,7 @@ class RefreshableAssumeRoleProvider(CredentialProvider):
                 .replace(tzinfo=tz.tzutc())
                 .astimezone(to_zone)
             )
-            logger.debug(
+            logger.info(
                 f"""Refreshed credentials with access key '{credentials["access_key"]}' and expiry time '{local_expiry_time}'."""
             )
             return credentials
