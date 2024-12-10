@@ -36,7 +36,7 @@ def aws_credentials() -> Tuple[str, str, Union[str, None]]:
 
         if "CI_IN_FORK" not in os.environ or os.environ["CI_IN_FORK"].lower() == "true":
             # We skip if the variable is not set at all (local development)
-            # or if it is explicitely set to "true".
+            # or if it is explicitly set to "true".
 
             if "CI_IN_FORK" in os.environ:
                 msg += "Skipping, because you (or the CI) set 'CI_IN_FORK=true'."

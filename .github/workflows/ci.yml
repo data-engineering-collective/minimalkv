@@ -114,3 +114,5 @@ jobs:
           environments: py38 # as in pyproject.toml
       - name: Install repository
         run: pixi run -e py38 postinstall
+      - name: Run mypy
+        run: pixi run -e py38 mypy minimalkv

@@ -69,3 +69,8 @@ check_untyped_defs = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.typos]
+files.extend-exclude = ["tests/storefact"]
+[tool.typos.default.extend-words]
+ue = "ue"

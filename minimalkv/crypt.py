@@ -119,7 +119,7 @@ class HMACDecorator(StoreDecorator):
         hm.update(buf)
 
         if not hm.digest() == hash:
-            raise VerificationException("Invalid hash on key %r" % key)
+            raise VerificationException(f"Invalid hash on key {key}")
 
         return buf
 

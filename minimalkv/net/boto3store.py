@@ -61,8 +61,7 @@ class Boto3SimpleKeyFile(io.RawIOBase):  # noqa D
             self.position = self.size + offset
         else:
             raise ValueError(
-                "invalid whence (%r, should be %d, %d, %d)"
-                % (whence, io.SEEK_SET, io.SEEK_CUR, io.SEEK_END)
+                f"invalid whence ({whence}, should be {io.SEEK_SET}, {io.SEEK_CUR}, {io.SEEK_END})"
             )
 
         return self.position
@@ -73,7 +72,7 @@ class Boto3SimpleKeyFile(io.RawIOBase):  # noqa D
     def read(self, size=-1):  # noqa D
         if size == -1:
             # Read to the end of the file
-            range_header = "bytes=%d-" % self.position
+            range_header = f"bytes={self.position}-"
             self.seek(offset=0, whence=io.SEEK_END)
         else:
             new_position = self.position + size
@@ -83,7 +82,7 @@ class Boto3SimpleKeyFile(io.RawIOBase):  # noqa D
             if new_position >= self.size:
                 return self.read()
 
-            range_header = "bytes=%d-%d" % (self.position, new_position - 1)
+            range_header = f"bytes={self.position}-{new_position - 1}"
             self.seek(offset=size, whence=io.SEEK_CUR)
 
         return self.s3_object.get(Range=range_header)["Body"].read()

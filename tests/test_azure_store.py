@@ -34,9 +34,7 @@ def get_azure_conn_string():
         account_key = parser.get(section, "account_key")
         protocol = parser.get(section, "protocol")
         endpoint = parser.get(section, "endpoint")
-        conn_string = "DefaultEndpointsProtocol={};AccountName={};AccountKey={}".format(
-            protocol, account_name, account_key
-        )
+        conn_string = f"DefaultEndpointsProtocol={protocol};AccountName={account_name};AccountKey={account_key}"
         if endpoint:
             conn_string += f";BlobEndpoint={endpoint}"
         return conn_string
@@ -53,12 +51,12 @@ def _delete_container(conn_string, container):
             s.delete_container(container)
         except AzureError as ex:
             # ignore the ContainerNotFound error:
-            if ex.error_code != "ContainerNotFound":
+            if ex.error_code != "ContainerNotFound":  # type: ignore[attr-defined]
                 raise
         s.close()
     except ImportError:
         # for azure-storage-blob<12
-        from azure.storage.blob import BlockBlobService
+        from azure.storage.blob import BlockBlobService  # type: ignore[attr-defined]
 
         s = BlockBlobService(connection_string=conn_string)
         s.delete_container(container)

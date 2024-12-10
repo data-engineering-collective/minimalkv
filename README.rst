@@ -12,7 +12,7 @@ minimalkv is `available on PyPI <http://pypi.python.org/pypi/minimalkv/>`_ and
 can be installed through `pip <http://pypi.python.org/pypi/pip>`_::
 
    pip install minimalkv
-   
+
 or via ``conda`` on `conda-forge <https://github.com/conda-forge/minimalkv-feedstock>`_::
 
   conda install -c conda-forge minimalkv

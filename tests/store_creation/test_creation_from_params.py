@@ -4,7 +4,7 @@ from minimalkv._store_creation import create_store
 
 
 def test_create_store_azure(mocker):
-    # Mock HAzureBlockBlobStore also here, becase otherwise it will try to inherit from
+    # Mock HAzureBlockBlobStore also here, because otherwise it will try to inherit from
     # the mock object `mock_azure` created below, which will fail.
     mock_hazure = mocker.patch("minimalkv._hstores.HAzureBlockBlobStore")
     mock_azure = mocker.patch("minimalkv.net.azurestore.AzureBlockBlobStore")

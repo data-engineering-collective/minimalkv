@@ -177,7 +177,7 @@ class URLEncodeKeysDecorator(KeyTransformingDecorator):
 
     def _map_key(self, key: str) -> str:  # noqa D
         if not isinstance(key, str):
-            raise ValueError("%r is not a unicode string" % key)
+            raise ValueError(f"{key} is not a unicode string")
         quoted = quote_plus(key.encode("utf-8"))
         if isinstance(quoted, bytes):
             quoted = quoted.decode("utf-8")
