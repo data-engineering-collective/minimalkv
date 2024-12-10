@@ -8,7 +8,7 @@ import os
 import pickle
 import time
 from configparser import ConfigParser
-from typing import Optional
+from typing import Any, Generator, Optional, Union
 from uuid import uuid4
 
 from basic_store import BasicStore, OpenSeekTellStore
@@ -23,7 +23,7 @@ from minimalkv.net.gcstore import GoogleCloudStore
 
 
 @pytest.fixture(scope="module")
-def gc_credentials():
+def gc_credentials() -> Generator[Union[AnonymousCredentials, str, None], Any, None]:
     # If we have credentials in the environment, we don't need to do anything
     if "GOOGLE_APPLICATION_CREDENTIALS" in os.environ:
         yield None
@@ -43,6 +43,7 @@ def gc_credentials():
         credentials_path or emulator_endpoint
     ), "Either set endpoint (for gc emulation) or credentials_json_path (for actual gc)"
 
+    credentials: Union[AnonymousCredentials, str, None] = None
     if emulator_endpoint:
         # google's client library looks for this env var
         # if we didn't set it it would use the standard endpoint

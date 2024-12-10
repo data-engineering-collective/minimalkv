@@ -6,7 +6,7 @@ Changelog
 * Add a real AWS integration test for S3FSStore
 * Add minio test for S3FSStore
 * `verify` url param that can be passed to url when creating a `[h]s3://` store now really controls SSL verifaction
-* Refactor tests to not skip Boto3Store / S3FSStore tests anymore if `boto` is unavailible
+* Refactor tests to not skip Boto3Store / S3FSStore tests anymore if `boto` is unavailable
 
 1.9.0
 =====
@@ -41,7 +41,7 @@ Changelog
 1.8.1
 =====
 * Drop `pkg_resources` and use `importlib.metadata` to access package version string.
-* Add missing `region_name` in `s3fs` store creation to set required location contraint
+* Add missing `region_name` in `s3fs` store creation to set required location constraint
   during bucket creation.
 
 1.8.0
@@ -184,7 +184,7 @@ Changelog
 
 * Use ``BlockBlobService.list_blob_names`` in ``minimalkv.net.azurestore.AzureBlockBlobStore.iter_keys``.
   This will only parse the names from Azure's XML response thus reducing CPU time
-  siginificantly for this function.
+  significantly for this function.
 * They ``.keys()`` method on Python 3 now returns a list. This is in line with the documentation and the
   behaviour on Python 2. It used to return a generator.
 

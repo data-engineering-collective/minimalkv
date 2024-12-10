@@ -45,7 +45,6 @@ mock = "*"
 [feature.test.tasks]
 test = "pytest"
 test-coverage = "pytest --cov=minimalkv --cov-report=xml --cov-report=term-missing"
-mypy = "mypy minimalkv"
 
 [feature.build.dependencies]
 python-build = "*"

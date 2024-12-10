@@ -177,7 +177,7 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
         """Iterate over unique prefixes in the store up to delimiter, starting with prefix.
 
         If ``prefix`` contains ``delimiter``, return the prefix up to the first
-        occurence of delimiter after the prefix.
+        occurrence of delimiter after the prefix.
 
         Parameters
         ----------

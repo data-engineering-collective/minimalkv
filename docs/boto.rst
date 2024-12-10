@@ -73,7 +73,7 @@ The unit tests for S3 will be run by travis against a local minio instance, emul
       Constructs a new boto based backend.
 
       :param bucket: An instance of :class:`boto.s3.bucket.Bucket`,
-                     :class:`boto.gs.bucket.Bucket` or similiar.
+                     :class:`boto.gs.bucket.Bucket` or similar.
       :param prefix: A string that will transparently prefixed to all handled
                      keys.
       :param url_valid_time=0: When using

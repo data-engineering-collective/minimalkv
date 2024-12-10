@@ -7,7 +7,7 @@ from uritools import SplitResult
 from minimalkv._constants import VALID_KEY_RE
 from minimalkv._mixins import UrlMixin
 
-# Only here to keep backwards-compatability
+# Only here to keep backwards-compatibility
 key_type = str
 
 
@@ -143,7 +143,7 @@ class KeyValueStore:
         """Iterate over unique prefixes in the store up to delimiter, starting with prefix.
 
         If ``prefix`` contains ``delimiter``, return the prefix up to the first
-        occurence of delimiter after the prefix.
+        occurrence of delimiter after the prefix.
 
         The default uses an naive key iteration. Some backends may implement more
         efficient methods.
@@ -361,7 +361,7 @@ class KeyValueStore:
         Parameters
         ----------
         key : str
-            Key to check the existance of.
+            Key to check the existence of.
         """
         return key in self.keys()
 

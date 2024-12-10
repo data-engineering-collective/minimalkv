@@ -171,14 +171,8 @@ def _build_azure_url(
     protocol = default_endpoints_protocol or "https"
     if use_sas:
         return (
-            "DefaultEndpointsProtocol={protocol};AccountName={account_name};"
-            "SharedAccessSignature={shared_access_signature}".format(
-                protocol=protocol,
-                account_name=account_name,
-                shared_access_signature=account_key,
-            )
+            f"DefaultEndpointsProtocol={protocol};AccountName={account_name};"
+            f"SharedAccessSignature={account_key}"
         )
     else:
-        return "DefaultEndpointsProtocol={protocol};AccountName={account_name};AccountKey={account_key}".format(
-            protocol=protocol, account_name=account_name, account_key=account_key
-        )
+        return f"DefaultEndpointsProtocol={protocol};AccountName={account_name};AccountKey={account_key}"
