@@ -1,7 +1,24 @@
 name: CI
 on: [push, pull_request, workflow_dispatch]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
+  pre-commit:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
+      - name: Set up pixi
+        uses: prefix-dev/setup-pixi@ba3bb36eb2066252b2363392b7739741bb777659 # v0.8.1
+        with:
+          environments: default lint
+      - name: pre-commit
+        run: pixi run pre-commit-run --color=always --show-diff-on-failure
+
   unittest:
     name: Unit tests - ${{ matrix.PYTHON_VERSION }}
     runs-on: ubuntu-latest
@@ -11,7 +28,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        PYTHON_VERSION: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        environment:
+          - py38 # TODO: drop
+          - py39
+          - py310
+          - py311
+          - py312
     services:
       postgres:
         image: postgres:11
@@ -19,17 +41,15 @@ jobs:
           POSTGRES_DB: minimalkv_test
           POSTGRES_PASSWORD: minimalkv_test
           POSTGRES_USER: minimalkv_test
-    env:
-      SIMPLEKV_CI: 1
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up Conda env
-        uses: mamba-org/setup-micromamba@068f1ab4b37ed9b3d9f73da7db90a0cda0a48d29
+      - name: Checkout branch
+        uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
+      - name: Set up pixi
+        uses: prefix-dev/setup-pixi@ba3bb36eb2066252b2363392b7739741bb777659 # v0.8.1
         with:
-          environment-file: environment.yml
-          cache-environment: true
-          create-args: >-
-            python=${{ matrix.PYTHON_VERSION }}
+          environments: ${{ matrix.environment }}
+      - name: Install repository
+        run: pixi run -e ${{ matrix.environment }} postinstall
       # For some reason we can't check for $ACTIONS_ID_TOKEN_REQUEST_URL
       # from the `if` condition in the next step.
       # See this commit: https://github.com/simonbohnen/minimalkv/commit/775c74c1b1248245d66c2be69476e18acda9f2fe
@@ -57,62 +77,40 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::211125346859:role/github-poweruser
           aws-region: eu-central-1
-        # We set an env variable according to the result of the check
-        # to only allow skipping of aws integration test when in fork.
-        # When being run in the base repo, the aws integration test should always be executed.
+
+      # This is a work around as long as S3FSStore has the side effect of setting env variables
+      # to provide authentication. This can safely be removed as soon as this side effect is gone
       - name: Remap AWS Environment Variables
         if: steps.check-id-token.outcome == 'success'
         run: |
           echo "ACCESS_KEY_ID=${{ env.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
           echo "SECRET_ACCESS_KEY=${{ env.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
           echo "SESSION_TOKEN=${{ env.AWS_SESSION_TOKEN }}" >> $GITHUB_ENV
-        # This is a work around as long as S3FSStore has the side effect of setting env variables
-        # to provide authentication. This can savely be removed as soon as this side effect is gone
+      # We set an env variable according to the result of the check
+      # to only allow skipping of aws integration test when in fork.
+      # When being run in the base repo, the aws integration test should always be executed.
       - name: Check whether the workflow runs in a fork
         run: echo "CI_IN_FORK=${{ github.event.pull_request && github.repository != github.event.pull_request.head.repo.full_name }}" >> $GITHUB_ENV
       - name: "Run setup: install package & start docker container"
         shell: bash -x -l {0}
         run: |
-          pip install --no-deps .
           docker-compose up -d
           while ! docker exec mysql mysqladmin status -h 127.0.0.1 -u minimalkv_test --password=minimalkv_test; \
             do sleep 3; done
-      - name: Run the unittests
-        shell: bash -l {0}
-        run: |
-          pytest -n auto --dist loadfile -rs --cov=minimalkv --cov-report=xml
-      - name: Build the package
-        shell: bash -x -l {0}
-        run: |
-          python -m build
-      - name: Typecheck the codebase
-        shell: bash -x -l {0}
-        run: mypy minimalkv
-      - name: Publish package
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags') && matrix.PYTHON_VERSION == '3.10'
-        uses: pypa/gh-action-pypi-publish@v1.12.3
-        with:
-          user: __token__
-          password: ${{ secrets.pypi_password }}
+      - name: Run pytest
+        run: pixi run -e ${{ matrix.environment }} pytest -n auto --dist loadfile -rs --cov=minimalkv --cov-report=xml --color=yes
       - uses: codecov/codecov-action@v5
         with:
           file: ./coverage.xml
 
-  pre-commit-checks:
-    name: "Pre-commit checks"
+  mypy:
     runs-on: ubuntu-latest
-    env:
-      PRE_COMMIT_USE_MICROMAMBA: 1
     steps:
       - name: Checkout branch
-        uses: actions/checkout@v4
-      - name: Set up micromamba
-        uses: mamba-org/setup-micromamba@068f1ab4b37ed9b3d9f73da7db90a0cda0a48d29
-      - name: Add micromamba to GITHUB_PATH
-        run: echo "${HOME}/micromamba-bin" >> "$GITHUB_PATH"
-      - name: Install Python 3.10
-        uses: actions/setup-python@v5
+        uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
+      - name: Set up pixi
+        uses: prefix-dev/setup-pixi@ba3bb36eb2066252b2363392b7739741bb777659 # v0.8.1
         with:
-          python-version: "3.10"
-      - name: Run pre-commit checks
-        uses: pre-commit/action@v3.0.1
+          environments: py38 # as in pyproject.toml
+      - name: Install repository
+        run: pixi run -e py38 postinstall
