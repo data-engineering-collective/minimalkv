@@ -1,0 +1,12 @@
+# This file is managed by Copier; DO NOT EDIT OR REMOVE.
+_commit: v0.2.1
+_src_path: https://github.com/quantco/copier-template-python-open-source
+add_autobump_workflow: true
+author_email: minimalkv@uwekorn.com
+author_name: Data Engineering Collective
+github_url: https://github.com/data-engineering-collective/minimalkv
+github_user: xhochy
+minimal_python_version: py39
+project_short_description: A key-value storage for binary data, support many backends.
+project_slug: minimalkv
+use_devcontainer: false
