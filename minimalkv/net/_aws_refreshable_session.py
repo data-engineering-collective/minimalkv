@@ -3,7 +3,7 @@
 
 from datetime import datetime
 from logging import getLogger
-from typing import Dict, Optional
+from typing import Any, Callable, Coroutine, Dict, Optional, TypedDict
 
 from aiobotocore.credentials import (
     AioRefreshableCredentials,
@@ -15,6 +15,13 @@ from botocore.credentials import CredentialProvider
 from dateutil import tz  # type: ignore[import-untyped]
 
 logger = getLogger(__name__)
+
+
+class BotoCredentials(TypedDict):
+    access_key: str
+    secret_key: str
+    token: str
+    expiry_time: str
 
 
 class RefreshableAssumeRoleProvider(CredentialProvider):
@@ -58,13 +65,13 @@ class RefreshableAssumeRoleProvider(CredentialProvider):
 
         return refreshable_credentials
 
-    def create_refresh(self):
-        async def _refresh() -> Dict:
+    def create_refresh(self) -> Callable[[], Coroutine[Any, Any, BotoCredentials]]:
+        async def _refresh() -> BotoCredentials:
             logger.info("Refreshing credentials")
             sts_client = self.sts_session.create_client("sts")
             refresh = create_assume_role_refresher(sts_client, self._assume_role_params)
 
-            credentials = await refresh()
+            credentials: BotoCredentials = await refresh()
             to_zone = tz.tzlocal()
             local_expiry_time = (
                 datetime.strptime(credentials["expiry_time"], "%Y-%m-%dT%H:%M:%S%Z")
