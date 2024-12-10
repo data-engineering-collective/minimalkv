@@ -1,13 +1,16 @@
 import os
 import time
+from logging import getLogger
 from random import randint
 from typing import Union
 from urllib.parse import quote_plus
 
 import pytest
-from boto3 import Session, client
+from boto3 import Session
 
 from minimalkv import get_store_from_url
+
+logger = getLogger(__name__)
 
 
 @pytest.fixture()
@@ -72,6 +75,11 @@ def ci_s3_point() -> str:
     return "s3.eu-north-1.amazonaws.com"
 
 
+@pytest.fixture()
+def role_arn() -> str:
+    return "arn:aws:iam::211125346859:role/S3MinimalKvAccessRole"
+
+
 def get_s3_url(
     access_key: str,
     secret_key: str,
@@ -126,56 +134,40 @@ def test_s3fs_aws_integration(
     assert new_filename not in bucket.keys()
 
 
-def assume_role(credentials):
-    access_key, secret_key, session_token = credentials
-    sts_client = client(
-        "sts",
-        aws_access_key_id=access_key,
-        aws_secret_access_key=secret_key,
-        aws_session_token=session_token,
-    )
-
-    params = {
-        "RoleArn": "arn:aws:iam::211125346859:role/S3MinimalKvAccessRole",
-        "RoleSessionName": "assumed-session",
-        "DurationSeconds": 900,
-    }
-
-    response = sts_client.assume_role(**params)
-
-    print(response)
-
-    credentials = response["Credentials"]
-    return (
-        credentials["AccessKeyId"],
-        credentials["SecretAccessKey"],
-        credentials["SessionToken"],
-    )
-
-
-@pytest.mark.xfail(reason="Demonstrate failure because of expired credentials.")
-def test_sts(
-    test_id,
-    aws_credentials: Tuple[str, str, Union[str, None]],
+@pytest.mark.slow
+def test_sts_refresh_mechanism(
+    aws_credentials: tuple[str, str, Union[str, None]],
     ci_bucket_name,
     ci_s3_point,
+    role_arn,
 ):
     """
     In an enterprise environment, we usually have static sts credentials that can be used to assume a role with necessary permissions.
 
-    This demonstrates the need for a mechanism to refresh credentials, because we don't want
-    to keep track from the outside when the short-term credentials (via assume role) expire.
-    Instead, this should be handled by the store itself.
-
-    Downside: The test takes 15 minutes, as this is the minimum duration for a role.
+    To verify that a refreshing mechanism works, we use the following approach:
+    - Use the `is_sts_credentials` parameter to signal that the credentials are STS credentials.
+    - Under the hood, minimalkv will assume the specified role (via `sts_assume_role__RoleArn`)
+    and use the credentials to access the bucket.
+    - Test whether a basic operation works. Wait for 15 minutes until the credentials expire.
+    - Test whether the basic operation still works.
     """
-    access_key, secret_key, session_token = assume_role(aws_credentials)
-    bucket = get_store_from_url(
-        get_s3_url(access_key, secret_key, session_token, ci_bucket_name, ci_s3_point)
+    access_key, secret_key, session_token = aws_credentials
+    role_arn = "arn:aws:iam::211125346859:role/S3MinimalKvAccessRole"
+    base_url = get_s3_url(
+        access_key, secret_key, session_token, ci_bucket_name, ci_s3_point
     )
+    sts_url_extension = f"is_sts_credentials=true&sts_assume_role__RoleArn={quote_plus(role_arn)}&sts_assume_role__DurationSeconds=900"
+
+    bucket = get_store_from_url(f"{base_url}&{sts_url_extension}")
 
     bucket.iter_keys()
 
-    time.sleep(60 * 15 + 10)
+    for i in range(15):
+        logger.info(
+            f"Sleeping for 60 seconds ({i+1}/15) to wait for credentials to expire."
+        )
+        time.sleep(60)
+
+    time.sleep(10)  # Some buffer time
 
     bucket.iter_keys()  # no assert as this will raise if the credentials are expired

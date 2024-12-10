@@ -3,7 +3,7 @@
 
 from datetime import datetime
 from logging import getLogger
-from typing import Dict, Optional
+from typing import Optional
 
 from aiobotocore.credentials import (
     AioRefreshableCredentials,
@@ -34,7 +34,7 @@ class RefreshableAssumeRoleProvider(CredentialProvider):
     def __init__(
         self,
         sts_session: AioSession,
-        assume_role_params: Dict,
+        assume_role_params: dict,
         advisory_timeout: Optional[int] = None,
         mandatory_timeout: Optional[int] = None,
     ):
@@ -59,8 +59,8 @@ class RefreshableAssumeRoleProvider(CredentialProvider):
         return refreshable_credentials
 
     def create_refresh(self):
-        async def _refresh() -> Dict:
-            logger.debug("Refreshing credentials")
+        async def _refresh() -> dict:
+            logger.info("Refreshing credentials")
             sts_client = self.sts_session.create_client("sts")
             refresh = create_assume_role_refresher(sts_client, self._assume_role_params)
 
@@ -71,7 +71,7 @@ class RefreshableAssumeRoleProvider(CredentialProvider):
                 .replace(tzinfo=tz.tzutc())
                 .astimezone(to_zone)
             )
-            logger.debug(
+            logger.info(
                 f"""Refreshed credentials with access key '{credentials["access_key"]}' and expiry time '{local_expiry_time}'."""
             )
             return credentials
@@ -83,7 +83,7 @@ def create_aio_session_w_refreshable_credentials(
     access_key: str,
     secret_key: str,
     token: Optional[str],
-    assume_role_params: Dict,
+    assume_role_params: dict,
     advisory_timeout: Optional[int] = None,
     mandatory_timeout: Optional[int] = None,
 ):
