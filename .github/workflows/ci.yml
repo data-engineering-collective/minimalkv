@@ -94,7 +94,7 @@ jobs:
       - name: "Run setup: install package & start docker container"
         shell: bash -x -l {0}
         run: |
-          docker-compose up -d
+          pixi run docker compose up -d
           while ! docker exec mysql mysqladmin status -h 127.0.0.1 -u minimalkv_test --password=minimalkv_test; \
             do sleep 3; done
       - name: Run pytest
