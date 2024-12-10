@@ -87,5 +87,5 @@ class TestPrefixDecorator(BasicStore):
     def test_pickle(self, store):
         import pickle
 
-        rountrip = pickle.loads(pickle.dumps(store))
-        assert isinstance(rountrip, PrefixDecorator)
+        roundtrip = pickle.loads(pickle.dumps(store))
+        assert isinstance(roundtrip, PrefixDecorator)

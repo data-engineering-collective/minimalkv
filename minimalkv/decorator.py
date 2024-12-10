@@ -1,5 +1,6 @@
+from collections.abc import Iterable, Iterator
 from types import TracebackType
-from typing import Iterable, Iterator, Optional, Type
+from typing import Optional
 from urllib.parse import quote_plus, unquote_plus
 
 from minimalkv._key_value_store import KeyValueStore
@@ -49,7 +50,7 @@ class StoreDecorator:
 
     def __exit__(
         self,
-        exc_type: Optional[Type[BaseException]],
+        exc_type: Optional[type[BaseException]],
         exc_val: Optional[BaseException],
         exc_tb: Optional[TracebackType],
     ):
@@ -177,7 +178,7 @@ class URLEncodeKeysDecorator(KeyTransformingDecorator):
 
     def _map_key(self, key: str) -> str:  # noqa D
         if not isinstance(key, str):
-            raise ValueError("%r is not a unicode string" % key)
+            raise ValueError(f"{key} is not a unicode string")
         quoted = quote_plus(key.encode("utf-8"))
         if isinstance(quoted, bytes):
             quoted = quoted.decode("utf-8")

@@ -1,5 +1,6 @@
+from collections.abc import Iterator
 from io import BytesIO
-from typing import BinaryIO, Iterator
+from typing import BinaryIO
 
 from sqlalchemy import Column, LargeBinary, String, Table, exists, select
 from sqlalchemy.orm import Session

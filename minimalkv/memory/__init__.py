@@ -1,5 +1,6 @@
+from collections.abc import Iterator
 from io import BytesIO
-from typing import Dict, Iterator, Optional
+from typing import Optional
 
 from uritools import SplitResult
 
@@ -14,9 +15,9 @@ class DictStore(KeyValueStore, CopyMixin):
 
     """
 
-    d: Dict[str, bytes]
+    d: dict[str, bytes]
 
-    def __init__(self, d: Optional[Dict[str, bytes]] = None):
+    def __init__(self, d: Optional[dict[str, bytes]] = None):
         self.d = d or {}
 
     def _delete(self, key: str) -> None:
@@ -48,6 +49,6 @@ class DictStore(KeyValueStore, CopyMixin):
 
     @classmethod
     def _from_parsed_url(
-        cls, parsed_url: SplitResult, query: Dict[str, str]
+        cls, parsed_url: SplitResult, query: dict[str, str]
     ) -> "DictStore":
         return cls()

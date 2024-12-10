@@ -10,7 +10,7 @@ from minimalkv.crypt import HMACDecorator, VerificationException, _HMACFileReade
 
 class TestHMACFileReader:
     @pytest.fixture
-    def bad_datas(self, value):
+    def bad_data(self, value):
         val = value * 3
 
         def _alter_byte(byte_string, pos):
@@ -75,19 +75,19 @@ class TestHMACFileReader:
 
             assert b"".join(chunks) == value
 
-    def test_manipulated_input_full_read(self, secret_key, value, bad_datas, hashfunc):
-        for bad_data in bad_datas:
+    def test_manipulated_input_full_read(self, secret_key, value, bad_data, hashfunc):
+        for bad_data_point in bad_data:
             reader = _HMACFileReader(
-                hmac.HMAC(secret_key, None, hashfunc), BytesIO(bad_data)
+                hmac.HMAC(secret_key, None, hashfunc), BytesIO(bad_data_point)
             )
 
             with pytest.raises(VerificationException):
                 reader.read()
 
-    def test_manipulated_input_incremental_read(self, secret_key, bad_datas, hashfunc):
-        for bad_data in bad_datas:
+    def test_manipulated_input_incremental_read(self, secret_key, bad_data, hashfunc):
+        for bad_data_point in bad_data:
             reader = _HMACFileReader(
-                hmac.HMAC(secret_key, None, hashfunc), BytesIO(bad_data)
+                hmac.HMAC(secret_key, None, hashfunc), BytesIO(bad_data_point)
             )
 
             with pytest.raises(VerificationException):

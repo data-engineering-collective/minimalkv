@@ -112,10 +112,10 @@ class TimeToLiveMixin:
             return ttl_secs
 
         if not isinstance(ttl_secs, (int, float)):
-            raise ValueError("Not a valid ttl_secs value: %r" % ttl_secs)
+            raise ValueError(f"Not a valid ttl_secs value: {ttl_secs}")
 
         if ttl_secs < 0:
-            raise ValueError("ttl_secs must not be negative: %r" % ttl_secs)
+            raise ValueError(f"ttl_secs must not be negative: {ttl_secs}")
 
         return ttl_secs
 
@@ -411,6 +411,6 @@ class ExtendedKeyspaceMixin:
         """
         if key is not None:
             if not isinstance(key, str):
-                raise ValueError("%r is not a valid key type" % key)
+                raise ValueError(f"{key} is not a valid key type")
             elif not VALID_KEY_RE_EXTENDED.match(key) or key == "/":
-                raise ValueError("%r contains illegal characters" % key)
+                raise ValueError(f"{key} contains illegal characters")

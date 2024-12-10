@@ -1,6 +1,6 @@
 import os
 import warnings
-from typing import Dict, NamedTuple, Optional
+from typing import NamedTuple, Optional
 
 from uritools import SplitResult
 
@@ -117,7 +117,7 @@ class S3FSStore(FSSpecStore, UrlMixin):  # noqa D
 
     @classmethod
     def _from_parsed_url(
-        cls, parsed_url: SplitResult, query: Dict[str, str]
+        cls, parsed_url: SplitResult, query: dict[str, str]
     ) -> "S3FSStore":  # noqa D
         """Build an ``S3FSStore`` from a parsed URL.
 

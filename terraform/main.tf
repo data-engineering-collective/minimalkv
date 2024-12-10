@@ -50,7 +50,7 @@ resource "google_iam_workload_identity_pool_provider" "github_actions_provider" 
 
 resource "google_service_account" "service_account_gha" {
   account_id   = "sa-github-actions"
-  display_name = "GHA Service Accont"
+  display_name = "GHA Service Account"
 }
 
 # Grant the external identities permission to impersonate the service account

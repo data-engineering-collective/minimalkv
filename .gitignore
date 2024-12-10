@@ -114,3 +114,6 @@ old/
 
 # Exploratory code
 exploration_scripts/
+
+# Pixi
+.pixi

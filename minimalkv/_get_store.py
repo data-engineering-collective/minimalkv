@@ -1,5 +1,5 @@
 from functools import reduce
-from typing import Any, Dict, List, Optional, Type
+from typing import Any, Optional
 
 from uritools import SplitResult, urisplit
 
@@ -8,7 +8,7 @@ from minimalkv._urls import url2dict
 
 
 def get_store_from_url(
-    url: str, store_cls: Optional[Type[KeyValueStore]] = None
+    url: str, store_cls: Optional[type[KeyValueStore]] = None
 ) -> KeyValueStore:
     """Take a URL and return a minimalkv store according to the parameters in the URL.
 
@@ -55,7 +55,7 @@ def get_store_from_url(
     from minimalkv._hstores import HS3FSStore
     from minimalkv.net.s3fsstore import S3FSStore
 
-    scheme_to_store: Dict[str, Type[KeyValueStore]] = {
+    scheme_to_store: dict[str, type[KeyValueStore]] = {
         "s3": S3FSStore,
         "hs3": HS3FSStore,
         "boto": HS3FSStore,
@@ -81,7 +81,7 @@ def get_store_from_url(
             f"URL scheme {scheme} does not match store class {store_cls.__name__}"
         )
 
-    query_listdict: Dict[str, List[str]] = parsed_url.getquerydict()
+    query_listdict: dict[str, list[str]] = parsed_url.getquerydict()
     # We will just use the last occurrence for each key
     query = {k: v[-1] for k, v in query_listdict.items()}
 
@@ -95,7 +95,7 @@ def get_store_from_url(
     return wrapped_store
 
 
-def _extract_wrappers(parsed_url: SplitResult) -> List[str]:
+def _extract_wrappers(parsed_url: SplitResult) -> list[str]:
     """Extract wrappers from a parsed URL.
 
     Wrappers allow you to add additional functionality to a store, e.g. encryption.

@@ -1,13 +1,14 @@
+from collections.abc import Iterator
 from io import BytesIO
 from types import TracebackType
-from typing import BinaryIO, Dict, Iterator, List, Optional, Type, Union
+from typing import BinaryIO, Optional, Union
 
 from uritools import SplitResult
 
 from minimalkv._constants import VALID_KEY_RE
 from minimalkv._mixins import UrlMixin
 
-# Only here to keep backwards-compatability
+# Only here to keep backwards-compatibility
 key_type = str
 
 
@@ -143,7 +144,7 @@ class KeyValueStore:
         """Iterate over unique prefixes in the store up to delimiter, starting with prefix.
 
         If ``prefix`` contains ``delimiter``, return the prefix up to the first
-        occurence of delimiter after the prefix.
+        occurrence of delimiter after the prefix.
 
         The default uses an naive key iteration. Some backends may implement more
         efficient methods.
@@ -173,7 +174,7 @@ class KeyValueStore:
                 yield k
                 memory.add(k)
 
-    def keys(self, prefix: str = "") -> List[str]:
+    def keys(self, prefix: str = "") -> list[str]:
         """List all keys in the store starting with prefix.
 
         Parameters
@@ -361,7 +362,7 @@ class KeyValueStore:
         Parameters
         ----------
         key : str
-            Key to check the existance of.
+            Key to check the existence of.
         """
         return key in self.keys()
 
@@ -450,7 +451,7 @@ class KeyValueStore:
 
     def __exit__(
         self,
-        exc_type: Optional[Type[BaseException]],
+        exc_type: Optional[type[BaseException]],
         exc_val: Optional[BaseException],
         exc_tb: Optional[TracebackType],
     ):
@@ -464,7 +465,7 @@ class KeyValueStore:
 
     @classmethod
     def _from_parsed_url(
-        cls, parsed_url: SplitResult, query: Dict[str, str]
+        cls, parsed_url: SplitResult, query: dict[str, str]
     ) -> "KeyValueStore":
         """Build a ``KeyValueStore`` from a parsed URL.
 

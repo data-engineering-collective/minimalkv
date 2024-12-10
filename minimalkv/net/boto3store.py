@@ -1,12 +1,13 @@
 import io
+from collections.abc import Iterator
 from contextlib import contextmanager
 from shutil import copyfileobj
-from typing import Iterator, List, Optional
+from typing import Optional
 
 from minimalkv import CopyMixin, KeyValueStore, UrlMixin
 
 
-def _public_readable(grants: List) -> bool:  # TODO: What kind of list
+def _public_readable(grants: list) -> bool:  # TODO: What kind of list
     """Take a list of grants from an ACL and check if they allow public read access."""
     for grant in grants:
         # see: https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html
@@ -61,8 +62,7 @@ class Boto3SimpleKeyFile(io.RawIOBase):  # noqa D
             self.position = self.size + offset
         else:
             raise ValueError(
-                "invalid whence (%r, should be %d, %d, %d)"
-                % (whence, io.SEEK_SET, io.SEEK_CUR, io.SEEK_END)
+                f"invalid whence ({whence}, should be {io.SEEK_SET}, {io.SEEK_CUR}, {io.SEEK_END})"
             )
 
         return self.position
@@ -73,7 +73,7 @@ class Boto3SimpleKeyFile(io.RawIOBase):  # noqa D
     def read(self, size=-1):  # noqa D
         if size == -1:
             # Read to the end of the file
-            range_header = "bytes=%d-" % self.position
+            range_header = f"bytes={self.position}-"
             self.seek(offset=0, whence=io.SEEK_END)
         else:
             new_position = self.position + size
@@ -83,7 +83,7 @@ class Boto3SimpleKeyFile(io.RawIOBase):  # noqa D
             if new_position >= self.size:
                 return self.read()
 
-            range_header = "bytes=%d-%d" % (self.position, new_position - 1)
+            range_header = f"bytes={self.position}-{new_position - 1}"
             self.seek(offset=size, whence=io.SEEK_CUR)
 
         return self.s3_object.get(Range=range_header)["Body"].read()

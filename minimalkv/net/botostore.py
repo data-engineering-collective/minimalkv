@@ -1,5 +1,6 @@
+from collections.abc import Iterator
 from contextlib import contextmanager
-from typing import BinaryIO, Dict, Iterator, cast
+from typing import BinaryIO, cast
 
 from minimalkv import CopyMixin, KeyValueStore, UrlMixin
 
@@ -45,7 +46,7 @@ class BotoStore(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
             k.update_metadata(self.metadata)
         return k
 
-    def __upload_args(self) -> Dict[str, str]:
+    def __upload_args(self) -> dict[str, str]:
         """Generate a dictionary of arguments to pass to ``set_content_from`` functions.
 
         This allows us to save API calls by passing the necessary parameters on with the
