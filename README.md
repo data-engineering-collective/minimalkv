@@ -6,6 +6,7 @@
 [![python-version](https://img.shields.io/pypi/pyversions/minimalkv?logoColor=white&logo=python&style=flat-square)](https://pypi.org/project/minimalkv)
 [![Documentation Status](https://readthedocs.org/projects/minimalkv/badge/?version=stable)](https://minimalkv.readthedocs.io/en/stable/?badge=stable)
 [![codecov.io](https://codecov.io/github/data-engineering-collective/minimalkv/coverage.svg?branch=main)](https://codecov.io/github/data-engineering-collective/minimalkv)
+![PyPI - License](https://img.shields.io/pypi/l/minimalkv)
 
 _minimalkv_ is an API for very basic key-value stores used for small, frequently
 accessed data or large binary blobs. Its basic interface is easy to implement
