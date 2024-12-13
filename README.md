@@ -4,6 +4,8 @@
 [![conda-forge](https://img.shields.io/conda/vn/conda-forge/minimalkv?logoColor=white&logo=conda-forge&style=flat-square)](https://prefix.dev/channels/conda-forge/packages/minimalkv)
 [![pypi-version](https://img.shields.io/pypi/v/minimalkv.svg?logo=pypi&logoColor=white&style=flat-square)](https://pypi.org/project/minimalkv)
 [![python-version](https://img.shields.io/pypi/pyversions/minimalkv?logoColor=white&logo=python&style=flat-square)](https://pypi.org/project/minimalkv)
+[![Documentation Status](https://readthedocs.org/projects/minimalkv/badge/?version=stable)](https://minimalkv.readthedocs.io/en/stable/?badge=stable)
+[![codecov.io](https://codecov.io/github/data-engineering-collective/minimalkv/coverage.svg?branch=main)](https://codecov.io/github/data-engineering-collective/minimalkv)
 
 _minimalkv_ is an API for very basic key-value stores used for small, frequently
 accessed data or large binary blobs. Its basic interface is easy to implement
