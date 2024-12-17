@@ -1,6 +1,11 @@
 Changelog
 *********
 
+1.9.2
+=====
+* Port setup to use the OSS QuantCo copier template (`copier template https://github.com/Quantco/copier-template-python-open-source`_) and (`pixi https://pixi.sh`_) as environment manager.
+
+
 1.9.1
 =====
 * Add a real AWS integration test for S3FSStore
