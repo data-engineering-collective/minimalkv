@@ -4,7 +4,6 @@ from typing import Any, Optional
 from uritools import SplitResult, urisplit
 
 from minimalkv._key_value_store import KeyValueStore
-from minimalkv._urls import url2dict
 
 
 def get_store_from_url(
@@ -52,13 +51,16 @@ def get_store_from_url(
     See the respective store's :func:`_from_parsed_url` function for more details.
 
     """
-    from minimalkv._hstores import HS3FSStore
+    from minimalkv._hstores import HDictStore, HS3FSStore
+    from minimalkv.memory import DictStore
     from minimalkv.net.s3fsstore import S3FSStore
 
     scheme_to_store: dict[str, type[KeyValueStore]] = {
         "s3": S3FSStore,
         "hs3": HS3FSStore,
         "boto": HS3FSStore,
+        "memory": DictStore,
+        "hmemory": HDictStore,
     }
 
     parsed_url = urisplit(url)
@@ -72,8 +74,8 @@ def get_store_from_url(
     scheme = scheme_parts[0]
 
     if scheme not in scheme_to_store:
-        # If we can't find the scheme, we fall back to the old creation methods
-        return get_store(**url2dict(url))
+        # If we can't find the scheme, we fail hard.
+        raise NotImplementedError(scheme)
 
     store_cls_from_url = scheme_to_store[scheme]
     if store_cls is not None and store_cls_from_url != store_cls:
