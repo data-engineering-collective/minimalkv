@@ -1,12 +1,12 @@
 import base64
-from typing import Any, Dict, List
+from typing import Any
 
 from uritools import urisplit
 
 TRUEVALUES = ("true",)
 
 
-def url2dict(url: str, raise_on_extra_params: bool = False) -> Dict[str, Any]:
+def url2dict(url: str, raise_on_extra_params: bool = False) -> dict[str, Any]:
     """Create dictionary with parameters from url.
 
     Parameters
@@ -124,7 +124,7 @@ def extract_params(scheme, host, port, path, query, userinfo):  # noqa D
     raise ValueError(f'Unknown storage type "{store_type}"')
 
 
-def _parse_userinfo(userinfo: str) -> List[str]:
+def _parse_userinfo(userinfo: str) -> list[str]:
     """Try to split the URL's userinfo into fields separated by `:`.
 
     The user info is the part between ``://`` and ``@``. If anything looks wrong, remind

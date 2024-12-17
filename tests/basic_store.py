@@ -52,24 +52,24 @@ class BasicStore:
             pytest.skip(
                 "'test_store_and_copy' can only be tested with stores that use the 'CopyMixin' mixin."
             )
-        store.put(key, value)
-        assert store.get(key) == value
+        store.put(key, value)  # type: ignore[attr-defined]
+        assert store.get(key) == value  # type: ignore[attr-defined]
         store.copy(key, key2)
-        assert store.get(key) == value
-        assert store.get(key2) == value
+        assert store.get(key) == value  # type: ignore[attr-defined]
+        assert store.get(key2) == value  # type: ignore[attr-defined]
 
     def test_store_and_copy_overwrite(self, store, key, key2, value, value2):
         if not isinstance(store, CopyMixin):
             pytest.skip(
                 "'test_store_and_copy_overwrite' can only be tested with stores that use the 'CopyMixin' mixin."
             )
-        store.put(key, value)
-        store.put(key2, value2)
-        assert store.get(key) == value
-        assert store.get(key2) == value2
+        store.put(key, value)  # type: ignore[attr-defined]
+        store.put(key2, value2)  # type: ignore[attr-defined]
+        assert store.get(key) == value  # type: ignore[attr-defined]
+        assert store.get(key2) == value2  # type: ignore[attr-defined]
         store.copy(key, key2)
-        assert store.get(key) == value
-        assert store.get(key2) == value
+        assert store.get(key) == value  # type: ignore[attr-defined]
+        assert store.get(key2) == value  # type: ignore[attr-defined]
 
     def test_open_incremental_read(self, store, key, long_value):
         store.put_file(key, BytesIO(long_value))
@@ -78,27 +78,27 @@ class BasicStore:
         assert long_value[3:5] == ok.read(2)
         assert long_value[5:8] == ok.read(3)
 
-    def test_key_error_on_nonexistant_get(self, store, key):
+    def test_key_error_on_nonexistent_get(self, store, key):
         with pytest.raises(KeyError):
             store.get(key)
 
-    def test_key_error_on_nonexistant_copy(self, store, key, key2):
+    def test_key_error_on_nonexistent_copy(self, store, key, key2):
         if not isinstance(store, CopyMixin):
             pytest.skip(
-                "'test_key_error_on_nonexistant_copy' can only be tested with stores that use the 'CopyMixin' mixin."
+                "'test_key_error_on_nonexistent_copy' can only be tested with stores that use the 'CopyMixin' mixin."
             )
         with pytest.raises(KeyError):
             store.copy(key, key2)
 
-    def test_key_error_on_nonexistant_open(self, store, key):
+    def test_key_error_on_nonexistent_open(self, store, key):
         with pytest.raises(KeyError):
             store.open(key)
 
-    def test_key_error_on_nonexistant_get_file(self, store, key):
+    def test_key_error_on_nonexistent_get_file(self, store, key):
         with pytest.raises(KeyError):
             store.get_file(key, BytesIO())
 
-    def test_key_error_on_nonexistant_get_filename(self, store, key, tmp_path):
+    def test_key_error_on_nonexistent_get_filename(self, store, key, tmp_path):
         with pytest.raises(KeyError):
             store.get_file(key, "/dev/null")
 

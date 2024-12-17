@@ -2,7 +2,8 @@ import os
 import os.path
 import shutil
 import urllib.parse
-from typing import Any, BinaryIO, Callable, Iterator, List, Optional, Union, cast
+from collections.abc import Iterator
+from typing import Any, BinaryIO, Callable, Optional, Union, cast
 
 from minimalkv._key_value_store import KeyValueStore
 from minimalkv._mixins import CopyMixin, UrlMixin
@@ -144,7 +145,7 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
         location = "/".join(urllib.parse.quote(p, safe="") for p in parts)
         return "file://" + location
 
-    def keys(self, prefix: str = "") -> List[str]:
+    def keys(self, prefix: str = "") -> list[str]:
         """List all keys in the store starting with prefix.
 
         Parameters
@@ -177,7 +178,7 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
         """Iterate over unique prefixes in the store up to delimiter, starting with prefix.
 
         If ``prefix`` contains ``delimiter``, return the prefix up to the first
-        occurence of delimiter after the prefix.
+        occurrence of delimiter after the prefix.
 
         Parameters
         ----------

@@ -87,11 +87,7 @@ class HashGen(IDGen):
 
     @pytest.fixture
     def validate_hash(self, hashfunc):
-        hash_regexp = re.compile(
-            r"^[0-9a-f]{{{}}}$".format(
-                hashfunc().digest_size * 2,
-            )
-        )
+        hash_regexp = re.compile(rf"^[0-9a-f]{{{hashfunc().digest_size * 2}}}$")
 
         return hash_regexp.match
 

@@ -17,7 +17,7 @@ class CacheDecorator(StoreDecorator):
     backing store. After their completion, the cache will be updated.
 
     No cache maintainenace above this is done by the decorator. The caching
-    store itselfs decides how large to grow the cache and which data to keep,
+    store itself decides how large to grow the cache and which data to keep,
     which data to throw away.
 
     Parameters
@@ -25,7 +25,7 @@ class CacheDecorator(StoreDecorator):
     cache : KeyValueStore
         The caching backend.
     store : KeyValueStore
-        The backing store. This is the "authorative" backend.
+        The backing store. This is the "authoritative" backend.
     """
 
     def __init__(self, cache: KeyValueStore, store: KeyValueStore):
@@ -111,7 +111,7 @@ class CacheDecorator(StoreDecorator):
 
             # return from cache
             return self.cache.get_file(key, file)
-        # if an IOError occured, file pointer may be dirty - cannot proceed
+        # if an IOError occurred, file pointer may be dirty - cannot proceed
         # safely
 
     def open(self, key: str) -> BinaryIO:

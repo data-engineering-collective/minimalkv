@@ -85,14 +85,14 @@ class TestBotoStorage(BasicStore, UrlStore):
     # Disable max key length test as it leads to problems with minio
     test_max_key_length = None
 
-    def test_get_filename_nonexistant(self, store, key, tmp_path):
+    def test_get_filename_nonexistent(self, store, key, tmp_path):
         # NOTE: boto misbehaves here and tries to erase the target file
         # the parent tests use /dev/null, which you really should not try
         # to os.remove!
         with pytest.raises(KeyError):
             store.get_file(key, os.path.join(str(tmp_path), "a"))
 
-    def test_key_error_on_nonexistant_get_filename(self, store, key, tmp_path):
+    def test_key_error_on_nonexistent_get_filename(self, store, key, tmp_path):
         with pytest.raises(KeyError):
             store.get_file(key, os.path.join(str(tmp_path), "a"))
 

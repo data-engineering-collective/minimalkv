@@ -7,7 +7,7 @@ class User(NamedTuple):
     access_key: str
     secret_key: str
     bucket_name: str
-    # The mapping between users and accessable buckets can be arbitrary.
+    # The mapping between users and accessible buckets can be arbitrary.
     # The config in "tests/minio-container/policies" is very simple, allowing
     # user1 -> bucket1
     # user2 -> bucket2
