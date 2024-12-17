@@ -1,8 +1,8 @@
 Changelog
 *********
 
-
-1.10.1
+.. Wait until the no side effects PR is merged
+1.1X.0
 ======
 * Add option to pass STS credentials to ``s3://`` store by setting the ``is_sts_credentials=true`` url param and passing role params via ``sts_assume_role__*``, e.g. ``sts_assume_role__RoleArn=...``.
 
