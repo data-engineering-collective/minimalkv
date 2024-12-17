@@ -21,12 +21,12 @@ dependencies:
   - pytest
   - pytest-cov
   - pytest-mock
-  - pytest-xdist  
+  - pytest-xdist
   - python
   - redis-py
   - setuptools-scm
   - six
-  - sphinx  
+  - sphinx
   - sqlalchemy
   - uritools
   # type checking dependencies
@@ -36,5 +36,6 @@ dependencies:
   - types-redis
   - types-boto
   - boto3-stubs
+  - types-python-dateutil
   # Development dependencies
   - docker-compose

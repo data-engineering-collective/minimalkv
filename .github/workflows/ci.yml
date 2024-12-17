@@ -79,6 +79,7 @@ jobs:
             do sleep 3; done
       - name: Run the unittests
         shell: bash -l {0}
+        # Remove dev de-selection of slow tests by resetting the marker to the default
         run: |
           pytest -n auto --dist loadfile -rs --cov=minimalkv --cov-report=xml
       - name: Build the package
