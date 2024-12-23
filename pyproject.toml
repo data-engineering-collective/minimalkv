@@ -67,6 +67,8 @@ no_implicit_optional = true
 check_untyped_defs = true
 
 [tool.pytest.ini_options]
+addopts = "--strict-markers"
+markers = ["slow: marks test as slow to run"]
 testpaths = ["tests"]
 
 [tool.typos]
