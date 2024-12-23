@@ -77,14 +77,6 @@ jobs:
           role-to-assume: arn:aws:iam::211125346859:role/github-poweruser
           aws-region: eu-central-1
 
-      # This is a work around as long as S3FSStore has the side effect of setting env variables
-      # to provide authentication. This can safely be removed as soon as this side effect is gone
-      - name: Remap AWS Environment Variables
-        if: steps.check-id-token.outcome == 'success'
-        run: |
-          echo "ACCESS_KEY_ID=${{ env.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
-          echo "SECRET_ACCESS_KEY=${{ env.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
-          echo "SESSION_TOKEN=${{ env.AWS_SESSION_TOKEN }}" >> $GITHUB_ENV
       # We set an env variable according to the result of the check
       # to only allow skipping of aws integration test when in fork.
       # When being run in the base repo, the aws integration test should always be executed.

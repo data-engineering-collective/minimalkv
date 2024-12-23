@@ -184,13 +184,10 @@ class S3FSStore(FSSpecStore, UrlMixin):  # noqa D
 
         if url_access_key_id is None:
             url_secret_access_key = os.environ.get("AWS_ACCESS_KEY_ID")
-        else:
-            os.environ["AWS_ACCESS_KEY_ID"] = url_access_key_id
+            # We allow attributes to be nonable, a potential use case might be a public bucket
 
         if url_secret_access_key is None:
             url_secret_access_key = os.environ.get("AWS_SECRET_ACCESS_KEY")
-        else:
-            os.environ["AWS_SECRET_ACCESS_KEY"] = url_secret_access_key
 
         credentials = Credentials(
             access_key_id=url_access_key_id,
