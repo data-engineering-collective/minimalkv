@@ -14,7 +14,7 @@ repos:
       # ruff
       - id: ruff
         name: ruff
-        entry: pixi run -e lint ruff check --fix --exit-non-zero-on-fix --force-exclude
+        entry: pixi run -e lint ruff check --fix --exit-non-zero-on-fix --force-exclude --unsafe-fixes
         language: system
         types_or: [python, pyi]
         require_serial: true

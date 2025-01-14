@@ -132,6 +132,7 @@ Table of contents
    boto
    azure
    gcstorage
+   s3fsstore
    memory
    db
    git

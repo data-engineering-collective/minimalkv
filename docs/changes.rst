@@ -1,15 +1,17 @@
 Changelog
 *********
 
+1.11.0
+======
+* Add option to pass STS credentials to ``s3://`` store by setting the ``is_sts_credentials=true`` url param and passing role params via ``sts_assume_role__*``, e.g. ``sts_assume_role__RoleArn=...``.
+
 1.10.0
 ======
 * When using the S3FSStore, the environment variables 'AWS_ACCESS_KEY_ID' and 'AWS_SECRET_ACCESS_KEY' are no longer set automatically based on the values provided in the url to create the store. This was a side effect that has now been removed since the credentials are passed internally without the need of a detour through environment variables.
 
-
 1.9.2
 =====
 * Port setup to use the OSS QuantCo copier template (`copier template https://github.com/Quantco/copier-template-python-open-source`_) and (`pixi https://pixi.sh`_) as environment manager.
-
 
 1.9.1
 =====
