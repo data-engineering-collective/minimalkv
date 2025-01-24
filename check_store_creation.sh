@@ -8,3 +8,4 @@
 whl_file=$(ls dist/*.whl)
 pip install $whl_file
 python -c 'from minimalkv import get_store; get_store("hfs", path=".")'
+echo "Store creation successful"
