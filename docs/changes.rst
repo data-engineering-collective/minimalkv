@@ -1,6 +1,10 @@
 Changelog
 *********
 
+1.11.1
+======
+* Remove hard dependency of aiobotocore in the S3FSStore.
+
 1.11.0
 ======
 * Add option to pass STS credentials to ``s3://`` store by setting the ``is_sts_credentials=true`` url param and passing role params via ``sts_assume_role__*``, e.g. ``sts_assume_role__RoleArn=...``.

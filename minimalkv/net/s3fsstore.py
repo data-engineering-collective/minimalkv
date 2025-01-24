@@ -9,12 +9,13 @@ from uritools import SplitResult
 from minimalkv import UrlMixin
 from minimalkv._url_utils import _get_password, _get_username
 from minimalkv.fsspecstore import FSSpecStore
-from minimalkv.net._aws_refreshable_session import (
-    create_aio_session_w_refreshable_credentials,
-)
 
 try:
     from s3fs import S3FileSystem
+
+    from minimalkv.net._aws_refreshable_session import (
+        create_aio_session_w_refreshable_credentials,
+    )  # aws refreshable session only is of interest in conjunction with s3fs
 
     has_s3fs = True
 except ImportError:
