@@ -74,12 +74,12 @@ def test_no_env_side_effects():
 
     bucket = user1.get_store_from_config()
 
-    assert dict(os.environ) == dict(
-        pre_env_state
-    ), "Retrieved bucket should not modify the environment."
+    assert dict(os.environ) == dict(pre_env_state), (
+        "Retrieved bucket should not modify the environment."
+    )
 
     bucket.keys()
 
-    assert (
-        os.environ == pre_env_state
-    ), "Performing operations on the bucket should not modify the environment."
+    assert os.environ == pre_env_state, (
+        "Performing operations on the bucket should not modify the environment."
+    )
