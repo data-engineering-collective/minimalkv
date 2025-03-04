@@ -163,7 +163,7 @@ def test_sts_refresh_mechanism(
 
     for i in range(15):
         logger.info(
-            f"Sleeping for 60 seconds ({i+1}/15) to wait for credentials to expire."
+            f"Sleeping for 60 seconds ({i + 1}/15) to wait for credentials to expire."
         )
         time.sleep(60)
 

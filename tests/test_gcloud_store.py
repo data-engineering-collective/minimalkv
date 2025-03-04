@@ -40,9 +40,9 @@ def gc_credentials() -> Generator[Union[AnonymousCredentials, str, None], Any, N
         "google-cloud-tests", "emulator_endpoint", fallback=None
     )
 
-    assert (
-        credentials_path or emulator_endpoint
-    ), "Either set endpoint (for gc emulation) or credentials_json_path (for actual gc)"
+    assert credentials_path or emulator_endpoint, (
+        "Either set endpoint (for gc emulation) or credentials_json_path (for actual gc)"
+    )
 
     credentials: Union[AnonymousCredentials, str, None] = None
     if emulator_endpoint:
