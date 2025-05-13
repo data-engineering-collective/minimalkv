@@ -97,6 +97,7 @@ def test_json_decode():
         assert json.loads(creds) == json.load(file)
 
 
+@pytest.mark.gcs
 def test_complete():
     url, expected = ACTUAL_URL
     store = get_store_from_url(url)
