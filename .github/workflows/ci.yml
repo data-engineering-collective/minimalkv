@@ -89,7 +89,7 @@ jobs:
           while ! docker exec mysql mysqladmin status -h 127.0.0.1 -u minimalkv_test --password=minimalkv_test; \
             do sleep 3; done
       - name: Run pytest
-        run: pixi run -e ${{ matrix.environment }} pytest -n auto --dist loadfile -rs --cov=minimalkv --cov-report=xml --color=yes --cov-report=term-missing
+        run: pixi run -e ${{ matrix.environment }} pytest -n auto --dist loadfile -rs --cov=minimalkv --cov-report=xml --color=yes --cov-report=term-missing -m "not gcs"
       - uses: codecov/codecov-action@v5
         with:
           file: ./coverage.xml

@@ -68,7 +68,7 @@ check_untyped_defs = true
 
 [tool.pytest.ini_options]
 addopts = "--strict-markers"
-markers = ["slow: marks test as slow to run"]
+markers = ["slow: marks test as slow to run", "gcs"]
 testpaths = ["tests"]
 
 [tool.typos]
