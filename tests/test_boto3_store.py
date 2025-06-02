@@ -70,7 +70,7 @@ class TestBoto3Storage(BasicStore, UrlStore):
             return s3fsstore
 
     # Disable max key length test as it leads to problems with minio
-    test_max_key_length = None
+    test_max_key_length = None  # type: ignore
 
     def test_get_filename_nonexistent(self, store, key, tmp_path):
         with pytest.raises(KeyError):

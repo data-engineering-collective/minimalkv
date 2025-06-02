@@ -2,6 +2,7 @@ import os
 import stat
 import tempfile
 from io import BytesIO
+from typing import Any
 from unittest.mock import Mock
 from urllib.parse import (
     quote as url_quote,
@@ -122,23 +123,19 @@ class TestFilesystemStoreUmask(TestBaseFilesystemStore):
 
 class TestFileStoreSetPermissions(TestFilesystemStoreUmask):
     @pytest.fixture
-    def perms(self):
+    def perms(self, current_umask: Any):
         return 0o612
         self.tmpdir = tempfile.mkdtemp()
 
     @pytest.fixture
-    def store(self, tmpdir, perms):
-        return FilesystemStore(tmpdir, perm=perms)
+    def store(self, tmpdir):
+        return FilesystemStore(tmpdir)
 
 
 class TestWebFileStore(TestBaseFilesystemStore):
     @pytest.fixture
-    def url_prefix(self):
-        return "http://some/url/root/"
-
-    @pytest.fixture
-    def store(self, tmpdir, url_prefix):
-        return WebFilesystemStore(tmpdir, url_prefix)
+    def store(self, tmpdir):
+        return WebFilesystemStore(tmpdir, "http://some/url/root/")
 
     def test_url(self, store, url_prefix, key):
         expected = url_prefix + url_quote(key)
