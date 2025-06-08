@@ -83,7 +83,7 @@ class TestBotoStorage(BasicStore, UrlStore):
         return BotoStore(bucket, prefix, reduced_redundancy=reduced_redundancy)
 
     # Disable max key length test as it leads to problems with minio
-    test_max_key_length = None
+    test_max_key_length = None  # type: ignore
 
     def test_get_filename_nonexistent(self, store, key, tmp_path):
         # NOTE: boto misbehaves here and tries to erase the target file

@@ -28,6 +28,6 @@ class TestURLEncodeKeysDecorator(BasicStore):
 
     # The invalid key is replaced by a valid one after encoding through
     # the decorator...
-    test_exception_on_invalid_key_delete = None
-    test_exception_on_invalid_key_get_file = None
-    test_exception_on_invalid_key_get = None
+    test_exception_on_invalid_key_delete = None  # type: ignore
+    test_exception_on_invalid_key_get_file = None  # type: ignore
+    test_exception_on_invalid_key_get = None  # type: ignore
