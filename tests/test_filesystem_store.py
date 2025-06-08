@@ -122,12 +122,12 @@ class TestFilesystemStoreUmask(TestBaseFilesystemStore):
 
 class TestFileStoreSetPermissions(TestFilesystemStoreUmask):
     @pytest.fixture
-    def perms(self):
+    def perms(self):  # type: ignore
         return 0o612
         self.tmpdir = tempfile.mkdtemp()
 
     @pytest.fixture
-    def store(self, tmpdir, perms):
+    def store(self, tmpdir, perms):  # type: ignore
         return FilesystemStore(tmpdir, perm=perms)
 
 
@@ -137,7 +137,7 @@ class TestWebFileStore(TestBaseFilesystemStore):
         return "http://some/url/root/"
 
     @pytest.fixture
-    def store(self, tmpdir, url_prefix):
+    def store(self, tmpdir, url_prefix):  # type: ignore
         return WebFilesystemStore(tmpdir, url_prefix)
 
     def test_url(self, store, url_prefix, key):
