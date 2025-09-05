@@ -229,7 +229,7 @@ class GitCommitStore(KeyValueStore):
         if self.subdir:
             components = self._subdir_components + components
         res = _on_tree(self.repo, tree, components, blob)  # type: ignore
-        objects_to_add.extend(res)
+        objects_to_add.extend(res)  # type: ignore
 
         commit.tree = res[-1].id
         objects_to_add.append(commit)
