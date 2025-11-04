@@ -2,7 +2,7 @@ import os
 import warnings
 from datetime import datetime
 from random import randint
-from typing import Any, NamedTuple, Optional
+from typing import Any, NamedTuple
 
 from uritools import SplitResult
 
@@ -43,9 +43,9 @@ def _generate_session_name() -> str:
 class Credentials(NamedTuple):
     """Dataclass to hold AWS credentials."""
 
-    access_key_id: Optional[str]
-    secret_access_key: Optional[str]
-    session_token: Optional[str]
+    access_key_id: str | None
+    secret_access_key: str | None
+    session_token: str | None
 
     def as_boto3_params(self):
         """Return the credentials as a dictionary suitable for boto3 authentication."""
@@ -60,7 +60,7 @@ class S3FSStore(FSSpecStore, UrlMixin):  # noqa D
     def __init__(
         self,
         bucket,
-        credentials: Optional[Credentials] = None,
+        credentials: Credentials | None = None,
         object_prefix="",
         url_valid_time=0,
         reduced_redundancy=False,
@@ -69,7 +69,7 @@ class S3FSStore(FSSpecStore, UrlMixin):  # noqa D
         verify=True,
         region_name=None,
         is_sts_credentials: bool = False,
-        sts_assume_role_params: Optional[dict[str, Any]] = None,
+        sts_assume_role_params: dict[str, Any] | None = None,
     ):
         if isinstance(bucket, str):
             import boto3

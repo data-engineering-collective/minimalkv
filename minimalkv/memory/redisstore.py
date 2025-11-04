@@ -2,7 +2,7 @@
 import re
 from collections.abc import Iterator
 from io import BytesIO
-from typing import TYPE_CHECKING, BinaryIO, Optional, Union
+from typing import TYPE_CHECKING, BinaryIO
 
 if TYPE_CHECKING:
     from redis import StrictRedis
@@ -72,7 +72,7 @@ class RedisStore(TimeToLiveMixin, KeyValueStore):
         return BytesIO(self._get(key))
 
     def _put(
-        self, key: str, value: bytes, ttl_secs: Optional[Union[str, int, float]] = None
+        self, key: str, value: bytes, ttl_secs: str | int | float | None = None
     ) -> str:
         assert ttl_secs is not None
         if ttl_secs in (NOT_SET, FOREVER):
@@ -99,7 +99,7 @@ class RedisStore(TimeToLiveMixin, KeyValueStore):
         self,
         key: str,
         file: BinaryIO,
-        ttl_secs: Optional[Union[str, int, float]] = None,
+        ttl_secs: str | int | float | None = None,
     ) -> str:
         self._put(key, file.read(), ttl_secs)
         return key

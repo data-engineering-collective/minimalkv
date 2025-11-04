@@ -29,7 +29,6 @@ jobs:
       fail-fast: false
       matrix:
         environment:
-          - py39
           - py310
           - py311
           - py312
@@ -102,8 +101,8 @@ jobs:
       - name: Set up pixi
         uses: prefix-dev/setup-pixi@28eb668aafebd9dede9d97c4ba1cd9989a4d0004 # v0.9.2
         with:
-          environments: py39 # as in pyproject.toml
+          environments: py310 # as in pyproject.toml
       - name: Install repository
-        run: pixi run -e py39 postinstall
+        run: pixi run -e py310 postinstall
       - name: Run mypy
-        run: pixi run -e py39 mypy minimalkv
+        run: pixi run -e py310 mypy minimalkv

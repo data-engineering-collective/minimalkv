@@ -9,7 +9,7 @@ import pickle
 import time
 from collections.abc import Generator
 from configparser import ConfigParser
-from typing import Any, Optional, Union
+from typing import Any
 from uuid import uuid4
 
 from basic_store import BasicStore, OpenSeekTellStore
@@ -24,7 +24,7 @@ from minimalkv.net.gcstore import GoogleCloudStore
 
 
 @pytest.fixture(scope="module")
-def gc_credentials() -> Generator[Union[AnonymousCredentials, str, None], Any, None]:
+def gc_credentials() -> Generator[AnonymousCredentials | str | None, Any, None]:
     # If we have credentials in the environment, we don't need to do anything
     if "GOOGLE_APPLICATION_CREDENTIALS" in os.environ:
         yield None
@@ -44,7 +44,7 @@ def gc_credentials() -> Generator[Union[AnonymousCredentials, str, None], Any, N
         "Either set endpoint (for gc emulation) or credentials_json_path (for actual gc)"
     )
 
-    credentials: Union[AnonymousCredentials, str, None] = None
+    credentials: AnonymousCredentials | str | None = None
     if emulator_endpoint:
         # google's client library looks for this env var
         # if we didn't set it it would use the standard endpoint
@@ -104,7 +104,7 @@ def dirty_store(gc_credentials):
     uuid = str(uuid4())
     # if we have a credentials.json that specifies the project name, else we pick one
     if isinstance(gc_credentials, AnonymousCredentials):
-        project_name: Optional[str] = "testing"
+        project_name: str | None = "testing"
     else:
         project_name = None
     with GoogleCloudStore(
@@ -174,7 +174,7 @@ class TestExtendedKeysGCStore(TestGoogleCloudStore, ExtendedKeyspaceTests):
         uuid = str(uuid4())
         # if we have a credentials.json that specifies the project name, else we pick one
         if isinstance(gc_credentials, AnonymousCredentials):
-            project_name: Optional[str] = "testing"
+            project_name: str | None = "testing"
         else:
             project_name = None
 

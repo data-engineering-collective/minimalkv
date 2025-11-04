@@ -2,7 +2,6 @@ import os
 import time
 from logging import getLogger
 from random import randint
-from typing import Union
 from urllib.parse import quote_plus
 
 import pytest
@@ -14,13 +13,13 @@ logger = getLogger(__name__)
 
 
 @pytest.fixture()
-def aws_credentials() -> tuple[str, str, Union[str, None]]:
+def aws_credentials() -> tuple[str, str, str | None]:
     env_var_name = "AWS_PROFILE"
     profile_name = os.environ.get(env_var_name, None)
 
-    access_key: Union[str, None] = None
-    secret_key: Union[str, None] = None
-    session_token: Union[str, None] = None
+    access_key: str | None = None
+    secret_key: str | None = None
+    session_token: str | None = None
 
     if profile_name:
         session = Session(profile_name=profile_name)
@@ -82,7 +81,7 @@ def role_arn() -> str:
 def get_s3_url(
     access_key: str,
     secret_key: str,
-    session_token: Union[str, None],
+    session_token: str | None,
     bucket_name: str,
     s3_point: str,
 ) -> str:
@@ -98,7 +97,7 @@ def test_id() -> str:
 
 def test_s3fs_aws_integration(
     test_id,
-    aws_credentials: tuple[str, str, Union[str, None]],
+    aws_credentials: tuple[str, str, str | None],
     ci_bucket_name,
     ci_s3_point,
 ):
@@ -135,7 +134,7 @@ def test_s3fs_aws_integration(
 
 @pytest.mark.slow
 def test_sts_refresh_mechanism(
-    aws_credentials: tuple[str, str, Union[str, None]],
+    aws_credentials: tuple[str, str, str | None],
     ci_bucket_name,
     ci_s3_point,
     role_arn,

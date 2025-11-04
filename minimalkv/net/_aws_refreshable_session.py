@@ -1,10 +1,10 @@
 # Copyright (c) QuantCo 2024-2024
 # SPDX-License-Identifier: LicenseRef-QuantCo
 
-from collections.abc import Coroutine
+from collections.abc import Callable, Coroutine
 from datetime import datetime
 from logging import getLogger
-from typing import Any, Callable, Optional, TypedDict
+from typing import Any, TypedDict
 
 from aiobotocore.credentials import (
     AioRefreshableCredentials,
@@ -43,8 +43,8 @@ class RefreshableAssumeRoleProvider(CredentialProvider):
         self,
         sts_session: AioSession,
         assume_role_params: dict,
-        advisory_timeout: Optional[int] = None,
-        mandatory_timeout: Optional[int] = None,
+        advisory_timeout: int | None = None,
+        mandatory_timeout: int | None = None,
     ):
         self.sts_session = sts_session
         self._assume_role_params = assume_role_params
@@ -90,10 +90,10 @@ class RefreshableAssumeRoleProvider(CredentialProvider):
 def create_aio_session_w_refreshable_credentials(
     access_key: str,
     secret_key: str,
-    token: Optional[str],
+    token: str | None,
     assume_role_params: dict,
-    advisory_timeout: Optional[int] = None,
-    mandatory_timeout: Optional[int] = None,
+    advisory_timeout: int | None = None,
+    mandatory_timeout: int | None = None,
 ):
     """Create an aio session that knows how to refresh its credentials using 'sts.assume_role'.
 

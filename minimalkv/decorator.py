@@ -1,6 +1,5 @@
 from collections.abc import Iterable, Iterator
 from types import TracebackType
-from typing import Optional
 from urllib.parse import quote_plus, unquote_plus
 
 from minimalkv._key_value_store import KeyValueStore
@@ -50,9 +49,9 @@ class StoreDecorator:
 
     def __exit__(
         self,
-        exc_type: Optional[type[BaseException]],
-        exc_val: Optional[BaseException],
-        exc_tb: Optional[TracebackType],
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
     ):
         """Call close on underlying store or decorator.
 
