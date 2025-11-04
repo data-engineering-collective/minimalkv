@@ -59,7 +59,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/decorator-5.2.1-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/dnspython-2.7.0-pyhff2d567_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/docutils-0.22-pyhd8ed1ab_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-64/dulwich-0.24.8-py314ha5689aa_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/dulwich-0.24.1-py314ha5689aa_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/frozenlist-1.7.0-pyhf298e5d_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/fsspec-2025.7.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/gcsfs-2025.7.0-pyhd8ed1ab_0.conda
@@ -263,7 +263,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/decorator-5.2.1-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/dnspython-2.7.0-pyhff2d567_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/docutils-0.22-pyhd8ed1ab_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/osx-64/dulwich-0.24.8-py314hc9c287a_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/osx-64/dulwich-0.24.1-py314hc9c287a_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/frozenlist-1.7.0-pyhf298e5d_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/fsspec-2025.7.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/gcsfs-2025.7.0-pyhd8ed1ab_0.conda
@@ -454,7 +454,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/decorator-5.2.1-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/dnspython-2.7.0-pyhff2d567_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/docutils-0.22-pyhd8ed1ab_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/dulwich-0.24.8-py314h8d4a433_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/dulwich-0.24.1-py314h8d4a433_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/frozenlist-1.7.0-pyhf298e5d_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/fsspec-2025.7.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/gcsfs-2025.7.0-pyhd8ed1ab_0.conda
@@ -639,7 +639,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/decorator-5.2.1-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/dnspython-2.7.0-pyhff2d567_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/docutils-0.22-pyhd8ed1ab_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/win-64/dulwich-0.24.8-py314h170c82c_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/win-64/dulwich-0.24.1-py314h170c82c_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/frozenlist-1.7.0-pyhf298e5d_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/fsspec-2025.7.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/gcsfs-2025.7.0-pyhd8ed1ab_0.conda
@@ -823,7 +823,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/decorator-5.2.1-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/dnspython-2.7.0-pyhff2d567_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/docker-compose-2.39.2-h280c20c_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-64/dulwich-0.24.8-py314ha5689aa_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/dulwich-0.24.1-py314ha5689aa_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/exceptiongroup-1.3.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/execnet-2.1.1-pyhd8ed1ab_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/frozenlist-1.7.0-pyhf298e5d_0.conda
@@ -1025,7 +1025,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/decorator-5.2.1-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/dnspython-2.7.0-pyhff2d567_1.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/docker-compose-2.39.2-h5282f48_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/osx-64/dulwich-0.24.8-py313ha265c4a_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/osx-64/dulwich-0.24.1-py313ha265c4a_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/exceptiongroup-1.3.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/execnet-2.1.1-pyhd8ed1ab_1.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/frozenlist-1.7.0-py313haf29b43_0.conda
@@ -1218,7 +1218,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/decorator-5.2.1-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/dnspython-2.7.0-pyhff2d567_1.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/docker-compose-2.39.2-h925e9cb_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/dulwich-0.24.8-py314h8d4a433_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/dulwich-0.24.1-py314h8d4a433_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/exceptiongroup-1.3.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/execnet-2.1.1-pyhd8ed1ab_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/frozenlist-1.7.0-pyhf298e5d_0.conda
@@ -1405,7 +1405,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/decorator-5.2.1-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/dnspython-2.7.0-pyhff2d567_1.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/docker-compose-2.39.2-h6a83c73_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/win-64/dulwich-0.24.8-py314h170c82c_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/win-64/dulwich-0.24.1-py314h170c82c_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/exceptiongroup-1.3.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/execnet-2.1.1-pyhd8ed1ab_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/frozenlist-1.7.0-pyhf298e5d_0.conda
@@ -1591,7 +1591,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/decorator-5.2.1-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/dnspython-2.7.0-pyhff2d567_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/docutils-0.21.2-pyhd8ed1ab_1.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-64/dulwich-0.24.8-py314ha5689aa_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/dulwich-0.24.1-py314ha5689aa_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/frozenlist-1.7.0-pyhf298e5d_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/fsspec-2025.7.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/gcsfs-2025.7.0-pyhd8ed1ab_0.conda
@@ -1783,7 +1783,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/decorator-5.2.1-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/dnspython-2.7.0-pyhff2d567_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/docutils-0.21.2-pyhd8ed1ab_1.conda
-      - conda: https://conda.anaconda.org/conda-forge/osx-64/dulwich-0.24.8-py314hc9c287a_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/osx-64/dulwich-0.24.1-py314hc9c287a_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/frozenlist-1.7.0-pyhf298e5d_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/fsspec-2025.7.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/gcsfs-2025.7.0-pyhd8ed1ab_0.conda
@@ -1966,7 +1966,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/decorator-5.2.1-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/dnspython-2.7.0-pyhff2d567_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/docutils-0.21.2-pyhd8ed1ab_1.conda
-      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/dulwich-0.24.8-py314h8d4a433_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/dulwich-0.24.1-py314h8d4a433_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/frozenlist-1.7.0-pyhf298e5d_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/fsspec-2025.7.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/gcsfs-2025.7.0-pyhd8ed1ab_0.conda
@@ -2143,7 +2143,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/decorator-5.2.1-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/dnspython-2.7.0-pyhff2d567_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/docutils-0.21.2-pyhd8ed1ab_1.conda
-      - conda: https://conda.anaconda.org/conda-forge/win-64/dulwich-0.24.8-py314h170c82c_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/win-64/dulwich-0.24.1-py314h170c82c_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/frozenlist-1.7.0-pyhf298e5d_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/fsspec-2025.7.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/gcsfs-2025.7.0-pyhd8ed1ab_0.conda
@@ -7573,22 +7573,22 @@ packages:
   license_family: Apache
   size: 1220178
   timestamp: 1754083972188
-- conda: https://conda.anaconda.org/conda-forge/linux-64/dulwich-0.24.8-py314ha5689aa_0.conda
-  sha256: 946dbb2bb1b1d912e32db02f1f1a318c6624e3cde9685908faa4329ed793472a
-  md5: a9c3777ac8fdb8ad2db50d4c7e0f0e6f
+- conda: https://conda.anaconda.org/conda-forge/linux-64/dulwich-0.24.1-py314ha5689aa_1.conda
+  sha256: 54c805ff9e2d713c37b7e1ae595cf55340406404d6d71f451bed1ca7a512dca1
+  md5: aa801684dde44d4a1ea0ae7bea167caa
   depends:
   - __glibc >=2.17,<3.0.a0
   - libgcc >=14
-  - python >=3.14,<3.15.0a0
+  - python >=3.14.0rc2,<3.15.0a0
   - python_abi 3.14.* *_cp314
   - setuptools
-  - urllib3 >=2.2.2
+  - urllib3 >=1.25
   constrains:
   - __glibc >=2.17
   license: Apache-2.0
   license_family: Apache
-  size: 1563435
-  timestamp: 1761808965717
+  size: 1281263
+  timestamp: 1756869992359
 - conda: https://conda.anaconda.org/conda-forge/osx-64/dulwich-0.24.1-py310hf04a4a5_0.conda
   sha256: 13ecbae2d39f4744ccca6ce77e16bcbf567d1c373557b0eca9a2564bbfb928c2
   md5: ed48524e42a008f4c55184b38956d162
@@ -7633,36 +7633,36 @@ packages:
   license_family: Apache
   size: 1179580
   timestamp: 1754084089829
-- conda: https://conda.anaconda.org/conda-forge/osx-64/dulwich-0.24.8-py313ha265c4a_0.conda
-  sha256: f92bd63394fb75edec20410c5af73298ab44c09d6e19746433576401bf5a8cd4
-  md5: 9570827595bcfdfa2e163094eb3f2bd4
+- conda: https://conda.anaconda.org/conda-forge/osx-64/dulwich-0.24.1-py313ha265c4a_1.conda
+  sha256: d75c9a3005eb75196faad925b64b6853f8fb2bfbfb6664055827368e380ed9bb
+  md5: b8f66a1e10dd186db391014cd1197e2a
   depends:
   - __osx >=10.13
   - python >=3.13,<3.14.0a0
   - python_abi 3.13.* *_cp313
   - setuptools
-  - urllib3 >=2.2.2
+  - urllib3 >=1.25
   constrains:
   - __osx >=10.13
   license: Apache-2.0
   license_family: Apache
-  size: 1457545
-  timestamp: 1761809198359
-- conda: https://conda.anaconda.org/conda-forge/osx-64/dulwich-0.24.8-py314hc9c287a_0.conda
-  sha256: 324ed127c02b8283459183b93fa59637b1fc8f16bc95f486e53db98c6277b1c9
-  md5: 0e9fefa313a05b7ad9bdcf742b085705
+  size: 1193138
+  timestamp: 1756870331579
+- conda: https://conda.anaconda.org/conda-forge/osx-64/dulwich-0.24.1-py314hc9c287a_1.conda
+  sha256: 809a1cde96cc3971004d2ba1ef0da0114f6030ad421e9eeca58f90dc488ec573
+  md5: 6e3db1477af17c980d7130be8e86c43c
   depends:
   - __osx >=10.13
-  - python >=3.14,<3.15.0a0
+  - python >=3.14.0rc2,<3.15.0a0
   - python_abi 3.14.* *_cp314
   - setuptools
-  - urllib3 >=2.2.2
+  - urllib3 >=1.25
   constrains:
   - __osx >=10.13
   license: Apache-2.0
   license_family: Apache
-  size: 1516693
-  timestamp: 1761809321956
+  size: 1232778
+  timestamp: 1756870521849
 - conda: https://conda.anaconda.org/conda-forge/osx-arm64/dulwich-0.24.1-py310hccbd8a7_0.conda
   sha256: 6090cf31746e10bf59518b2983b28f4aae4d41ca56bacb0885a23831cccf35c3
   md5: 3f825ad28af084d0a89a417899385ec7
@@ -7710,22 +7710,22 @@ packages:
   license_family: Apache
   size: 1178343
   timestamp: 1754084121448
-- conda: https://conda.anaconda.org/conda-forge/osx-arm64/dulwich-0.24.8-py314h8d4a433_0.conda
-  sha256: 65ada840a83c076bd9cb697ae08f2f02ff4cddf3755c132e2577e2dafef28a7b
-  md5: 7564805a9049a34be916b5b7d649fca3
+- conda: https://conda.anaconda.org/conda-forge/osx-arm64/dulwich-0.24.1-py314h8d4a433_1.conda
+  sha256: 484ed8e328e63abf5843a1b7d50a5280e68996ae9e2cf6bada9366e177f41ea0
+  md5: f9c46bbe0e91b5087044f5bde160a748
   depends:
   - __osx >=11.0
-  - python >=3.14,<3.15.0a0
-  - python >=3.14,<3.15.0a0 *_cp314
+  - python >=3.14.0rc2,<3.15.0a0
+  - python >=3.14.0rc2,<3.15.0a0 *_cp314
   - python_abi 3.14.* *_cp314
   - setuptools
-  - urllib3 >=2.2.2
+  - urllib3 >=1.25
   constrains:
   - __osx >=11.0
   license: Apache-2.0
   license_family: Apache
-  size: 1513604
-  timestamp: 1761809333794
+  size: 1229127
+  timestamp: 1756870354785
 - conda: https://conda.anaconda.org/conda-forge/win-64/dulwich-0.24.1-py310hf13f778_0.conda
   sha256: f46f1ec0c26d6b2489fa69a456b5c4c85dfdccd75d4316ab9d4b759fa98d4955
   md5: 4983d4aadc3559ab61d399d7b3c1dc72
@@ -7770,21 +7770,21 @@ packages:
   license_family: Apache
   size: 1091391
   timestamp: 1754084147241
-- conda: https://conda.anaconda.org/conda-forge/win-64/dulwich-0.24.8-py314h170c82c_0.conda
-  sha256: b6074e46d28626af5544ab39946e1e5c689c8d3ce4854cc9f61d75d3d0293920
-  md5: aaba628600c20b47c49e7ccb772ce3ad
+- conda: https://conda.anaconda.org/conda-forge/win-64/dulwich-0.24.1-py314h170c82c_1.conda
+  sha256: 043b706cb4d564133aa99cce64244008e43c93ea3a30a1a0ceb19a3feafa776d
+  md5: d90e74c6b070b9f0984f90fb67474939
   depends:
-  - python >=3.14,<3.15.0a0
+  - python >=3.14.0rc2,<3.15.0a0
   - python_abi 3.14.* *_cp314
   - setuptools
   - ucrt >=10.0.20348.0
-  - urllib3 >=2.2.2
+  - urllib3 >=1.25
   - vc >=14.3,<15
   - vc14_runtime >=14.44.35208
   license: Apache-2.0
   license_family: Apache
-  size: 1422733
-  timestamp: 1761809344157
+  size: 1145983
+  timestamp: 1756870368925
 - conda: https://conda.anaconda.org/conda-forge/noarch/exceptiongroup-1.3.0-pyhd8ed1ab_0.conda
   sha256: ce61f4f99401a4bd455b89909153b40b9c823276aefcbb06f2044618696009ca
   md5: 72e42d28960d875c7654614f8b50939a
