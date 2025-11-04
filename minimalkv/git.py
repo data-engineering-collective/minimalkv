@@ -2,7 +2,7 @@ import re
 import time
 from collections.abc import Iterator
 from io import BytesIO
-from typing import BinaryIO, Optional, Union
+from typing import BinaryIO
 
 from dulwich.objects import Blob, Commit, Tree
 from dulwich.repo import Repo
@@ -15,7 +15,7 @@ def _on_tree(
     repo: Repo,
     tree: Tree,
     components: list[bytes],
-    obj: Optional[Union[Blob, Tree]],
+    obj: Blob | Tree | None,
 ) -> list[Tree]:
     """Mount an object on a tree, using the given path components.
 
@@ -42,7 +42,7 @@ def _on_tree(
     # pattern-matching:
     if len(components) == 1:
         if isinstance(obj, Blob):
-            mode: Optional[int] = 0o100644
+            mode: int | None = 0o100644
         elif isinstance(obj, Tree):
             mode = 0o040000
         elif obj is None:

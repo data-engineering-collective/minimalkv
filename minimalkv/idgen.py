@@ -17,7 +17,7 @@ import hashlib
 import os
 import tempfile
 import uuid
-from typing import BinaryIO, Optional, Union
+from typing import BinaryIO
 
 from minimalkv.decorator import StoreDecorator
 
@@ -43,7 +43,7 @@ class HashDecorator(StoreDecorator):
         self._template = template
         super().__init__(decorated_store)
 
-    def put(self, key: Optional[str], data: bytes, *args, **kwargs):
+    def put(self, key: str | None, data: bytes, *args, **kwargs):
         """Store bytestring data at key.
 
         Parameters
@@ -71,7 +71,7 @@ class HashDecorator(StoreDecorator):
 
         return self._dstore.put(key, data, *args, **kwargs)  # type: ignore
 
-    def put_file(self, key: Optional[str], file: Union[str, BinaryIO], *args, **kwargs):
+    def put_file(self, key: str | None, file: str | BinaryIO, *args, **kwargs):
         """Store contents of file at key.
 
         Store data from a file into key. ``file`` can be a string, which will be
@@ -171,7 +171,7 @@ class UUIDDecorator(StoreDecorator):
         super().__init__(store)
         self._template = template
 
-    def put(self, key: Optional[str], data: bytes, *args, **kwargs) -> str:
+    def put(self, key: str | None, data: bytes, *args, **kwargs) -> str:
         """Store bytestring data at key.
 
         Parameters
@@ -198,7 +198,7 @@ class UUIDDecorator(StoreDecorator):
 
         return self._dstore.put(self._template.format(key), data, *args, **kwargs)  # type: ignore
 
-    def put_file(self, key: Optional[str], file: Union[str, BinaryIO], *args, **kwargs):
+    def put_file(self, key: str | None, file: str | BinaryIO, *args, **kwargs):
         """Store contents of file at key.
 
         Store data from a file into key. ``file`` can be a string, which will be

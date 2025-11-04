@@ -2,7 +2,6 @@ import io
 from collections.abc import Iterator
 from contextlib import contextmanager
 from shutil import copyfileobj
-from typing import Optional
 
 from minimalkv import CopyMixin, KeyValueStore, UrlMixin
 
@@ -96,7 +95,7 @@ class Boto3Store(KeyValueStore, UrlMixin, CopyMixin):  # noqa D
     def __init__(
         self,
         bucket,
-        prefix: Optional[str] = None,
+        prefix: str | None = None,
         object_prefix: str = "",
         url_valid_time: int = 0,
         reduced_redundancy: bool = False,

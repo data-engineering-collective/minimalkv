@@ -1,4 +1,4 @@
-from typing import BinaryIO, Union
+from typing import BinaryIO
 
 from minimalkv._key_value_store import KeyValueStore
 from minimalkv.decorator import StoreDecorator
@@ -81,7 +81,7 @@ class CacheDecorator(StoreDecorator):
             # cache error, ignore completely and return from backend
             return self._dstore.get(key)
 
-    def get_file(self, key: str, file: Union[str, BinaryIO]) -> str:
+    def get_file(self, key: str, file: str | BinaryIO) -> str:
         """Write data at key to file.
 
         If a cache miss occurs, the value is retrieved, stored in the cache and
@@ -205,7 +205,7 @@ class CacheDecorator(StoreDecorator):
         finally:
             self.cache.delete(key)
 
-    def put_file(self, key: str, file: Union[str, BinaryIO]) -> str:
+    def put_file(self, key: str, file: str | BinaryIO) -> str:
         """Store contents of file at key.
 
         Will store the value in the backing store. Afterwards delete the (original)

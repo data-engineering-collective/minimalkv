@@ -1,7 +1,7 @@
 from collections.abc import Iterator
 from io import BytesIO
 from types import TracebackType
-from typing import BinaryIO, Optional, Union
+from typing import BinaryIO
 
 from uritools import SplitResult
 
@@ -48,7 +48,7 @@ class KeyValueStore:
         """
         return self.iter_keys()
 
-    def delete(self, key: str) -> Optional[str]:
+    def delete(self, key: str) -> str | None:
         """Delete data at key.
 
         Does not raise an error if the key does not exist.
@@ -93,7 +93,7 @@ class KeyValueStore:
         self._check_valid_key(key)
         return self._get(key)
 
-    def get_file(self, key: str, file: Union[str, BinaryIO]) -> str:
+    def get_file(self, key: str, file: str | BinaryIO) -> str:
         """Write data at key to file.
 
         Like :meth:`~mininmalkv.KeyValueStore.put_file`, this method allows backends to
@@ -241,7 +241,7 @@ class KeyValueStore:
             raise OSError("Provided data is not of type bytes")
         return self._put(key, data)
 
-    def put_file(self, key: str, file: Union[str, BinaryIO]) -> str:
+    def put_file(self, key: str, file: str | BinaryIO) -> str:
         """Store contents of file at key.
 
         Store data from a file into key. ``file`` can be a string, which will be
@@ -451,9 +451,9 @@ class KeyValueStore:
 
     def __exit__(
         self,
-        exc_type: Optional[type[BaseException]],
-        exc_val: Optional[BaseException],
-        exc_tb: Optional[TracebackType],
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
     ):
         """Support with clause for automatic calling of close.
 

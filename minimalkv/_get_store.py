@@ -1,5 +1,5 @@
 from functools import reduce
-from typing import Any, Optional
+from typing import Any
 
 from uritools import SplitResult, urisplit
 
@@ -8,7 +8,7 @@ from minimalkv._urls import url2dict
 
 
 def get_store_from_url(
-    url: str, store_cls: Optional[type[KeyValueStore]] = None
+    url: str, store_cls: type[KeyValueStore] | None = None
 ) -> KeyValueStore:
     """Take a URL and return a minimalkv store according to the parameters in the URL.
 

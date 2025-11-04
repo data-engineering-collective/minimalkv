@@ -1,6 +1,5 @@
 from collections.abc import Iterator
 from io import BytesIO
-from typing import Optional
 
 from uritools import SplitResult
 
@@ -17,7 +16,7 @@ class DictStore(KeyValueStore, CopyMixin):
 
     d: dict[str, bytes]
 
-    def __init__(self, d: Optional[dict[str, bytes]] = None):
+    def __init__(self, d: dict[str, bytes] | None = None):
         self.d = d or {}
 
     def _delete(self, key: str) -> None:

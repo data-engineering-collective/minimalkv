@@ -1,5 +1,6 @@
+from collections.abc import Callable
 from io import BytesIO
-from typing import BinaryIO, Callable, Optional, Union
+from typing import BinaryIO
 
 from minimalkv._constants import FOREVER, NOT_SET, VALID_KEY_RE_EXTENDED
 
@@ -85,9 +86,7 @@ class TimeToLiveMixin:
     default_ttl_secs = NOT_SET
     _check_valid_key: Callable
 
-    def _valid_ttl(
-        self, ttl_secs: Optional[Union[float, int, str]]
-    ) -> Union[float, int, str]:
+    def _valid_ttl(self, ttl_secs: float | int | str | None) -> float | int | str:
         """Check ``ttl_secs`` for validity and replace ``None`` with default.
 
         Parameters
@@ -111,7 +110,7 @@ class TimeToLiveMixin:
         if ttl_secs in (FOREVER, NOT_SET):
             return ttl_secs
 
-        if not isinstance(ttl_secs, (int, float)):
+        if not isinstance(ttl_secs, int | float):
             raise ValueError(f"Not a valid ttl_secs value: {ttl_secs}")
 
         if ttl_secs < 0:
@@ -120,7 +119,7 @@ class TimeToLiveMixin:
         return ttl_secs
 
     def put(
-        self, key: str, data: bytes, ttl_secs: Optional[Union[str, float, int]] = None
+        self, key: str, data: bytes, ttl_secs: str | float | int | None = None
     ) -> str:
         """Store bytestring data at key.
 
@@ -161,8 +160,8 @@ class TimeToLiveMixin:
     def put_file(
         self,
         key: str,
-        file: Union[str, BinaryIO],
-        ttl_secs: Optional[Union[float, int, str]] = None,
+        file: str | BinaryIO,
+        ttl_secs: float | int | str | None = None,
     ) -> str:
         """Store contents of file at key.
 
@@ -210,7 +209,7 @@ class TimeToLiveMixin:
 
     # default implementations similar to KeyValueStore below:
     def _put(
-        self, key: str, data: bytes, ttl_secs: Optional[Union[str, float, int]] = None
+        self, key: str, data: bytes, ttl_secs: str | float | int | None = None
     ) -> str:
         """Store bytestring data at key.
 
@@ -235,7 +234,7 @@ class TimeToLiveMixin:
         self,
         key: str,
         file: BinaryIO,
-        ttl_secs: Optional[Union[str, float, int]] = None,
+        ttl_secs: str | float | int | None = None,
     ):
         """Store contents of file at key.
 
@@ -257,7 +256,7 @@ class TimeToLiveMixin:
         raise NotImplementedError
 
     def _put_filename(
-        self, key: str, filename: str, ttl_secs: Optional[Union[str, float, int]] = None
+        self, key: str, filename: str, ttl_secs: str | float | int | None = None
     ):
         """Store contents of file at key.
 
@@ -397,7 +396,7 @@ class ExtendedKeyspaceMixin:
 
     """
 
-    def _check_valid_key(self, key: Optional[str]) -> None:
+    def _check_valid_key(self, key: str | None) -> None:
         """Check if a key is valid and raises a ValueError if its not.
 
         When in need of checking a key for validity, always use this

@@ -2,7 +2,6 @@
 
 import io
 from contextlib import contextmanager
-from typing import Optional
 
 from minimalkv._key_value_store import KeyValueStore
 from minimalkv.net._azurestore_common import _byte_buffer_md5, _file_md5
@@ -50,8 +49,8 @@ class AzureBlockBlobStore(KeyValueStore):  # noqa D
         self.max_block_size = max_block_size
         self.max_single_put_size = max_single_put_size
         self.checksum = checksum
-        self._service_client: Optional[BlobServiceClient] = None
-        self._container_client: Optional[ContainerClient] = None
+        self._service_client: BlobServiceClient | None = None
+        self._container_client: ContainerClient | None = None
 
     # Using @lazy_property will (re-)create block_blob_service instance needed.
     # Together with the __getstate__ implementation below, this allows

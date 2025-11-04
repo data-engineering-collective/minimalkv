@@ -1,7 +1,7 @@
 import io
 import warnings
 from collections.abc import Iterator
-from typing import TYPE_CHECKING, BinaryIO, Optional, Union
+from typing import TYPE_CHECKING, BinaryIO, Optional
 
 from minimalkv.net._net_common import LAZY_PROPERTY_ATTR_PREFIX, lazy_property
 
@@ -55,7 +55,7 @@ class FSSpecStoreEntry(io.BufferedIOBase):
             raise ValueError("I/O operation on closed file.")
         return self._file.tell()
 
-    def read(self, size: Optional[int] = -1) -> bytes:
+    def read(self, size: int | None = -1) -> bytes:
         """Return first ``size`` bytes of data.
 
         If no size is given all data is returned.
@@ -86,7 +86,7 @@ class FSSpecStore(KeyValueStore):
         self,
         prefix: str = "",
         mkdir_prefix: bool = True,
-        write_kwargs: Optional[dict] = None,
+        write_kwargs: dict | None = None,
         custom_fs: Optional["AbstractFileSystem"] = None,
     ):
         """Initialize an FSSpecStore.
@@ -112,7 +112,7 @@ class FSSpecStore(KeyValueStore):
         self._custom_fs = custom_fs
 
     @lazy_property
-    def _prefix_exists(self) -> Union[None, bool]:
+    def _prefix_exists(self) -> None | bool:
         from google.auth.exceptions import RefreshError
 
         # Check if prefix exists.

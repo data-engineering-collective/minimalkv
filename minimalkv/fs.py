@@ -2,8 +2,8 @@ import os
 import os.path
 import shutil
 import urllib.parse
-from collections.abc import Iterator
-from typing import Any, BinaryIO, Callable, Optional, Union, cast
+from collections.abc import Callable, Iterator
+from typing import Any, BinaryIO, cast
 
 from minimalkv._key_value_store import KeyValueStore
 from minimalkv._mixins import CopyMixin, UrlMixin
@@ -32,10 +32,10 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
     """
 
     root: str
-    perm: Optional[int]
+    perm: int | None
     bufsize: int
 
-    def __init__(self, root: str, perm: Optional[int] = None):
+    def __init__(self, root: str, perm: int | None = None):
         super().__init__()
         self.root = str(root)
         self.perm = perm
@@ -200,7 +200,7 @@ class FilesystemStore(KeyValueStore, UrlMixin, CopyMixin):
     ) -> Iterator[str]:
         if delimiter in prefix:
             pos = prefix.rfind(delimiter)
-            search_prefix: Optional[str] = prefix[:pos]
+            search_prefix: str | None = prefix[:pos]
             path = os.path.join(self.root, cast(str, search_prefix))
         else:
             search_prefix = None
@@ -262,9 +262,7 @@ class WebFilesystemStore(FilesystemStore):
     https://some.domain.invalid/files/some_key
     """
 
-    def __init__(
-        self, root, url_prefix: Union[Callable[[Any, str], str], str], **kwargs
-    ):
+    def __init__(self, root, url_prefix: Callable[[Any, str], str] | str, **kwargs):
         super().__init__(root, **kwargs)
 
         self.url_prefix = url_prefix
