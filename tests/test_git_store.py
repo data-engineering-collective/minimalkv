@@ -1,6 +1,9 @@
+from typing import cast
+
 import pytest
 from basic_store import BasicStore
 from conftest import ExtendedKeyspaceTests
+from dulwich.objects import Blob, Commit, Tree
 from dulwich.repo import Repo
 from idgens import HashGen, UUIDGen
 
@@ -43,11 +46,11 @@ class TestGitCommitStore(BasicStore, UUIDGen, HashGen):
             fn = sdir + "/" + fn
 
         repo = Repo(repo_path)
-        commit = repo[repo.refs[b"refs/heads/" + branch]]
-        tree = repo[commit.tree]
+        commit: Commit = cast(Commit, repo[repo.refs[b"refs/heads/" + branch]])
+        tree: Tree = cast(Tree, repo[commit.tree])
         _, blob_id = tree.lookup_path(repo.__getitem__, fn.encode("ascii"))
 
-        assert repo[blob_id].data == b"bar"
+        assert cast(Blob, repo[blob_id]).data == b"bar"
 
         # add a second key, resulting in a new commit and two keys available
         store.put("foo2", b"bar2")
@@ -57,16 +60,16 @@ class TestGitCommitStore(BasicStore, UUIDGen, HashGen):
             fn = sdir + "/" + fn
 
         repo = Repo(repo_path)
-        commit = repo[repo.refs[b"refs/heads/" + branch]]
-        tree = repo[commit.tree]
+        commit = cast(Commit, repo[repo.refs[b"refs/heads/" + branch]])
+        tree = cast(Tree, repo[commit.tree])
         _, blob_id = tree.lookup_path(repo.__getitem__, fn.encode("ascii"))
-        assert repo[blob_id].data == b"bar"
+        assert cast(Blob, repo[blob_id]).data == b"bar"
 
         fn2 = "foo2"
         if sdir:
             fn2 = sdir + "/" + fn2
         _, blob_id = tree.lookup_path(repo.__getitem__, fn2.encode("ascii"))
-        assert repo[blob_id].data == b"bar2"
+        assert cast(Blob, repo[blob_id]).data == b"bar2"
 
 
 class TestExtendedKeyspaceGitStore(TestGitCommitStore, ExtendedKeyspaceTests):

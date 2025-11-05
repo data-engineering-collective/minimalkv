@@ -2,9 +2,9 @@ import re
 import time
 from collections.abc import Iterator
 from io import BytesIO
-from typing import BinaryIO
+from typing import BinaryIO, cast
 
-from dulwich.objects import Blob, Commit, Tree
+from dulwich.objects import Blob, Commit, ShaFile, Tree, TreeEntry
 from dulwich.repo import Repo
 
 from minimalkv import __version__
@@ -99,7 +99,7 @@ class GitCommitStore(KeyValueStore):
     TIMEZONE = None
 
     def __init__(self, repo_path: str, branch: bytes = b"master", subdir: bytes = b""):
-        self.repo = Repo(repo_path)
+        self.repo: Repo = Repo(repo_path)
         self.branch = branch
 
         # cleans up subdir, to a form of 'a/b/c' (no duplicate, leading or
@@ -114,10 +114,10 @@ class GitCommitStore(KeyValueStore):
         return [c.encode("ascii") for c in key.split("/")]
 
     @property
-    def _refname(self):
+    def _refname(self) -> bytes:
         return b"refs/heads/" + self.branch
 
-    def _create_top_commit(self):
+    def _create_top_commit(self) -> Commit:
         # get the top commit, create empty one if it does not exist
         commit = Commit()
 
@@ -137,13 +137,13 @@ class GitCommitStore(KeyValueStore):
 
     def _delete(self, key: str) -> None:
         try:
-            commit = self.repo[self._refname]
-            tree = self.repo[commit.tree]
+            commit: Commit = cast(Commit, self.repo[self._refname])
+            tree: Tree = cast(Tree, self.repo[commit.tree])
         except KeyError:
             return  # not-found key errors are ignored
 
         commit = self._create_top_commit()
-        objects_to_add = []
+        objects_to_add: list[ShaFile] = []
 
         components = self._key_components(key)
         if self.subdir:
@@ -168,11 +168,11 @@ class GitCommitStore(KeyValueStore):
     def _get(self, key: str) -> bytes:
         # might raise key errors, except block corrects param
         try:
-            commit = self.repo[self._refname]
-            tree = self.repo[commit.tree]
+            commit: Commit = cast(Commit, self.repo[self._refname])
+            tree: Tree = cast(Tree, self.repo[commit.tree])
             fn = self.subdir + "/" + key
             _, blob_id = tree.lookup_path(self.repo.__getitem__, fn.encode("ascii"))
-            blob = self.repo[blob_id]
+            blob: Blob = cast(Blob, self.repo[blob_id])
         except KeyError as e:
             raise KeyError(key) from e
 
@@ -180,23 +180,27 @@ class GitCommitStore(KeyValueStore):
 
     def iter_keys(self, prefix: str = "") -> Iterator[str]:  # noqa D
         try:
-            commit = self.repo[self._refname]
-            tree = self.repo[commit.tree]
+            commit: Commit = cast(Commit, self.repo[self._refname])
+            tree: Tree = cast(Tree, self.repo[commit.tree])
 
             if self.subdir:
-                tree = self.repo[
-                    tree.lookup_path(
-                        self.repo.__getitem__, self.subdir.encode("ascii")
-                    )[1]
-                ]
+                tree = cast(
+                    Tree,
+                    self.repo[
+                        tree.lookup_path(
+                            self.repo.__getitem__, self.subdir.encode("ascii")
+                        )[1]
+                    ],
+                )
         except KeyError:
             pass
         else:
             for o in self.repo.object_store.iter_tree_contents(
                 tree.sha().hexdigest().encode("ascii")
             ):
-                if o.path.decode("ascii").startswith(prefix):
-                    yield o.path.decode("ascii")
+                o_ = cast(TreeEntry, o)
+                if o_.path.decode("ascii").startswith(prefix):
+                    yield o_.path.decode("ascii")
 
     def _open(self, key: str) -> BinaryIO:
         return BytesIO(self._get(key))
@@ -214,16 +218,17 @@ class GitCommitStore(KeyValueStore):
 
         blob = Blob.from_string(data)
 
+        tree: Tree
         try:
-            parent_commit = self.repo[self._refname]
+            parent_commit: Commit = cast(Commit, self.repo[self._refname])
         except KeyError:
             # branch does not exist, start with an empty tree
             tree = Tree()
         else:
             commit.parents = [parent_commit.id]
-            tree = self.repo[parent_commit.tree]
+            tree = cast(Tree, self.repo[parent_commit.tree])
 
-        objects_to_add = [blob]
+        objects_to_add: list[ShaFile] = [blob]
 
         components = self._key_components(key)
         if self.subdir:
