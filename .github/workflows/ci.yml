@@ -32,6 +32,7 @@ jobs:
           - py310
           - py311
           - py312
+          - py313
     services:
       postgres:
         image: postgres:11
