@@ -10,7 +10,7 @@ postinstall = "pip install --no-build-isolation --no-deps --disable-pip-version-
 python = ">=3.10"
 azure-storage-blob = "*"
 boto = "*"
-boto3 = "<1.40"
+boto3 = "*"
 dulwich = "*"
 fsspec = "<2025.10.0"
 gcsfs = ">=2022.10.0"

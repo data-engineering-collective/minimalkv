@@ -18,7 +18,7 @@ class User(NamedTuple):
 
     def get_store_from_config(self):
         return get_store_from_url(
-            f"hs3://{self.access_key}:{self.secret_key}@localhost:9000/{self.bucket_name}?force_bucket_suffix=false&verify=false"
+            f"hs3://{self.access_key}:{self.secret_key}@localhost:9000/{self.bucket_name}?force_bucket_suffix=false&verify=false&is_secure=false"
         )
 
 
