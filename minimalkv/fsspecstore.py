@@ -223,7 +223,7 @@ class FSSpecStore(KeyValueStore):
             fs = self._create_filesystem()
 
         if self._mkdir_prefix and not fs.exists(self._prefix):
-            fs.mkdir(self._prefix)
+            fs.mkdir(self._prefix, create_parents=True)
         return fs
 
     # Skips lazy properties.
