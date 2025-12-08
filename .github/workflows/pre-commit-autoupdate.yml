@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout branch
-        uses: actions/checkout@v6.0.0
+        uses: actions/checkout@v6.0.1
         # We need to checkout with SSH here to have actions run on the PR.
         with:
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
@@ -28,7 +28,7 @@ jobs:
           pixi run pre-commit-update
           pixi run pre-commit-run --color=always --show-diff-on-failure || true
 
-      - uses: peter-evans/create-pull-request@84ae59a2cdc2258d6fa0732dd66352dddae2a412
+      - uses: peter-evans/create-pull-request@22a9089034f40e5a961c8808d113e2c98fb63676
         with:
           commit-message: "Auto-update pre-commit hooks"
           title: "Auto-update pre-commit hooks"
