@@ -4,7 +4,8 @@ from collections.abc import Iterator
 from io import BytesIO
 from typing import BinaryIO, cast
 
-from dulwich.objects import Blob, Commit, ShaFile, Tree, TreeEntry
+from dulwich.objects import Blob, Commit, ObjectID, ShaFile, Tree, TreeEntry
+from dulwich.refs import Ref
 from dulwich.repo import Repo
 
 from minimalkv import __version__
@@ -163,7 +164,7 @@ class GitCommitStore(KeyValueStore):
         for obj in objects_to_add:
             self.repo.object_store.add_object(obj)
 
-        self.repo.refs[self._refname] = commit.id
+        self.repo.refs[cast(Ref, self._refname)] = commit.id
 
     def _get(self, key: str) -> bytes:
         # might raise key errors, except block corrects param
@@ -196,7 +197,7 @@ class GitCommitStore(KeyValueStore):
             pass
         else:
             for o in self.repo.object_store.iter_tree_contents(
-                tree.sha().hexdigest().encode("ascii")
+                cast(ObjectID, tree.sha().hexdigest().encode("ascii"))
             ):
                 o_ = cast(TreeEntry, o)
                 if o_.path.decode("ascii").startswith(prefix):
@@ -244,6 +245,6 @@ class GitCommitStore(KeyValueStore):
             self.repo.object_store.add_object(obj)
 
         # update refs
-        self.repo.refs[self._refname] = commit.id
+        self.repo.refs[cast(Ref, self._refname)] = commit.id
 
         return key
