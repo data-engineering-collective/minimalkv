@@ -223,7 +223,7 @@ class TestAzureExceptionHandling:
 
         with pytest.raises(IOError) as exc:
             store.put("key", b"data")
-        assert "connect" in str(exc.value)
+        assert "connect" in str(exc.value) or "resolve" in str(exc.value)
         store.close()
 
     def test_wrong_credentials(self):

@@ -10,7 +10,7 @@ services:
     container_name: azurite
     ports:
       - 10000:10000
-    command: azurite-blob --blobHost 0.0.0.0 --loose
+    command: azurite-blob --blobHost 0.0.0.0 --loose --skipApiVersionCheck
   minio:
     build:
       context: tests/minio-container
