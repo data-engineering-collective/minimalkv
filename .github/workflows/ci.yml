@@ -71,12 +71,6 @@ jobs:
           workload_identity_provider: "projects/498651197656/locations/global/workloadIdentityPools/qc-minimalkv-gh-actions-pool/providers/github-actions-provider"
           service_account: "sa-github-actions@qc-minimalkv.iam.gserviceaccount.com"
           token_format: "access_token"
-      - name: Authenticate to AWS
-        if: steps.check-id-token.outcome == 'success'
-        uses: aws-actions/configure-aws-credentials@v5
-        with:
-          role-to-assume: arn:aws:iam::211125346859:role/github-poweruser
-          aws-region: eu-central-1
 
       # We set an env variable according to the result of the check
       # to only allow skipping of aws integration test when in fork.
