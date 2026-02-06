@@ -12,8 +12,8 @@ from minimalkv.net.gcstore import GoogleCloudStore
 storage = pytest.importorskip(
     "google.cloud.storage", reason="'google.cloud.storage' is not available"
 )
+from gcsfs.retry import HttpError
 from google.auth.credentials import AnonymousCredentials
-from google.auth.exceptions import RefreshError
 
 
 def test_create_store_gcstore(mocker):
@@ -104,5 +104,5 @@ def test_complete():
     assert isinstance(store, GoogleCloudStore)
     assert store.bucket_name == expected["bucket_name"]  # type: ignore
     assert store.project_name == "central-splice-296415"  # type: ignore
-    with pytest.raises(RefreshError):
+    with pytest.raises(HttpError):
         store.get("somekey")
