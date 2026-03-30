@@ -87,7 +87,7 @@ jobs:
             do sleep 3; done
       - name: Run pytest
         run: pixi run -e ${{ matrix.environment }} pytest -n auto --dist loadfile -rs --cov=minimalkv --cov-report=xml --color=yes --cov-report=term-missing -m "not gcs"
-      - uses: codecov/codecov-action@v5
+      - uses: codecov/codecov-action@v6
         with:
           file: ./coverage.xml
 
