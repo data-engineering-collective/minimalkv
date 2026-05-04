@@ -1,6 +1,12 @@
 Changelog
 *********
 
+1.11.2
+======
+* Fix ``S3FSStore`` credential fallback from environment variables when creating
+  ``s3://`` or ``hs3://`` stores without credentials in the URL. The access key
+  ID is now assigned correctly, and ``AWS_SESSION_TOKEN`` is propagated.
+
 1.11.1
 ======
 * Remove hard dependency of aiobotocore in the S3FSStore.
