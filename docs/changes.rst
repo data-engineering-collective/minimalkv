@@ -1,7 +1,7 @@
 Changelog
 *********
 
-1.11.2
+1.11.3
 ======
 * Fix ``S3FSStore`` credential fallback from environment variables when creating
   ``s3://`` or ``hs3://`` stores without credentials in the URL. The access key
