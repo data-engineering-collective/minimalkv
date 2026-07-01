@@ -54,8 +54,9 @@ def url2dict(url: str, raise_on_extra_params: bool = False) -> dict[str, Any]:
         wrappers = wrap_spec[-1].partition("wrap:")[2]  # remove the 'wrap:' part
         params["wrap"] = wrappers
 
-    if "create_if_missing" in parsed["query"]:
-        create_if_missing = parsed["query"].pop("create_if_missing")[
+    query = parsed["query"]
+    if isinstance(query, dict) and "create_if_missing" in query:
+        create_if_missing = query.pop("create_if_missing")[
             -1
         ]  # use last appearance of key
         params["create_if_missing"] = create_if_missing in TRUEVALUES
