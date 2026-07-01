@@ -67,9 +67,10 @@ def get_store_from_url(
     wrappers = _extract_wrappers(parsed_url)
 
     # Remove wrappers from scheme
-    scheme_parts = parsed_url.getscheme().split("+")
+    scheme_str = parsed_url.getscheme()
+    scheme_parts = scheme_str.split("+") if scheme_str else []
     # pop off the type of the store
-    scheme = scheme_parts[0]
+    scheme = scheme_parts[0] if scheme_parts else ""
 
     if scheme not in scheme_to_store:
         # If we can't find the scheme, we fall back to the old creation methods
@@ -81,9 +82,9 @@ def get_store_from_url(
             f"URL scheme {scheme} does not match store class {store_cls.__name__}"
         )
 
-    query_listdict: dict[str, list[str]] = parsed_url.getquerydict()
-    # We will just use the last occurrence for each key
-    query = {k: v[-1] for k, v in query_listdict.items()}
+    query_listdict: dict[str, list[str | None]] = parsed_url.getquerydict()
+    # We will just use the last occurrence for each key, skipping None values
+    query = {k: v[-1] for k, v in query_listdict.items() if v[-1] is not None}
 
     store = store_cls_from_url._from_parsed_url(parsed_url, query)
 
@@ -116,14 +117,18 @@ def _extract_wrappers(parsed_url: SplitResult) -> list[str]:
         The list of wrappers.
     """
     # Find wrappers in scheme, looking like this: "s3+readonly+urlencode://..."
-    parts = parsed_url.getscheme().split("+")
+    scheme_str = parsed_url.getscheme()
+    parts = scheme_str.split("+") if scheme_str else []
     # pop off the type of the store
     parts.pop(0)
     scheme_wrappers = list(reversed(parts))
 
     # Find fragment wrappers, looking like this: "s3://...#wrap:readonly+urlencode"
     fragment = parsed_url.getfragment()
-    fragments = fragment.split("#") if fragment else []
+    if fragment:
+        fragments = fragment.split("#")
+    else:
+        fragments = []
     wrap_spec = [s for s in fragments if s.startswith("wrap:")]
     if wrap_spec:
         fragment_without_wrap = wrap_spec[-1].partition("wrap:")[
