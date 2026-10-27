@@ -1,4 +1,4 @@
-FROM minio/minio
+FROM pgsty/minio
 COPY scripts/startup.sh /startup.sh
 COPY policies /policies
 COPY files /files
