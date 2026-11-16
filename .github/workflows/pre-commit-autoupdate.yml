@@ -19,7 +19,7 @@ jobs:
         with:
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: Set up pixi
-        uses: prefix-dev/setup-pixi@ad1da6449d9e506fd127fd67ab2d054a769f6a94 # v0.11.2
+        uses: prefix-dev/setup-pixi@9936258fee697aff89b3fed6ca1f80a382ef694e # v0.11.3
         with:
           environments: default lint
       - name: Update pre-commit hooks and run
@@ -28,7 +28,7 @@ jobs:
           pixi run pre-commit-update
           pixi run pre-commit-run --color=always --show-diff-on-failure || true
 
-      - uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1
+      - uses: peter-evans/create-pull-request@3ffccacd46053766916f087ce41d627c0b8cf2d1
         with:
           commit-message: "Auto-update pre-commit hooks"
           title: "Auto-update pre-commit hooks"
